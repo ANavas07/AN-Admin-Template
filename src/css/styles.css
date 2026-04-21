@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+	--color-brand: #0ea55b;
+	--color-brand-soft: color-mix(in oklab, var(--color-brand) 24%, transparent);
+	--color-highlight: #0ea5e9;
+	--color-highlight-soft: color-mix(in oklab, var(--color-highlight) 24%, transparent);
+}
+
+:root {
+	--color-bg: #f4f8f3;
+	--color-bg-soft: #eaf2e8;
+	--color-surface: #ffffff;
+	--color-text: #182222;
+	--color-text-muted: #536369;
+	--color-border: #d2dfd5;
+}
+
+.dark {
+	--color-bg: #0c1518;
+	--color-bg-soft: #152227;
+	--color-surface: #111e23;
+	--color-text: #e5f1ef;
+	--color-text-muted: #a7bfbb;
+	--color-border: #274148;
+	--color-brand: #22c26f;
+	--color-highlight: #38bdf8;
+}
+
+html,
+body,
+#root {
+	min-height: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--color-bg);
+	color: var(--color-text);
+	transition: background-color 220ms ease, color 220ms ease;
+}
