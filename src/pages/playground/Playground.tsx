@@ -13,13 +13,19 @@ const playgroundNavItems: PlaygroundNavItem[] = [
         label: 'Inputs',
         description: 'Campos, busqueda y estados de formulario',
         path: '/playground/inputs',
-        icon: <InputIcon />,
+        icon: null,
     },
     {
-        label: 'Buttons',
+        label: 'Botones',
         description: 'Variantes, tamanos, estados e iconos',
         path: '/playground/buttons',
-        icon: <ButtonIcon />,
+        icon: null,
+    },
+    {
+        label: 'Tablas',
+        description: 'Ordenamiento, filtrado, paginacion y expansion',
+        path: '/playground/tables',
+        icon: null,
     },
 ]
 
@@ -27,45 +33,6 @@ function cn(...classes: Array<string | false | null | undefined>) {
     return classes.filter(Boolean).join(' ')
 }
 
-function SidebarIconWrapper({ children }: { children: ReactNode }) {
-    return (
-        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
-            {children}
-        </span>
-    )
-}
-
-function InputIcon() {
-    return (
-        <SidebarIconWrapper>
-            <svg viewBox="0 0 20 20" fill="none" className="size-5" aria-hidden="true">
-                <path
-                    d="M4 6.5h12M4 13.5h7M3.5 4h13A1.5 1.5 0 0 1 18 5.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 2 14.5v-9A1.5 1.5 0 0 1 3.5 4Z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-            </svg>
-        </SidebarIconWrapper>
-    )
-}
-
-function ButtonIcon() {
-    return (
-        <SidebarIconWrapper>
-            <svg viewBox="0 0 20 20" fill="none" className="size-5" aria-hidden="true">
-                <path
-                    d="M6.5 10h7M5 5.5h10a4.5 4.5 0 1 1 0 9H5a4.5 4.5 0 1 1 0-9Z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-            </svg>
-        </SidebarIconWrapper>
-    )
-}
 
 function DashboardIcon() {
     return (
@@ -84,7 +51,7 @@ function DashboardIcon() {
 export default function Playground() {
     return (
         <div className="min-h-[calc(100vh-4rem)] bg-(--color-bg)">
-            <div className="mx-auto grid max-w-[1600px] gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[300px_1fr] lg:px-8">
+            <div className="mx-auto grid max-w-400 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[300px_1fr] lg:px-8">
                 <aside className="lg:sticky lg:top-22 lg:h-[calc(100vh-6.5rem)]">
                     <div className="overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) shadow-sm">
                         <div className="border-b border-(--color-border) p-5">

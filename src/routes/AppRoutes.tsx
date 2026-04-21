@@ -3,6 +3,7 @@ import { ProtectedRoute } from './ProtectedRoute'
 import AdminPanel from '../features/admin-panel/AdminPanel'
 import InputCatalog from '../pages/playground/InputCatalog'
 import ButtonCatalog from '../pages/playground/ButtonCatalog'
+import TableCatalog from '../pages/playground/TableCatalog'
 import Playground from '../pages/playground/Playground'
 
 type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
@@ -44,6 +45,7 @@ export function AppRoutes({ currentRole, currentUser, isAuthenticated }: AppRout
           <Route index element={<Navigate to="/playground/inputs" replace />} />
           <Route path="inputs" element={<InputCatalog />} />
           <Route path="buttons" element={<ButtonCatalog />} />
+          <Route path="tables" element={<TableCatalog />} />
         </Route>
       </Route>
 
