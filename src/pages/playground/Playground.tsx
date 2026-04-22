@@ -27,6 +27,18 @@ const playgroundNavItems: PlaygroundNavItem[] = [
         path: '/playground/tables',
         icon: null,
     },
+    {
+        label: 'Gantt',
+        description: 'Diagrama de Gantt con tareas, dependencias y recursos',
+        path: '/gantt',
+        icon: null,
+    },
+    {
+        label: 'Formularios',
+        description: 'Formularios dinamicos, validacion y dependencias entre campos',
+        path: '/playground/forms',
+        icon: null,
+    }
 ]
 
 function cn(...classes: Array<string | false | null | undefined>) {
@@ -71,12 +83,16 @@ export default function Playground() {
                                 <NavLink
                                     key={item.path}
                                     to={item.path}
+                                    target={item.path === '/gantt' ? '_blank' : undefined}
+                                    rel={item.path === '/gantt' ? 'noreferrer noopener' : undefined}
                                     className={({ isActive }) =>
                                         cn(
                                             'group flex items-start gap-3 rounded-2xl border p-3 transition-all duration-200',
-                                            isActive
-                                                ? 'border-brand/40 bg-brand-soft text-brand shadow-sm'
-                                                : 'border-transparent text-(--color-text) hover:border-(--color-border) hover:bg-(--color-bg-soft)'
+                                            item.path === '/gantt'
+                                                ? 'border-transparent text-(--color-text) hover:border-(--color-border) hover:bg-(--color-bg-soft)'
+                                                : isActive
+                                                    ? 'border-brand/40 bg-brand-soft text-brand shadow-sm'
+                                                    : 'border-transparent text-(--color-text) hover:border-(--color-border) hover:bg-(--color-bg-soft)'
                                         )
                                     }
                                 >
@@ -88,6 +104,11 @@ export default function Playground() {
                                         <span className="mt-0.5 block text-xs leading-5 text-(--color-text-muted)">
                                             {item.description}
                                         </span>
+                                        {item.path === '/gantt' ? (
+                                            <span className="mt-1 inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-(--color-text-muted)">
+                                                Nueva ventana
+                                            </span>
+                                        ) : null}
                                     </span>
                                 </NavLink>
                             ))}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Navbar from '../components/common/navbar/navbar'
+import Navbar from '../components/common/navbar/Navbar'
 import { useTheme } from '../context/ThemeContext'
 import { AppRoutes } from '../routes/AppRoutes'
 

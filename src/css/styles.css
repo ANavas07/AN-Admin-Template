@@ -35,6 +35,20 @@ body,
 	min-height: 100%;
 }
 
+/* SVAR theme wrappers need explicit height to enable internal Gantt scrolling */
+.wx-material-theme,
+.wx-willow-theme,
+.wx-willow-dark-theme {
+	height: 100%;
+}
+
+/* ContextMenu (@svar-ui/react-menu) wraps children in a <span display:inline>.
+   That breaks height: 100% on the inner Gantt element (.wx-gantt). */
+span[data-menu-ignore] {
+	display: block;
+	height: 100%;
+}
+
 body {
 	margin: 0;
 	background: var(--color-bg);

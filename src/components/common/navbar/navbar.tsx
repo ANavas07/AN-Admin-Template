@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import ButtonComponent from '../../ui/buttons/ButtonComponent'
+import { SettingsIcon } from '../../../icons/icons'
 
 type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
 
@@ -81,6 +82,12 @@ export default function Navbar({
                     <ButtonComponent variant="primary" leftIcon="🏠" to={"/playground"}>
                         Playground Components
                     </ButtonComponent>
+                    <ButtonComponent variant="ghost" icon={<SettingsIcon />}
+                        iconPosition="right"
+                    >
+                        Super usuario
+                    </ButtonComponent>
+
 
                     {/* Rol selector */}
                     <select

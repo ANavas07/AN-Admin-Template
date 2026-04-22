@@ -5,6 +5,9 @@ import InputCatalog from '../pages/playground/InputCatalog'
 import ButtonCatalog from '../pages/playground/ButtonCatalog'
 import TableCatalog from '../pages/playground/TableCatalog'
 import Playground from '../pages/playground/Playground'
+import GanttCatalog from '../pages/playground/GanttCatalog'
+import GanttStandalone from '../pages/gantt/GanttStandalone'
+import FormsCatalog from '../pages/playground/FormsCatalog'
 
 type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
 
@@ -41,11 +44,14 @@ export function AppRoutes({ currentRole, currentUser, isAuthenticated }: AppRout
             />
           }
         />
+        <Route path="/gantt" element={<GanttStandalone />} />
         <Route path="/playground" element={<Playground />}>
           <Route index element={<Navigate to="/playground/inputs" replace />} />
           <Route path="inputs" element={<InputCatalog />} />
           <Route path="buttons" element={<ButtonCatalog />} />
           <Route path="tables" element={<TableCatalog />} />
+          <Route path="gantt" element={<GanttCatalog />} />
+          <Route path="forms" element={<FormsCatalog />} />
         </Route>
       </Route>
 

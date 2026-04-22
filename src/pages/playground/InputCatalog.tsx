@@ -1,6 +1,36 @@
 import { useMemo, useState } from 'react'
 import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
+import DataList from '../../components/ui/inputs/DataList'
 import InputComponent from '../../components/ui/inputs/InputComponent'
+
+type TournamentOption = {
+    id: string
+    name: string
+    category: string
+}
+
+const tournamentOptions: TournamentOption[] = [
+    {
+        id: 'champions-2026',
+        name: 'Champions Cup 2026',
+        category: 'Futbol / Senior',
+    },
+    {
+        id: 'juvenil-norte',
+        name: 'Liga Juvenil Norte',
+        category: 'Futbol / Sub 18',
+    },
+    {
+        id: 'basket-open',
+        name: 'Basket Open',
+        category: 'Baloncesto / Libre',
+    },
+    {
+        id: 'intercolegial',
+        name: 'Intercolegial Primavera',
+        category: 'Multideporte / Escolar',
+    },
+]
 
 function Block({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
     return (
@@ -17,6 +47,8 @@ export default function InputCatalogPlayground() {
     const [emailValue, setEmailValue] = useState('')
     const [nameValue, setNameValue] = useState('')
     const [quickValue, setQuickValue] = useState('')
+    const [tournamentValue, setTournamentValue] = useState('')
+    const [requiredTournamentValue, setRequiredTournamentValue] = useState('')
 
     const emailError = useMemo(() => {
         if (!emailValue) return ''
@@ -172,6 +204,71 @@ export default function InputCatalogPlayground() {
                             onChange={() => undefined}
                             disabled
                             fullWidth
+                        />
+                    </div>
+                </Block>
+
+                <Block
+                    title="DataList dinamico"
+                    description="Busqueda con seleccion por clave, detalle secundario y boton para limpiar."
+                >
+                    <div className="space-y-3">
+                        <DataList<TournamentOption>
+                            id="tournament"
+                            label="Torneo"
+                            placeholder="Busca un torneo"
+                            options={tournamentOptions}
+                            value={tournamentValue}
+                            opKey="id"
+                            opValue="name"
+                            optionP="category"
+                            hint="Guarda el id del torneo seleccionado, no el texto visible."
+                            onSelect={(event) => setTournamentValue(event.target.value)}
+                        />
+
+                        <div className="rounded-lg border border-(--color-border) bg-(--color-bg-soft) px-3 py-2 text-xs text-(--color-text-muted)">
+                            Valor seleccionado:{' '}
+                            <span className="font-semibold text-(--color-text)">
+                                {tournamentValue || 'ninguno'}
+                            </span>
+                        </div>
+                    </div>
+                </Block>
+
+                <Block
+                    title="DataList con validacion"
+                    description="Estado requerido, mensaje de error y estado deshabilitado."
+                >
+                    <div className="space-y-4">
+                        <DataList<TournamentOption>
+                            id="required-tournament"
+                            label="Campeonato principal"
+                            placeholder="Selecciona campeonato"
+                            options={tournamentOptions}
+                            value={requiredTournamentValue}
+                            opKey="id"
+                            opValue="name"
+                            optionP="category"
+                            requiredMark
+                            error={
+                                requiredTournamentValue
+                                    ? undefined
+                                    : 'Selecciona un campeonato para continuar.'
+                            }
+                            onSelect={(event) => setRequiredTournamentValue(event.target.value)}
+                        />
+
+                        <DataList<TournamentOption>
+                            id="disabled-tournament"
+                            label="Torneo bloqueado"
+                            placeholder="No disponible"
+                            options={tournamentOptions}
+                            value="champions-2026"
+                            opKey="id"
+                            opValue="name"
+                            optionP="category"
+                            disabled
+                            onSelect={() => undefined}
                         />
                     </div>
                 </Block>
