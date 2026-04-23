@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import ModuleCard from './ModuleCard'
+import InputComponent from '../ui/inputs/InputComponent'
 import SidebarPanel from './SidebarPanel'
-import InputComponent from '../../../components/ui/inputs/InputComponent'
+import ModuleCard from './ModuleCard'
 
 export type ModuleCategory = {
     name: string

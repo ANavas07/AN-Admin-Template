@@ -4,7 +4,7 @@ import type {
     ButtonSize,
     ButtonVariant,
 } from '../../components/ui/buttons/ButtonComponent'
-import { PlusIcon, SettingsIcon } from '../../icons/icons'
+import { ArrowRightIcon, ChartIcon, CheckIcon, PlusIcon, SearchIcon, SettingsIcon, TrashBinIcon } from '../../icons/icons'
 
 type CatalogSectionProps = {
     title: string
@@ -52,7 +52,7 @@ const variantExamples: VariantExample[] = [
     {
         label: 'Peligro',
         variant: 'danger',
-        icon: <TrashIcon />,
+        icon: <TrashBinIcon />,
     },
 ]
 
@@ -87,92 +87,6 @@ function CatalogSection({ title, description, children }: CatalogSectionProps) {
     )
 }
 
-function IconWrapper({ children }: { children: ReactNode }) {
-    return (
-        <span className="inline-flex size-5 items-center justify-center">
-            {children}
-        </span>
-    )
-}
-
-function ArrowRightIcon() {
-    return (
-        <IconWrapper>
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path
-                    d="M4 10h12m0 0-5-5m5 5-5 5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-            </svg>
-        </IconWrapper>
-    )
-}
-
-function SearchIcon() {
-    return (
-        <IconWrapper>
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path
-                    d="m14 14 3 3M8.5 15a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                />
-            </svg>
-        </IconWrapper>
-    )
-}
-
-
-function CheckIcon() {
-    return (
-        <IconWrapper>
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path
-                    d="m4 10.5 4 4L16 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-            </svg>
-        </IconWrapper>
-    )
-}
-
-function TrashIcon() {
-    return (
-        <IconWrapper>
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path
-                    d="M4 6h12M8 6V4h4v2M6 6l1 11h6l1-11"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-            </svg>
-        </IconWrapper>
-    )
-}
-
-function ChartIcon() {
-    return (
-        <IconWrapper>
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path
-                    d="M4 16V9M10 16V4M16 16v-6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                />
-            </svg>
-        </IconWrapper>
-    )
-}
 
 export default function ButtonCatalog() {
     return (
@@ -270,7 +184,7 @@ export default function ButtonCatalog() {
                         <ButtonComponent disabled variant="secondary" rightIcon={<ArrowRightIcon />}>
                             Accion bloqueada
                         </ButtonComponent>
-                        <ButtonComponent variant="danger" leftIcon={<TrashIcon />}>
+                        <ButtonComponent variant="danger" leftIcon={<TrashBinIcon />}>
                             Eliminar registro
                         </ButtonComponent>
                     </div>
@@ -324,7 +238,7 @@ export default function ButtonCatalog() {
                             aria-label="Eliminar"
                             title="Eliminar"
                         >
-                            <TrashIcon />
+                            <TrashBinIcon />
                         </ButtonComponent>
                     </div>
                 </CatalogSection>

@@ -11,12 +11,10 @@ import {
     type TableState,
     useReactTable,
 } from '@tanstack/react-table';
-import type { SVGProps } from 'react';
 import React, { useState } from 'react';
 import ButtonComponent from '../buttons/ButtonComponent';
 import InputComponent from '../../ui/inputs/InputComponent';
-
-type TableIconProps = SVGProps<SVGSVGElement>;
+import { ChevronIcon, EditIcon, PlusIcon, TrashBinIcon} from '../../../icons/icons';
 
 const statusStyles: Record<string, string> = {
     active: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-300',
@@ -30,84 +28,7 @@ function cn(...classes: Array<string | false | null | undefined>) {
     return classes.filter(Boolean).join(' ');
 }
 
-function ChevronDownIcon({ className, ...props }: TableIconProps) {
-    return (
-        <svg
-            viewBox="0 0 20 20"
-            fill="none"
-            className={className}
-            aria-hidden="true"
-            {...props}
-        >
-            <path
-                d="m5 7.5 5 5 5-5"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
-}
 
-function EditIcon({ className, ...props }: TableIconProps) {
-    return (
-        <svg
-            viewBox="0 0 20 20"
-            fill="none"
-            className={className}
-            aria-hidden="true"
-            {...props}
-        >
-            <path
-                d="M11.5 4.5 15 8m-9.5 7.5 3.3-.6 7.6-7.6a2.48 2.48 0 0 0-3.5-3.5L5.3 11.4l-.8 4.1Z"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
-}
-
-function PlusAddIcon({ className, ...props }: TableIconProps) {
-    return (
-        <svg
-            viewBox="0 0 20 20"
-            fill="none"
-            className={className}
-            aria-hidden="true"
-            {...props}
-        >
-            <path
-                d="M10 4v12M4 10h12"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-            />
-        </svg>
-    );
-}
-
-function TrashBinIcon({ className, ...props }: TableIconProps) {
-    return (
-        <svg
-            viewBox="0 0 20 20"
-            fill="none"
-            className={className}
-            aria-hidden="true"
-            {...props}
-        >
-            <path
-                d="M4 6h12M8 6V4h4v2M6 6l1 11h6l1-11"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
-}
 
 
 interface ReusableTableProps<T> {
@@ -155,10 +76,7 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                         }}
                         className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
                     >
-                        <ChevronDownIcon
-                            className={`w-4 h-4 transition-transform duration-200 ${row.getIsExpanded() ? 'rotate-180' : ''
-                                }`}
-                        />
+                        <ChevronIcon className={`w-4 h-4 transition-transform duration-200 ${row.getIsExpanded() ? 'rotate-180' : '' }`}/>
                     </button>
                 ),
                 size: 50,
@@ -241,7 +159,7 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                         <ButtonComponent
                             size="sm"
                             variant="primary"
-                            leftIcon={<PlusAddIcon className="size-5" />}
+                            leftIcon={<PlusIcon className="size-5" />}
                             onClick={onClickBtn}
                             className="w-full sm:w-auto text-xs lg:shrink-0"
                         >
@@ -249,7 +167,7 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                         </ButtonComponent>
                     )
                 }
-                <div className="w-full sm:flex-1 sm:max-w-[200px] lg:max-w-[300px]">
+                <div className="w-full sm:flex-1 sm:max-w-50 lg:max-w-75">
                     <InputComponent
                         inpPlaceHolder='Buscar...'
                         value={filter}
@@ -284,13 +202,13 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                                                     header.getContext()
                                                 )}
                                             {enableSorting && header.column.getCanSort() && (
-                                                <div className="flex flex-col flex-shrink-0">
+                                                <div className="flex flex-col shrink-0">
                                                     {header.column.getIsSorted() === 'asc' ? (
-                                                        <ChevronDownIcon className="w-4 h-4 text-brand rotate-180 transition-transform duration-200" />
+                                                        <ChevronIcon className="w-4 h-4 text-brand rotate-180 transition-transform duration-200" />
                                                     ) : header.column.getIsSorted() === 'desc' ? (
-                                                        <ChevronDownIcon className="w-4 h-4 text-brand transition-transform duration-200" />
+                                                        <ChevronIcon className="w-4 h-4 text-brand transition-transform duration-200" />
                                                     ) : (
-                                                        <ChevronDownIcon className="w-4 h-4 text-(--color-text-muted) transition-transform duration-200" />
+                                                        <ChevronIcon className="w-4 h-4 text-(--color-text-muted) transition-transform duration-200" />
                                                     )}
                                                 </div>
                                             )}
@@ -435,7 +353,7 @@ export const ActionCell = ({ onEdit, onDelete, onAdditional }: ActionCellProps) 
                 aria-label="Agregar"
                 title="Agregar"
             >
-                <PlusAddIcon className="h-5 w-5 text-green-600 dark:text-green-300" />
+                <PlusIcon className="h-5 w-5 text-green-600 dark:text-green-300" />
             </ButtonComponent>
         )}
     </div>

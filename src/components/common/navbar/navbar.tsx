@@ -59,6 +59,12 @@ export default function Navbar({
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
+
+    const handleLogout = () =>{
+        localStorage.removeItem('token')
+        window.location.href = '/login'
+    }
+
     return (
         <header className="sticky top-0 z-30 border-b border-(--color-border) bg-(--color-surface)/80 backdrop-blur">
             <div className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -166,7 +172,7 @@ export default function Navbar({
                                 <div className="border-t border-(--color-border) px-4 py-2">
                                     <button
                                         type="button"
-                                        onClick={() => setIsUserMenuOpen(false)}
+                                        onClick={handleLogout}
                                         className="w-full rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100 transition-colors dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
                                     >
                                         🚪 Cerrar sesión
@@ -288,7 +294,7 @@ export default function Navbar({
                                 <div className="border-t border-(--color-border) px-4 py-2">
                                     <button
                                         type="button"
-                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        onClick={handleLogout}
                                         className="w-full rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100 transition-colors dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
                                     >
                                         🚪 Cerrar sesión

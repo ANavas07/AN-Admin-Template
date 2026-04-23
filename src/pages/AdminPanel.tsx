@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import MainPanel from './components/MainPanel'
-import { MODULE_CATEGORIES } from './data/modules'
+import MainPanel from '../components/admin-panel/MainPanel'
+import { MODULE_CATEGORIES } from '../components/admin-panel/data/modules'
 
 type AdminPanelProps = {
     userRole: string

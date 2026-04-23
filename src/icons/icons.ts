@@ -1,8 +1,18 @@
-import {ReactComponent as PlusIcon} from './plus.svg?react';
-import {ReactComponent as SettingsIcon} from './settings.svg?react';
-import {ReactComponent as SearchIcon} from './searchIcon.svg?react';
-import {ReactComponent as ChevronIcon} from './chevron.svg?react';
-import {ReactComponent as ClearIcon} from './clear.svg?react';
+import { ReactComponent as PlusIcon } from './Plus.svg?react';
+import { ReactComponent as SettingsIcon } from './Settings.svg?react';
+import { ReactComponent as SearchIcon } from './Search.svg?react';
+import { ReactComponent as ChevronIcon } from './Chevron.svg?react';
+import { ReactComponent as ClearIcon } from './Clear.svg?react';
+import { ReactComponent as SparkIcon } from './Spark.svg?react';
+import { ReactComponent as ShieldIcon } from './Shield.svg?react';
+import { ReactComponent as EyeIcon } from './Eye.svg?react';
+import { ReactComponent as EyeOffIcon } from './EyeOff.svg?react';
+import { ReactComponent as EditIcon } from './Edit.svg?react';
+import { ReactComponent as TrashBinIcon } from './TrashBin.svg?react';
+import { ReactComponent as ArrowRightIcon } from './ArrowRight.svg?react';
+import { ReactComponent as CheckIcon } from './Check.svg?react';
+import { ReactComponent as ChartIcon } from './Chart.svg?react';
+
 
 
 export {
@@ -10,5 +20,14 @@ export {
     SettingsIcon,
     SearchIcon,
     ChevronIcon,
-    ClearIcon
+    ClearIcon,
+    SparkIcon,
+    ShieldIcon,
+    EyeIcon,
+    EyeOffIcon,
+    EditIcon,
+    TrashBinIcon,
+    ArrowRightIcon,
+    CheckIcon,
+    ChartIcon
 }
