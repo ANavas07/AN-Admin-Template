@@ -8,6 +8,7 @@ import Playground from '../pages/playground/Playground'
 import GanttCatalog from '../pages/playground/GanttCatalog'
 import GanttStandalone from '../pages/gantt/GanttStandalone'
 import FormsCatalog from '../pages/playground/FormsCatalog'
+import MainContentSP from '../pages/superuser/MainContentSP'
 
 type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
 
@@ -44,17 +45,23 @@ export function AppRoutes({ currentRole, currentUser, isAuthenticated }: AppRout
             />
           }
         />
-        <Route path="/gantt" element={<GanttStandalone />} />
-        <Route path="/playground" element={<Playground />}>
-          <Route index element={<Navigate to="/playground/inputs" replace />} />
-          <Route path="inputs" element={<InputCatalog />} />
-          <Route path="buttons" element={<ButtonCatalog />} />
-          <Route path="tables" element={<TableCatalog />} />
-          <Route path="gantt" element={<GanttCatalog />} />
-          <Route path="forms" element={<FormsCatalog />} />
-        </Route>
       </Route>
 
+      {/* COMPONENTES DE ESTILOS REUTILIZABLES */}
+      <Route path="/gantt" element={<GanttStandalone />} />
+      <Route path="/playground" element={<Playground />}>
+        <Route index element={<Navigate to="/playground/inputs" replace />} />
+        <Route path="inputs" element={<InputCatalog />} />
+        <Route path="buttons" element={<ButtonCatalog />} />
+        <Route path="tables" element={<TableCatalog />} />
+        <Route path="gantt" element={<GanttCatalog />} />
+        <Route path="forms" element={<FormsCatalog />} />
+      </Route>
+
+      {/*PANEL DE SUPERUSUARIO*/}
+      <Route path="/super" element={<MainContentSP/>}>
+          
+      </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )

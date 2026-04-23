@@ -84,6 +84,7 @@ export default function Navbar({
                     </ButtonComponent>
                     <ButtonComponent variant="ghost" icon={<SettingsIcon />}
                         iconPosition="right"
+                        to={"/super"}
                     >
                         Super usuario
                     </ButtonComponent>
@@ -118,7 +119,7 @@ export default function Navbar({
                             <span className="h-6 w-6 rounded-full bg-brand text-xs font-bold leading-6 text-white">
                                 {currentUser.name.charAt(0).toUpperCase()}
                             </span>
-                            <span className="max-w-[120px] truncate">
+                            <span className="max-w-30 truncate">
                                 {currentUser.name.split(' ')[0]}
                             </span>
                             <span className="text-xs opacity-60" aria-hidden="true">
