@@ -10,6 +10,7 @@ import GanttStandalone from '../pages/gantt/GanttStandalone'
 import FormsCatalog from '../pages/playground/FormsCatalog'
 import MainContentSP from '../pages/superuser/MainContentSP'
 import Login from '../pages/login/Login'
+import PopUpCatalog from '../pages/playground/PopUpCatalog'
 
 type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
 
@@ -88,6 +89,7 @@ export function AppRoutes({
         <Route path="tables" element={<TableCatalog />} />
         <Route path="gantt" element={<GanttCatalog />} />
         <Route path="forms" element={<FormsCatalog />} />
+        <Route path="modals" element={<PopUpCatalog />} />
       </Route>
 
       <Route path="/super" element={<MainContentSP />} />

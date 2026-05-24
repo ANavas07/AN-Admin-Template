@@ -38,6 +38,12 @@ const playgroundNavItems: PlaygroundNavItem[] = [
         description: 'Formularios dinamicos, validacion y dependencias entre campos',
         path: '/playground/forms',
         icon: null,
+    },
+    {
+        label: 'Modales',
+        description: 'Formularios dinamicos, validacion y dependencias entre campos',
+        path: '/playground/modals',
+        icon: null,
     }
 ]
 
