@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import MainPanel from '../components/admin-panel/MainPanel'
 import { MODULE_CATEGORIES } from '../components/admin-panel/data/modules'
+import { useNavigate } from 'react-router-dom'
 
 type AdminPanelProps = {
     userRole: string
@@ -20,11 +21,11 @@ export default function AdminPanel({
     location,
 }: AdminPanelProps) {
     const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null)
+    const navigate = useNavigate()
 
-    const handleModuleClick = (moduleId: string) => {
-        setSelectedModuleId(moduleId)
-        console.log(`Módulo seleccionado: ${moduleId}`)
-        // Aquí puedes agregar lógica para navegar a un modal, página detallada, etc.
+    const handleModuleClick = (url: string) => {
+        setSelectedModuleId(url)
+        navigate(url)
     }
 
     return (

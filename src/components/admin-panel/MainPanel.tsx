@@ -12,6 +12,7 @@ export type ModuleCategory = {
         description: string
         icon: string
         requiredRoles?: string[]
+        url?: string
     }[]
 }
 
@@ -23,7 +24,7 @@ type MainPanelProps = {
     organization: string
     identifier: string
     location: string
-    onModuleClick?: (moduleId: string) => void
+    onModuleClick?: (moduleUrl: string) => void
 }
 
 export default function MainPanel({
@@ -167,7 +168,7 @@ export default function MainPanel({
                                                         icon={module.icon}
                                                         title={module.title}
                                                         description={module.description}
-                                                        onClick={() => onModuleClick?.(module.id)}
+                                                        onClick={() => onModuleClick?.(module.url!)}
                                                     />
                                                 ))}
                                             </div>

@@ -8,6 +8,7 @@ export type ModuleCategory = {
         description: string
         icon: string
         requiredRoles?: string[]
+        url?: string
     }[]
 }
 
@@ -22,6 +23,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 description: 'Atención bienestar universitario online',
                 icon: '📅',
                 requiredRoles: ['admin', 'organizer'],
+                url: '/rutas'
             },
             {
                 id: 'calendar',
