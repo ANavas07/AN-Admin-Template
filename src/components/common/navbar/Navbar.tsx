@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import ButtonComponent from '../../ui/buttons/ButtonComponent'
-import { SettingsIcon } from '../../../icons/icons'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import {
+    ArrowLeftIcon,
+    FlowIcon,
+    HomeIcon,
+    SettingsIcon,
+    SparkIcon,
+    UploadIcon,
+    UsersIcon,
+} from '../../../icons/icons'
 
 type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
 
@@ -20,10 +28,28 @@ type NavbarProps = {
 }
 
 const ROLE_LABELS: Record<UserRole, string> = {
-    admin: 'Administrador',
-    organizer: 'Organizador',
-    analyst: 'Analista',
-    viewer: 'Observador',
+    admin: 'Administrator',
+    organizer: 'Organizer',
+    analyst: 'Analyst',
+    viewer: 'Viewer',
+}
+
+type ModuleLink = {
+    label: string
+    path: string
+    icon: React.ReactNode
+}
+
+const moduleLinks: ModuleLink[] = [
+    { label: 'Home', path: '/dashboard', icon: <HomeIcon className="size-4.5" /> },
+    { label: 'Users', path: '/users', icon: <UsersIcon className="size-4.5" /> },
+    { label: 'Files', path: '/files', icon: <UploadIcon className="size-4.5" /> },
+    { label: 'Process flow', path: '/process', icon: <FlowIcon className="size-4.5" /> },
+    { label: 'Playground', path: '/playground', icon: <SparkIcon className="size-4.5" /> },
+]
+
+function cn(...classes: Array<string | false | null | undefined>) {
+    return classes.filter(Boolean).join(' ')
 }
 
 export default function Navbar({
@@ -37,8 +63,10 @@ export default function Navbar({
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
     const mobileMenuRef = useRef<HTMLDivElement>(null)
+    const navigate = useNavigate()
+    const location = useLocation()
 
-    // Cerrar menus cuando hace click afuera
+    // Close dropdown menus when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (
@@ -59,49 +87,92 @@ export default function Navbar({
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
-
-    const handleLogout = () =>{
+    const handleLogout = () => {
         localStorage.removeItem('token')
         window.location.href = '/login'
     }
 
+    // History navigation keeps the previous module's route state intact
+    const handleGoBack = () => {
+        if (window.history.length > 1) {
+            navigate(-1)
+        } else {
+            navigate('/dashboard')
+        }
+    }
+
+    const isHome = location.pathname === '/dashboard'
+
     return (
         <header className="sticky top-0 z-30 border-b border-(--color-border) bg-(--color-surface)/80 backdrop-blur">
-            <div className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-                {/* Logo */}
-                <div className="flex items-center gap-3">
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand font-bold text-white shadow-sm">
-                        CT
-                    </span>
-                    <div className="hidden sm:block">
-                        <p className="text-sm font-semibold tracking-wide text-(--color-text)">
-                            Gestion de Torneos Deportivos
-                        </p>
-                        <p className="text-xs text-(--color-text-muted)">
-                            Panel
-                        </p>
-                    </div>
+            <div className="mx-auto flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+                {/* Left cluster: history controls + brand */}
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                    <button
+                        type="button"
+                        onClick={handleGoBack}
+                        disabled={isHome}
+                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-(--color-border) bg-(--color-bg-soft) text-(--color-text) transition-colors hover:border-brand hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-not-allowed disabled:opacity-40"
+                        aria-label="Go back to the previous module"
+                        title="Back to previous module"
+                    >
+                        <ArrowLeftIcon className="size-4.5" />
+                    </button>
+
+                    <div className="hidden h-6 w-px bg-(--color-border) sm:block" />
+
+                    <NavLink
+                        to="/dashboard"
+                        className="flex min-w-0 items-center gap-3"
+                        aria-label="Go to home"
+                    >
+                        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand font-bold text-white shadow-sm">
+                            CT
+                        </span>
+                        <span className="hidden min-w-0 xl:block">
+                            <span className="block truncate text-sm font-semibold tracking-wide text-(--color-text)">
+                                Sports Tournament Management
+                            </span>
+                            <span className="block text-xs text-(--color-text-muted)">
+                                Control panel
+                            </span>
+                        </span>
+                    </NavLink>
                 </div>
 
-                {/* Desktop Menu (lg+) */}
-                <div className="hidden items-center gap-3 sm:gap-4 lg:flex">
-                    <ButtonComponent variant="primary" leftIcon="🏠" to={"/playground"}>
-                        Playground Components
-                    </ButtonComponent>
-                    <ButtonComponent variant="ghost" icon={<SettingsIcon />}
-                        iconPosition="right"
-                        to={"/super"}
-                    >
-                        Super usuario
-                    </ButtonComponent>
+                {/* Center cluster: module navigation (desktop) */}
+                <nav
+                    className="hidden items-center gap-1 rounded-2xl border border-(--color-border) bg-(--color-bg-soft)/60 p-1 lg:flex"
+                    aria-label="Main navigation"
+                >
+                    {moduleLinks.map((link) => (
+                        <NavLink
+                            key={link.path}
+                            to={link.path}
+                            className={({ isActive }) =>
+                                cn(
+                                    'inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition-all duration-200',
+                                    isActive
+                                        ? 'bg-brand text-white shadow-sm'
+                                        : 'text-(--color-text-muted) hover:bg-(--color-surface) hover:text-brand'
+                                )
+                            }
+                        >
+                            {link.icon}
+                            <span className="hidden 2xl:inline">{link.label}</span>
+                            <span className="2xl:hidden">{link.label.split(' ')[0]}</span>
+                        </NavLink>
+                    ))}
+                </nav>
 
-
-                    {/* Rol selector */}
+                {/* Right cluster (desktop) */}
+                <div className="hidden items-center gap-3 lg:flex">
+                    {/* Role selector */}
                     <select
                         value={currentRole}
                         onChange={(e) => onChangeRole(e.target.value as UserRole)}
                         className="rounded-lg border border-(--color-border) bg-(--color-bg-soft) px-3 py-2 text-sm font-medium text-(--color-text) transition-colors hover:border-highlight focus:outline-none focus:ring-2 focus:ring-highlight focus:ring-offset-2 focus:ring-offset-(--color-bg)"
-                        aria-label="Selecciona tu rol"
+                        aria-label="Select your role"
                     >
                         {currentUser.roles.map((role) => (
                             <option key={role} value={role}>
@@ -110,7 +181,6 @@ export default function Navbar({
                         ))}
                     </select>
 
-                    {/* Divisor visual */}
                     <div className="h-6 w-px bg-(--color-border)" />
 
                     {/* User menu toggle */}
@@ -133,7 +203,7 @@ export default function Navbar({
                             </span>
                         </button>
 
-                        {/* Desktop Dropdown menu */}
+                        {/* Desktop dropdown menu */}
                         {isUserMenuOpen && (
                             <div className="absolute right-0 mt-2 w-56 rounded-lg border border-(--color-border) bg-(--color-surface) shadow-lg">
                                 <div className="border-b border-(--color-border) px-4 py-3">
@@ -151,21 +221,22 @@ export default function Navbar({
                                         onClick={() => setIsUserMenuOpen(false)}
                                         className="w-full px-4 py-2 text-left text-sm text-(--color-text) hover:bg-(--color-bg-soft) transition-colors"
                                     >
-                                        👤 Mi Perfil
+                                        👤 My profile
                                     </button>
+                                    <NavLink
+                                        to="/super"
+                                        onClick={() => setIsUserMenuOpen(false)}
+                                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-(--color-text) hover:bg-(--color-bg-soft) transition-colors"
+                                    >
+                                        <SettingsIcon className="size-4" />
+                                        Super user panel
+                                    </NavLink>
                                     <button
                                         type="button"
                                         onClick={() => setIsUserMenuOpen(false)}
                                         className="w-full px-4 py-2 text-left text-sm text-(--color-text) hover:bg-(--color-bg-soft) transition-colors"
                                     >
-                                        ⚙️ Configuración
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsUserMenuOpen(false)}
-                                        className="w-full px-4 py-2 text-left text-sm text-(--color-text) hover:bg-(--color-bg-soft) transition-colors"
-                                    >
-                                        🔔 Notificaciones
+                                        🔔 Notifications
                                     </button>
                                 </div>
 
@@ -175,7 +246,7 @@ export default function Navbar({
                                         onClick={handleLogout}
                                         className="w-full rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100 transition-colors dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
                                     >
-                                        🚪 Cerrar sesión
+                                        🚪 Sign out
                                     </button>
                                 </div>
                             </div>
@@ -187,8 +258,8 @@ export default function Navbar({
                         type="button"
                         onClick={onToggleTheme}
                         className="inline-flex items-center gap-2 rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-2 text-sm font-medium text-(--color-text) transition-colors hover:border-brand hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                        aria-label={isDarkMode ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
-                        title={isDarkMode ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+                        aria-label={isDarkMode ? 'Switch to light theme' : 'Switch to dark theme'}
+                        title={isDarkMode ? 'Switch to light theme' : 'Switch to dark theme'}
                     >
                         <span className="text-base leading-none" aria-hidden="true">
                             {isDarkMode ? '🌙' : '☀️'}
@@ -196,14 +267,14 @@ export default function Navbar({
                     </button>
                 </div>
 
-                {/* Mobile Hamburger Menu (lg hidden) */}
+                {/* Mobile controls (lg hidden) */}
                 <div className="flex items-center gap-2 lg:hidden">
-                    {/* Theme toggle en mobile */}
+                    {/* Theme toggle on mobile */}
                     <button
                         type="button"
                         onClick={onToggleTheme}
                         className="inline-flex items-center justify-center rounded-full border border-(--color-border) bg-(--color-bg-soft) p-2 text-(--color-text) transition-colors hover:border-brand"
-                        aria-label={isDarkMode ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+                        aria-label={isDarkMode ? 'Switch to light theme' : 'Switch to dark theme'}
                     >
                         <span className="text-lg leading-none" aria-hidden="true">
                             {isDarkMode ? '🌙' : '☀️'}
@@ -216,7 +287,7 @@ export default function Navbar({
                             type="button"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             className="inline-flex items-center justify-center rounded-lg border border-(--color-border) bg-(--color-bg-soft) p-2 text-(--color-text) transition-colors hover:border-brand"
-                            aria-label="Abre menu navegación"
+                            aria-label="Open navigation menu"
                             aria-expanded={isMobileMenuOpen}
                         >
                             <span className="text-xl" aria-hidden="true">
@@ -224,10 +295,10 @@ export default function Navbar({
                             </span>
                         </button>
 
-                        {/* Mobile Menu Dropdown */}
+                        {/* Mobile menu dropdown */}
                         {isMobileMenuOpen && (
                             <div className="absolute right-0 mt-2 w-64 rounded-lg border border-(--color-border) bg-(--color-surface) shadow-lg">
-                                {/* User Info Section */}
+                                {/* User info section */}
                                 <div className="border-b border-(--color-border) px-4 py-3">
                                     <div className="flex items-center gap-3">
                                         <span className="h-10 w-10 rounded-full bg-brand text-sm font-bold leading-10 text-white text-center">
@@ -244,10 +315,44 @@ export default function Navbar({
                                     </div>
                                 </div>
 
-                                {/* Role Selector */}
+                                {/* Module navigation */}
+                                <nav className="border-b border-(--color-border) py-2" aria-label="Main navigation">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            handleGoBack()
+                                            setIsMobileMenuOpen(false)
+                                        }}
+                                        disabled={isHome}
+                                        className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-(--color-text) hover:bg-(--color-bg-soft) transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                                    >
+                                        <ArrowLeftIcon className="size-4.5" />
+                                        Back to previous module
+                                    </button>
+                                    {moduleLinks.map((link) => (
+                                        <NavLink
+                                            key={link.path}
+                                            to={link.path}
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className={({ isActive }) =>
+                                                cn(
+                                                    'flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition-colors',
+                                                    isActive
+                                                        ? 'bg-brand-soft font-semibold text-brand'
+                                                        : 'text-(--color-text) hover:bg-(--color-bg-soft)'
+                                                )
+                                            }
+                                        >
+                                            {link.icon}
+                                            {link.label}
+                                        </NavLink>
+                                    ))}
+                                </nav>
+
+                                {/* Role selector */}
                                 <div className="border-b border-(--color-border) px-4 py-3">
                                     <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-(--color-text-muted)">
-                                        Mi Rol
+                                        My role
                                     </p>
                                     <select
                                         value={currentRole}
@@ -265,28 +370,29 @@ export default function Navbar({
                                     </select>
                                 </div>
 
-                                {/* Menu Items */}
+                                {/* Secondary items */}
                                 <div className="py-2">
                                     <button
                                         type="button"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className="w-full px-4 py-2 text-left text-sm text-(--color-text) hover:bg-(--color-bg-soft) transition-colors"
                                     >
-                                        👤 Mi Perfil
+                                        👤 My profile
                                     </button>
+                                    <NavLink
+                                        to="/super"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-(--color-text) hover:bg-(--color-bg-soft) transition-colors"
+                                    >
+                                        <SettingsIcon className="size-4" />
+                                        Super user panel
+                                    </NavLink>
                                     <button
                                         type="button"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className="w-full px-4 py-2 text-left text-sm text-(--color-text) hover:bg-(--color-bg-soft) transition-colors"
                                     >
-                                        ⚙️ Configuración
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="w-full px-4 py-2 text-left text-sm text-(--color-text) hover:bg-(--color-bg-soft) transition-colors"
-                                    >
-                                        🔔 Notificaciones
+                                        🔔 Notifications
                                     </button>
                                 </div>
 
@@ -297,7 +403,7 @@ export default function Navbar({
                                         onClick={handleLogout}
                                         className="w-full rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100 transition-colors dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
                                     >
-                                        🚪 Cerrar sesión
+                                        🚪 Sign out
                                     </button>
                                 </div>
                             </div>

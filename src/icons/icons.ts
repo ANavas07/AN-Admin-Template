@@ -12,6 +12,13 @@ import { ReactComponent as TrashBinIcon } from './TrashBin.svg?react';
 import { ReactComponent as ArrowRightIcon } from './ArrowRight.svg?react';
 import { ReactComponent as CheckIcon } from './Check.svg?react';
 import { ReactComponent as ChartIcon } from './Chart.svg?react';
+import { ReactComponent as HomeIcon } from './Home.svg?react';
+import { ReactComponent as ArrowLeftIcon } from './ArrowLeft.svg?react';
+import { ReactComponent as UploadIcon } from './Upload.svg?react';
+import { ReactComponent as UsersIcon } from './Users.svg?react';
+import { ReactComponent as FlowIcon } from './Flow.svg?react';
+import { ReactComponent as NoteIcon } from './Note.svg?react';
+import { ReactComponent as FileDocIcon } from './FileDoc.svg?react';
 
 
 
@@ -29,5 +36,12 @@ export {
     TrashBinIcon,
     ArrowRightIcon,
     CheckIcon,
-    ChartIcon
+    ChartIcon,
+    HomeIcon,
+    ArrowLeftIcon,
+    UploadIcon,
+    UsersIcon,
+    FlowIcon,
+    NoteIcon,
+    FileDocIcon
 }

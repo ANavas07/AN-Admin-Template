@@ -11,6 +11,9 @@ import FormsCatalog from '../pages/playground/FormsCatalog'
 import MainContentSP from '../pages/superuser/MainContentSP'
 import Login from '../pages/login/Login'
 import PopUpCatalog from '../pages/playground/PopUpCatalog'
+import UserManagement from '../pages/users/UserManagement'
+import FileUploadCenter from '../pages/files/FileUploadCenter'
+import ProcessDesigner from '../pages/process/ProcessDesigner'
 
 type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
 
@@ -78,6 +81,9 @@ export function AppRoutes({
             />
           }
         />
+        <Route path="/users" element={<UserManagement />} />
+        <Route path="/files" element={<FileUploadCenter />} />
+        <Route path="/process" element={<ProcessDesigner />} />
       </Route>
 
       <Route path="/gantt" element={<GanttStandalone />} />

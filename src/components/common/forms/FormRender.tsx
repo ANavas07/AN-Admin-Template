@@ -133,7 +133,7 @@ export default function FormRender({
             const isEmpty = value === '' || value === null || value === undefined
 
             if (field.required && isEmpty) {
-                nextErrors[field.name] = `${field.label} es requerido.`
+                nextErrors[field.name] = `${field.label} is required.`
                 return
             }
 
