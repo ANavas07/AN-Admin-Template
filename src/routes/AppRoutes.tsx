@@ -8,12 +8,20 @@ import Playground from '../pages/playground/Playground'
 import GanttCatalog from '../pages/playground/GanttCatalog'
 import GanttStandalone from '../pages/gantt/GanttStandalone'
 import FormsCatalog from '../pages/playground/FormsCatalog'
-import MainContentSP from '../pages/superuser/MainContentSP'
 import Login from '../pages/login/Login'
 import PopUpCatalog from '../pages/playground/PopUpCatalog'
 import UserManagement from '../pages/users/UserManagement'
 import FileUploadCenter from '../pages/files/FileUploadCenter'
 import ProcessDesigner from '../pages/process/ProcessDesigner'
+import ProcessRepository from '../pages/process/ProcessRepository'
+import {
+  RbacLayout,
+  RolesPage,
+  PermissionsPage,
+  GroupsPage,
+  UserRolesPage,
+  AuditLogPage,
+} from '../pages/superuser/rbac'
 
 type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
 
@@ -83,7 +91,17 @@ export function AppRoutes({
         />
         <Route path="/users" element={<UserManagement />} />
         <Route path="/files" element={<FileUploadCenter />} />
-        <Route path="/process" element={<ProcessDesigner />} />
+        <Route path="/process" element={<ProcessRepository />} />
+        <Route path="/process/:id" element={<ProcessDesigner />} />
+
+        <Route path="/superuser/rbac" element={<RbacLayout />}>
+          <Route index element={<Navigate to="/superuser/rbac/roles" replace />} />
+          <Route path="roles" element={<RolesPage />} />
+          <Route path="permissions" element={<PermissionsPage />} />
+          <Route path="groups" element={<GroupsPage />} />
+          <Route path="users" element={<UserRolesPage />} />
+          <Route path="audit" element={<AuditLogPage />} />
+        </Route>
       </Route>
 
       <Route path="/gantt" element={<GanttStandalone />} />
@@ -97,8 +115,6 @@ export function AppRoutes({
         <Route path="forms" element={<FormsCatalog />} />
         <Route path="modals" element={<PopUpCatalog />} />
       </Route>
-
-      <Route path="/super" element={<MainContentSP />} />
       <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
     </Routes>
   )

@@ -1,0 +1,6 @@
+export { default as RbacLayout } from './components/RbacLayout'
+export { default as RolesPage } from './roles/RolesPage'
+export { default as PermissionsPage } from './permissions/PermissionsPage'
+export { default as GroupsPage } from './groups/GroupsPage'
+export { default as UserRolesPage } from './users/UserRolesPage'
+export { default as AuditLogPage } from './audit/AuditLogPage'

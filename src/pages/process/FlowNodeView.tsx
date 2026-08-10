@@ -1,6 +1,8 @@
 import type { PointerEvent as ReactPointerEvent, MouseEvent as ReactMouseEvent } from 'react'
 import { NoteIcon } from '../../icons/icons'
+import BpmnGlyph from './components/BpmnGlyph'
 import {
+    bpmnTypeLabels,
     getDefaultDimensions,
     getNodeHeight,
     getNodeWidth,
@@ -93,21 +95,39 @@ export default function FlowNodeView({
 
     switch (node.kind) {
         case 'start':
-        case 'end': {
+        case 'end':
+        case 'intermediate': {
             const isStart = node.kind === 'start'
+            const isIntermediate = node.kind === 'intermediate'
+            // Timer / message start & intermediate events show their marker inside the circle
+            const hasMarker = node.bpmnType !== null && node.bpmnType !== 'startEvent' && node.bpmnType !== 'endEvent'
+            const accentText = isStart
+                ? 'text-emerald-600 dark:text-emerald-400'
+                : isIntermediate
+                    ? 'text-sky-600 dark:text-sky-400'
+                    : 'text-rose-600 dark:text-rose-400'
             body = (
                 <>
                     <div
                         className={cn(
-                            'flex h-16 w-16 items-center justify-center rounded-full bg-(--color-surface) shadow-sm',
-                            isStart ? 'border-2 border-emerald-500' : 'border-[5px] border-rose-500',
+                            'flex h-16 w-16 flex-col items-center justify-center rounded-full bg-(--color-surface) shadow-sm',
+                            isStart
+                                ? 'border-2 border-emerald-500'
+                                : isIntermediate
+                                    ? 'border-2 border-sky-500 ring-2 ring-inset ring-sky-500/60 ring-offset-2 ring-offset-(--color-surface)'
+                                    : 'border-[5px] border-rose-500',
                             isSelected ? 'ring-2 ring-brand/40 ring-offset-2 ring-offset-(--color-bg)' : ''
                         )}
+                        title={node.bpmnType ? bpmnTypeLabels[node.bpmnType] : undefined}
                     >
+                        {hasMarker ? (
+                            <BpmnGlyph kind={node.kind} bpmnType={node.bpmnType} className={cn('size-5', accentText)} />
+                        ) : null}
                         <span
                             className={cn(
                                 'px-1 text-center text-[10px] font-bold uppercase tracking-wide',
-                                isStart ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                                hasMarker ? 'line-clamp-1' : '',
+                                accentText
                             )}
                         >
                             {node.title}
@@ -125,7 +145,7 @@ export default function FlowNodeView({
 
         case 'decision': {
             body = (
-                <div className="relative h-32 w-32">
+                <div className="relative h-32 w-32" title={node.bpmnType ? bpmnTypeLabels[node.bpmnType] : undefined}>
                     <div
                         className={cn(
                             'absolute inset-4 rotate-45 rounded-xl border-2 bg-(--color-surface) shadow-sm',
@@ -133,6 +153,12 @@ export default function FlowNodeView({
                             isSelected ? 'ring-2 ring-brand/40' : ''
                         )}
                     />
+                    {/* Gateway type marker (X / O / + / event) */}
+                    {node.bpmnType && node.bpmnType !== 'exclusiveGateway' ? (
+                        <span className="absolute left-1/2 top-1.5 -translate-x-1/2 rounded-full bg-(--color-surface) p-0.5 text-(--color-text-muted)">
+                            <BpmnGlyph kind="decision" bpmnType={node.bpmnType} className="size-4" />
+                        </span>
+                    ) : null}
                     <div className="absolute inset-0 flex items-center justify-center p-6">
                         <span className="line-clamp-3 text-center text-xs font-bold leading-4 text-(--color-text)">
                             {node.title}
@@ -243,7 +269,18 @@ export default function FlowNodeView({
                 >
                     <div className={`h-1.5 rounded-t-2xl ${colorStyle.bar}`} />
                     <div className="px-4 py-3">
-                        <p className="truncate text-sm font-bold text-(--color-text)">{node.title}</p>
+                        <div className="flex items-center gap-1.5">
+                            {/* BPMN task-type badge (user / service / manual / script / rule / subprocess) */}
+                            {node.bpmnType && node.bpmnType !== 'task' ? (
+                                <span
+                                    className="shrink-0 text-(--color-text-muted)"
+                                    title={bpmnTypeLabels[node.bpmnType]}
+                                >
+                                    <BpmnGlyph kind="task" bpmnType={node.bpmnType} className="size-3.5" />
+                                </span>
+                            ) : null}
+                            <p className="truncate text-sm font-bold text-(--color-text)">{node.title}</p>
+                        </div>
                         {node.description ? (
                             <p className="mt-1 line-clamp-2 text-xs leading-5 text-(--color-text-muted)">
                                 {node.description}
@@ -253,6 +290,20 @@ export default function FlowNodeView({
                             <p className="mt-2 flex items-start gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] leading-4 text-amber-800 ring-1 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-300">
                                 <NoteIcon className="mt-0.5 size-3.5 shrink-0" />
                                 <span className="line-clamp-3">{node.note}</span>
+                            </p>
+                        ) : null}
+                        {node.data.responsible || node.data.documents.length > 0 ? (
+                            <p className="mt-1.5 flex items-center gap-2 text-[10px] text-(--color-text-muted)">
+                                {node.data.responsible ? (
+                                    <span className="truncate" title={`Responsable: ${node.data.responsible}`}>
+                                        👤 {node.data.responsible}
+                                    </span>
+                                ) : null}
+                                {node.data.documents.length > 0 ? (
+                                    <span className="shrink-0" title={`${node.data.documents.length} documento(s)`}>
+                                        📎 {node.data.documents.length}
+                                    </span>
+                                ) : null}
                             </p>
                         ) : null}
                     </div>

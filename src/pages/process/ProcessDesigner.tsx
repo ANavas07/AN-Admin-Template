@@ -1,60 +1,39 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
-import InputComponent from '../../components/ui/inputs/InputComponent'
 import PopUp from '../../components/common/pop-up/PopUp'
-import { FlowIcon, NoteIcon, TrashBinIcon } from '../../icons/icons'
+import { ArrowLeftIcon, FlowIcon, SparkIcon, TrashBinIcon } from '../../icons/icons'
+import { processService } from '../../services/process/process.service'
+import type { ProcessDraft } from '../../services/process/ai.service'
 import FlowNodeView from './FlowNodeView'
+import AiAssistantModal from './components/AiAssistantModal'
+import PalettePanel from './components/PalettePanel'
+import ProcessInfoModal from './components/ProcessInfoModal'
+import PropertiesPanel from './components/PropertiesPanel'
+import ValidationPanel from './components/ValidationPanel'
+import { useDiagramHistory } from './hooks/useDiagramHistory'
+import { validateDiagram } from './validation'
+import type { ValidationResult } from './validation'
+import type { PaletteItem } from './bpmnCatalog'
 import {
     CANVAS_HEIGHT,
     CANVAS_WIDTH,
     MAX_SCALE,
     MIN_SCALE,
-    STORAGE_KEY,
-    colorOptions,
     edgePath,
+    emptyElementData,
     getDefaultDimensions,
     getNodeHeight,
     getNodeWidth,
     getPorts,
     isContainer,
-    kindLabels,
     nodeColorStyles,
     parseDiagram,
 } from './flowTypes'
-import type { DiagramSnapshot, FlowEdge, FlowNode, NodeColor, NodeKind } from './flowTypes'
-
-const initialNodes: FlowNode[] = [
-    { id: 'n-start', kind: 'start', title: 'Start', description: '', note: '', color: 'emerald', x: 70, y: 300 },
-    { id: 'n-reg', kind: 'task', title: 'Registration opens', description: 'Teams submit their roster and payment.', note: '', color: 'emerald', x: 220, y: 268 },
-    { id: 'n-val', kind: 'task', title: 'Team validation', description: 'Documents and eligibility are reviewed.', note: '', color: 'sky', x: 520, y: 268 },
-    { id: 'n-dec', kind: 'decision', title: 'Documents OK?', description: '', note: '', color: 'violet', x: 820, y: 268 },
-    { id: 'n-draw', kind: 'task', title: 'Group draw', description: 'Validated teams are seeded into groups.', note: '', color: 'violet', x: 1060, y: 150 },
-    { id: 'n-fix', kind: 'task', title: 'Request corrections', description: 'Team is asked to resubmit documents.', note: '', color: 'rose', x: 1060, y: 470 },
-    { id: 'n-end', kind: 'end', title: 'End', description: '', note: '', color: 'rose', x: 1400, y: 180 },
-    { id: 'n-note', kind: 'note', title: 'Validation rule', description: 'Reject rosters with fewer than 8 players. Escalate edge cases to the organizer on duty.', note: '', color: 'amber', x: 470, y: 470 },
-]
-
-const initialEdges: FlowEdge[] = [
-    { id: 'e-1', from: 'n-start', to: 'n-reg', label: '' },
-    { id: 'e-2', from: 'n-reg', to: 'n-val', label: '' },
-    { id: 'e-3', from: 'n-val', to: 'n-dec', label: '' },
-    { id: 'e-4', from: 'n-dec', to: 'n-draw', label: 'Yes' },
-    { id: 'e-5', from: 'n-dec', to: 'n-fix', label: 'No' },
-    { id: 'e-6', from: 'n-draw', to: 'n-end', label: '' },
-    { id: 'e-7', from: 'n-note', to: 'n-val', label: '' },
-]
-
-const kindDefaults: Record<NodeKind, { title: string; description: string; color: NodeColor }> = {
-    task: { title: 'New task', description: 'Describe what happens in this step.', color: 'emerald' },
-    start: { title: 'Start', description: '', color: 'emerald' },
-    end: { title: 'End', description: '', color: 'rose' },
-    decision: { title: 'Decision?', description: '', color: 'violet' },
-    note: { title: 'Note', description: 'Write your comment here.', color: 'amber' },
-    data: { title: 'Data / document', description: 'Document produced by the process.', color: 'sky' },
-    group: { title: 'Group', description: '', color: 'slate' },
-    lane: { title: 'Lane', description: '', color: 'slate' },
-}
+import type { DiagramSnapshot, ElementData, FlowEdge, FlowNode } from './flowTypes'
+import { processStatusLabels, processStatusStyles } from './types'
+import type { ProcessMeta, ProcessRecord } from './types'
 
 type ViewportState = { scale: number; tx: number; ty: number }
 
@@ -69,9 +48,6 @@ const MINIMAP_WIDTH = 168
 const MINIMAP_SCALE = MINIMAP_WIDTH / CANVAS_WIDTH
 const MINIMAP_HEIGHT = Math.round(CANVAS_HEIGHT * MINIMAP_SCALE)
 
-const textareaClass =
-    'w-full rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-2.5 text-sm text-(--color-text) placeholder:text-(--color-text-muted) transition-all duration-200 focus:border-highlight focus:outline-none focus:ring-2 focus:ring-highlight/25'
-
 function isTypingTarget(target: EventTarget | null) {
     const element = target as HTMLElement | null
     return Boolean(
@@ -83,19 +59,6 @@ function isTypingTarget(target: EventTarget | null) {
     )
 }
 
-function loadInitialDiagram(): DiagramSnapshot {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY)
-        if (raw) {
-            const parsed = parseDiagram(JSON.parse(raw))
-            if (parsed) return parsed
-        }
-    } catch {
-        // Fall through to the demo diagram when storage is unreadable
-    }
-    return { version: 1, nodes: initialNodes, edges: initialEdges }
-}
-
 function approximateNodeHeight(node: FlowNode) {
     if (isContainer(node.kind)) return getNodeHeight(node)
     if (node.kind === 'decision') return 128
@@ -103,75 +66,16 @@ function approximateNodeHeight(node: FlowNode) {
     return 64
 }
 
-function PaletteGlyph({ kind }: { kind: NodeKind }) {
-    switch (kind) {
-        case 'task':
-            return (
-                <svg viewBox="0 0 20 20" fill="none" className="size-5" aria-hidden="true">
-                    <rect x="3" y="5" width="14" height="10" rx="3" stroke="currentColor" strokeWidth="1.6" />
-                </svg>
-            )
-        case 'start':
-            return (
-                <svg viewBox="0 0 20 20" fill="none" className="size-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true">
-                    <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.4" />
-                </svg>
-            )
-        case 'end':
-            return (
-                <svg viewBox="0 0 20 20" fill="none" className="size-5 text-rose-600 dark:text-rose-400" aria-hidden="true">
-                    <circle cx="10" cy="10" r="6" stroke="currentColor" strokeWidth="3" />
-                </svg>
-            )
-        case 'decision':
-            return (
-                <svg viewBox="0 0 20 20" fill="none" className="size-5" aria-hidden="true">
-                    <path d="M10 3 17 10 10 17 3 10Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-                </svg>
-            )
-        case 'note':
-            return (
-                <svg viewBox="0 0 20 20" fill="none" className="size-5 text-amber-600 dark:text-amber-400" aria-hidden="true">
-                    <rect x="3.5" y="3.5" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.6" strokeDasharray="2.5 2" />
-                </svg>
-            )
-        case 'data':
-            return (
-                <svg viewBox="0 0 20 20" fill="none" className="size-5" aria-hidden="true">
-                    <path d="M4 4h8l4 4v8H4V4Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-                    <path d="M12 4v4h4" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-                </svg>
-            )
-        case 'group':
-            return (
-                <svg viewBox="0 0 20 20" fill="none" className="size-5" aria-hidden="true">
-                    <rect x="3" y="4" width="14" height="12" rx="3" stroke="currentColor" strokeWidth="1.6" strokeDasharray="3 2.5" />
-                </svg>
-            )
-        default:
-            return (
-                <svg viewBox="0 0 20 20" fill="none" className="size-5" aria-hidden="true">
-                    <rect x="2.5" y="5" width="15" height="10" rx="2" stroke="currentColor" strokeWidth="1.6" />
-                    <path d="M6.5 5v10" stroke="currentColor" strokeWidth="1.6" />
-                </svg>
-            )
-    }
-}
-
-const paletteItems: { kind: NodeKind; label: string }[] = [
-    { kind: 'task', label: 'Add task' },
-    { kind: 'decision', label: 'Add decision' },
-    { kind: 'start', label: 'Add start point' },
-    { kind: 'end', label: 'Add end point' },
-    { kind: 'note', label: 'Add note' },
-    { kind: 'data', label: 'Add data / document' },
-    { kind: 'group', label: 'Add group' },
-    { kind: 'lane', label: 'Add lane' },
-]
-
 export default function ProcessDesigner() {
-    const [nodes, setNodes] = useState<FlowNode[]>(() => loadInitialDiagram().nodes)
-    const [edges, setEdges] = useState<FlowEdge[]>(() => loadInitialDiagram().edges)
+    const { id: processId } = useParams<{ id: string }>()
+    const navigate = useNavigate()
+
+    const [record, setRecord] = useState<ProcessRecord | null>(null)
+    const [loadState, setLoadState] = useState<'loading' | 'ready' | 'missing'>('loading')
+
+    const diagram = useDiagramHistory({ nodes: [], edges: [] })
+    const { nodes, edges } = diagram
+
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null)
     const [connectingFromId, setConnectingFromId] = useState<string | null>(null)
@@ -181,6 +85,11 @@ export default function ProcessDesigner() {
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
     const [statusMessage, setStatusMessage] = useState<string | null>(null)
     const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false)
+    const [isValidationOpen, setIsValidationOpen] = useState(false)
+    const [validationResults, setValidationResults] = useState<ValidationResult[]>([])
+    const [isAiOpen, setIsAiOpen] = useState(false)
+    const [isInfoOpen, setIsInfoOpen] = useState(false)
+    const [savedSerialized, setSavedSerialized] = useState('')
 
     const rootRef = useRef<HTMLDivElement>(null)
     const viewportRef = useRef<HTMLDivElement>(null)
@@ -191,6 +100,33 @@ export default function ProcessDesigner() {
     const connectDragRef = useRef<{ startClientX: number; startClientY: number; moved: boolean } | null>(null)
     const idCounterRef = useRef(0)
     const toastTimerRef = useRef<number | null>(null)
+
+    // --- Load the process from the repository ------------------------------
+    useEffect(() => {
+        let cancelled = false
+        setLoadState('loading')
+        processService.getById(processId ?? '').then((found) => {
+            if (cancelled) return
+            if (!found) {
+                setLoadState('missing')
+                return
+            }
+            setRecord(found)
+            diagram.reset({ nodes: found.diagram.nodes, edges: found.diagram.edges })
+            setSavedSerialized(JSON.stringify(found.diagram))
+            setLoadState('ready')
+        })
+        return () => {
+            cancelled = true
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [processId])
+
+    const isDirty = useMemo(
+        () => loadState === 'ready' && JSON.stringify(diagram.snapshot()) !== savedSerialized,
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [nodes, edges, savedSerialized, loadState]
+    )
 
     const selectedNode = useMemo(
         () => nodes.find((node) => node.id === selectedNodeId) ?? null,
@@ -246,13 +182,26 @@ export default function ProcessDesigner() {
         return () => element.removeEventListener('wheel', handleWheel)
     }, [])
 
-    // Keyboard shortcuts: Delete removes the selection, Escape cancels pending actions
+    // Keyboard shortcuts: Delete removes, Escape cancels, Ctrl+Z / Ctrl+Y history
     useEffect(() => {
         function handleKeyDown(event: KeyboardEvent) {
             if (event.key === 'Escape') {
                 setConnectingFromId(null)
                 setContextMenu(null)
                 return
+            }
+            if ((event.ctrlKey || event.metaKey) && !isTypingTarget(event.target)) {
+                const key = event.key.toLowerCase()
+                if (key === 'z' && !event.shiftKey) {
+                    event.preventDefault()
+                    diagram.undo()
+                    return
+                }
+                if (key === 'y' || (key === 'z' && event.shiftKey)) {
+                    event.preventDefault()
+                    diagram.redo()
+                    return
+                }
             }
             if ((event.key === 'Delete' || event.key === 'Backspace') && !isTypingTarget(event.target)) {
                 if (selectedNodeId) removeNode(selectedNodeId)
@@ -291,24 +240,46 @@ export default function ProcessDesigner() {
     }
 
     // --- Diagram mutations ------------------------------------------------
+    // Property edits are transient (not in undo history) so typing does not
+    // flood it; structural changes (add / remove / connect / drag) are recorded.
     function updateNode(nodeId: string, patch: Partial<FlowNode>) {
-        setNodes((current) => current.map((node) => (node.id === nodeId ? { ...node, ...patch } : node)))
+        diagram.applyTransient((current) => ({
+            ...current,
+            nodes: current.nodes.map((node) => (node.id === nodeId ? { ...node, ...patch } : node)),
+        }))
+    }
+
+    function updateNodeData(nodeId: string, patch: Partial<ElementData>) {
+        diagram.applyTransient((current) => ({
+            ...current,
+            nodes: current.nodes.map((node) =>
+                node.id === nodeId ? { ...node, data: { ...node.data, ...patch } } : node
+            ),
+        }))
     }
 
     function updateEdge(edgeId: string, patch: Partial<FlowEdge>) {
-        setEdges((current) => current.map((edge) => (edge.id === edgeId ? { ...edge, ...patch } : edge)))
+        diagram.applyTransient((current) => ({
+            ...current,
+            edges: current.edges.map((edge) => (edge.id === edgeId ? { ...edge, ...patch } : edge)),
+        }))
     }
 
     function removeNode(nodeId: string) {
-        setNodes((current) => current.filter((node) => node.id !== nodeId))
-        setEdges((current) => current.filter((edge) => edge.from !== nodeId && edge.to !== nodeId))
+        diagram.apply((current) => ({
+            nodes: current.nodes.filter((node) => node.id !== nodeId),
+            edges: current.edges.filter((edge) => edge.from !== nodeId && edge.to !== nodeId),
+        }))
         setSelectedNodeId((current) => (current === nodeId ? null : current))
         setConnectingFromId((current) => (current === nodeId ? null : current))
         setContextMenu(null)
     }
 
     function removeEdge(edgeId: string) {
-        setEdges((current) => current.filter((edge) => edge.id !== edgeId))
+        diagram.apply((current) => ({
+            ...current,
+            edges: current.edges.filter((edge) => edge.id !== edgeId),
+        }))
         setSelectedEdgeId((current) => (current === edgeId ? null : current))
         setContextMenu(null)
     }
@@ -316,61 +287,74 @@ export default function ProcessDesigner() {
     function duplicateNode(nodeId: string) {
         const source = nodes.find((node) => node.id === nodeId)
         if (!source) return
-        const copy: FlowNode = { ...source, id: newId('n'), x: source.x + 32, y: source.y + 32 }
-        setNodes((current) => [...current, copy])
+        const copy: FlowNode = {
+            ...source,
+            id: newId('n'),
+            x: source.x + 32,
+            y: source.y + 32,
+            data: { ...source.data, documents: [...source.data.documents] },
+        }
+        diagram.apply((current) => ({ ...current, nodes: [...current.nodes, copy] }))
         setSelectedNodeId(copy.id)
         setSelectedEdgeId(null)
         setContextMenu(null)
     }
 
-    function addNode(kind: NodeKind) {
-        const defaults = kindDefaults[kind]
-        const dims = getDefaultDimensions(kind)
+    function addNode(item: PaletteItem) {
+        const dims = getDefaultDimensions(item.kind)
         const center = viewportCenterWorld()
         const jitter = (idCounterRef.current % 5) * 16
 
         const node: FlowNode = {
             id: newId('n'),
-            kind,
-            title: defaults.title,
-            description: defaults.description,
+            kind: item.kind,
+            bpmnType: item.bpmnType,
+            title: item.defaultTitle,
+            description: item.defaultDescription,
             note: '',
-            color: defaults.color,
+            color: item.defaultColor,
             x: Math.max(0, Math.min(center.x - dims.width / 2 + jitter, CANVAS_WIDTH - dims.width)),
             y: Math.max(0, Math.min(center.y - 60 + jitter, CANVAS_HEIGHT - 160)),
-            ...(isContainer(kind) ? { width: dims.width, height: dims.defaultHeight } : {}),
+            data: emptyElementData(),
+            ...(isContainer(item.kind) ? { width: dims.width, height: dims.defaultHeight } : {}),
         }
 
-        if (kind === 'decision') {
-            // A decision automatically ships with its two labeled outputs
+        if (item.bpmnType === 'exclusiveGateway') {
+            // An exclusive gateway ships with its two labeled outputs
             const yesNode: FlowNode = {
                 ...node,
                 id: newId('n'),
                 kind: 'task',
-                title: 'Yes path',
-                description: 'Happens when the condition is met.',
+                bpmnType: 'task',
+                title: 'Camino Sí',
+                description: 'Ocurre cuando se cumple la condición.',
                 color: 'emerald',
                 x: Math.min(node.x + 260, CANVAS_WIDTH - 224),
                 y: Math.max(0, node.y - 100),
+                data: emptyElementData(),
             }
             const noNode: FlowNode = {
                 ...node,
                 id: newId('n'),
                 kind: 'task',
-                title: 'No path',
-                description: 'Happens when the condition fails.',
+                bpmnType: 'task',
+                title: 'Camino No',
+                description: 'Ocurre cuando no se cumple la condición.',
                 color: 'rose',
                 x: Math.min(node.x + 260, CANVAS_WIDTH - 224),
                 y: Math.min(node.y + 170, CANVAS_HEIGHT - 160),
+                data: emptyElementData(),
             }
-            setNodes((current) => [...current, node, yesNode, noNode])
-            setEdges((current) => [
-                ...current,
-                { id: newId('e'), from: node.id, to: yesNode.id, label: 'Yes' },
-                { id: newId('e'), from: node.id, to: noNode.id, label: 'No' },
-            ])
+            diagram.apply((current) => ({
+                nodes: [...current.nodes, node, yesNode, noNode],
+                edges: [
+                    ...current.edges,
+                    { id: newId('e'), from: node.id, to: yesNode.id, label: 'Sí', kind: 'sequence', condition: '' },
+                    { id: newId('e'), from: node.id, to: noNode.id, label: 'No', kind: 'sequence', condition: '' },
+                ],
+            }))
         } else {
-            setNodes((current) => [...current, node])
+            diagram.apply((current) => ({ ...current, nodes: [...current.nodes, node] }))
         }
 
         setSelectedNodeId(node.id)
@@ -382,21 +366,25 @@ export default function ProcessDesigner() {
         setConnectingFromId(null)
         if (!fromId || fromId === targetId) return
 
-        setEdges((current) => {
-            if (current.some((edge) => edge.from === fromId && edge.to === targetId)) return current
-            const fromNode = nodes.find((node) => node.id === fromId)
+        diagram.apply((current) => {
+            if (current.edges.some((edge) => edge.from === fromId && edge.to === targetId)) return current
+            const fromNode = current.nodes.find((node) => node.id === fromId)
+            const toNode = current.nodes.find((node) => node.id === targetId)
             let label = ''
-            if (fromNode?.kind === 'decision') {
-                const outgoing = current.filter((edge) => edge.from === fromId).length
-                label = outgoing === 0 ? 'Yes' : outgoing === 1 ? 'No' : ''
+            if (fromNode?.kind === 'decision' && fromNode.bpmnType === 'exclusiveGateway') {
+                const outgoing = current.edges.filter((edge) => edge.from === fromId).length
+                label = outgoing === 0 ? 'Sí' : outgoing === 1 ? 'No' : ''
             }
-            return [...current, { id: newId('e'), from: fromId, to: targetId, label }]
+            const kind = fromNode?.kind === 'note' || toNode?.kind === 'note' ? 'association' : 'sequence'
+            return {
+                ...current,
+                edges: [...current.edges, { id: newId('e'), from: fromId, to: targetId, label, kind, condition: '' }],
+            }
         })
     }
 
     function clearCanvas() {
-        setNodes([])
-        setEdges([])
+        diagram.apply(() => ({ nodes: [], edges: [] }))
         setSelectedNodeId(null)
         setSelectedEdgeId(null)
         setConnectingFromId(null)
@@ -404,28 +392,40 @@ export default function ProcessDesigner() {
     }
 
     // --- Persistence --------------------------------------------------------
-    function snapshot(): DiagramSnapshot {
-        return { version: 1, nodes, edges }
+    async function saveDiagram() {
+        if (!record) return
+        const snapshot = diagram.snapshot()
+        const saved = await processService.saveDiagram(record.meta.id, snapshot)
+        if (saved) {
+            setSavedSerialized(JSON.stringify(snapshot))
+            showStatus('Proceso guardado en el repositorio.')
+        } else {
+            showStatus('No se pudo guardar: el proceso ya no existe en el repositorio.')
+        }
     }
 
-    function saveDiagram() {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot()))
-            showStatus('Diagram saved on this device.')
-        } catch {
-            showStatus('Save failed: local storage is unavailable.')
+    async function saveMeta(patch: Partial<Omit<ProcessMeta, 'id' | 'createdAt'>>) {
+        if (!record) return
+        const updated = await processService.updateMeta(record.meta.id, patch)
+        if (updated) {
+            setRecord({ ...record, meta: updated })
+            showStatus('Información del proceso actualizada.')
         }
     }
 
     function exportDiagram() {
-        const blob = new Blob([JSON.stringify(snapshot(), null, 2)], { type: 'application/json' })
+        const blob = new Blob([JSON.stringify(diagram.snapshot(), null, 2)], { type: 'application/json' })
         const url = URL.createObjectURL(blob)
         const anchor = document.createElement('a')
         anchor.href = url
-        anchor.download = 'process-diagram.json'
+        const slug = (record?.meta.code || record?.meta.name || 'proceso')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+        anchor.download = `${slug || 'proceso'}.json`
         anchor.click()
         URL.revokeObjectURL(url)
-        showStatus('Diagram exported as JSON.')
+        showStatus('Diagrama exportado como JSON.')
     }
 
     async function handleImportFile(event: ChangeEvent<HTMLInputElement>) {
@@ -435,15 +435,44 @@ export default function ProcessDesigner() {
         try {
             const parsed = parseDiagram(JSON.parse(await file.text()))
             if (!parsed) throw new Error('invalid diagram')
-            setNodes(parsed.nodes)
-            setEdges(parsed.edges)
+            diagram.apply(() => ({ nodes: parsed.nodes, edges: parsed.edges }))
             setSelectedNodeId(null)
             setSelectedEdgeId(null)
             setConnectingFromId(null)
-            showStatus(`Imported ${parsed.nodes.length} elements and ${parsed.edges.length} connections.`)
+            showStatus(`Se importaron ${parsed.nodes.length} elementos y ${parsed.edges.length} conexiones.`)
         } catch {
-            showStatus('Import failed: the file is not a valid diagram JSON.')
+            showStatus('No se pudo importar: el archivo no es un diagrama JSON válido.')
         }
+    }
+
+    // --- Validation ---------------------------------------------------------
+    function runValidation() {
+        setValidationResults(validateDiagram(diagram.snapshot()))
+        setIsValidationOpen(true)
+    }
+
+    function goToNode(nodeId: string) {
+        const node = nodes.find((candidate) => candidate.id === nodeId)
+        if (!node) return
+        setSelectedNodeId(nodeId)
+        setSelectedEdgeId(null)
+        setViewport((current) => ({
+            ...current,
+            tx: viewportSize.width / 2 - (node.x + getNodeWidth(node) / 2) * current.scale,
+            ty: viewportSize.height / 2 - (node.y + approximateNodeHeight(node) / 2) * current.scale,
+        }))
+    }
+
+    // --- AI proposal --------------------------------------------------------
+    function applyAiDraft(generated: DiagramSnapshot, draft: ProcessDraft) {
+        diagram.apply(() => ({ nodes: generated.nodes, edges: generated.edges }))
+        setSelectedNodeId(null)
+        setSelectedEdgeId(null)
+        setViewport({ scale: 1, tx: 0, ty: 0 })
+        if (record && record.meta.name === 'Proceso sin título' && draft.name) {
+            saveMeta({ name: draft.name, description: draft.description, area: draft.area })
+        }
+        showStatus('Propuesta aplicada al lienzo. Revísala y guárdala cuando estés conforme.')
     }
 
     // --- Canvas pan + click-to-deselect ------------------------------------
@@ -496,6 +525,7 @@ export default function ProcessDesigner() {
         }
         const point = worldPoint(event)
         dragRef.current = { nodeId: node.id, offsetX: point.x - node.x, offsetY: point.y - node.y }
+        diagram.beginGesture()
         ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
         setSelectedNodeId(node.id)
         setSelectedEdgeId(null)
@@ -515,6 +545,7 @@ export default function ProcessDesigner() {
     function handleNodePointerUp(event: ReactPointerEvent) {
         if (dragRef.current) {
             ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+            diagram.endGesture()
         }
         dragRef.current = null
     }
@@ -531,6 +562,7 @@ export default function ProcessDesigner() {
             startX: point.x,
             startY: point.y,
         }
+        diagram.beginGesture()
         ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
     }
 
@@ -548,6 +580,7 @@ export default function ProcessDesigner() {
     function handleResizeEnd(event: ReactPointerEvent) {
         if (resizeRef.current) {
             ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+            diagram.endGesture()
         }
         resizeRef.current = null
     }
@@ -628,7 +661,7 @@ export default function ProcessDesigner() {
                 path: edgePath(fromPort.x, fromPort.y, toPort.x, toPort.y),
                 midX: (fromPort.x + toPort.x) / 2,
                 midY: (fromPort.y + toPort.y) / 2,
-                isDashed: from.kind === 'note' || to.kind === 'note',
+                isDashed: edge.kind !== 'sequence' || from.kind === 'note' || to.kind === 'note',
             }]
         })
     }, [edges, nodes])
@@ -657,19 +690,64 @@ export default function ProcessDesigner() {
 
     const zoomPercent = Math.round(viewport.scale * 100)
 
+    if (loadState === 'loading') {
+        return (
+            <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-(--color-bg)">
+                <p className="text-sm text-(--color-text-muted)">Cargando proceso…</p>
+            </div>
+        )
+    }
+
+    if (loadState === 'missing' || !record) {
+        return (
+            <div className="flex h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 bg-(--color-bg)">
+                <FlowIcon className="size-10 text-(--color-text-muted)" />
+                <p className="text-sm font-semibold text-(--color-text)">El proceso no existe o fue eliminado.</p>
+                <ButtonComponent variant="primary" size="sm" onClick={() => navigate('/process')}>
+                    Volver al repositorio
+                </ButtonComponent>
+            </div>
+        )
+    }
+
     return (
         <div ref={rootRef} className="relative flex h-[calc(100vh-4rem)] flex-col bg-(--color-bg)">
             {/* Toolbar */}
             <div className="border-b border-(--color-border) bg-(--color-surface)/80 backdrop-blur">
                 <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-3">
-                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
+                    <div className="flex min-w-0 items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/process')}
+                            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-(--color-border) text-(--color-text-muted) transition-colors hover:bg-(--color-bg-soft) hover:text-(--color-text)"
+                            aria-label="Volver al repositorio de procesos"
+                            title="Volver al repositorio"
+                        >
+                            <ArrowLeftIcon className="size-4" />
+                        </button>
+                        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
                             <FlowIcon className="size-5" />
                         </span>
-                        <div>
-                            <h1 className="text-sm font-bold text-(--color-text)">Process flow designer</h1>
-                            <p className="text-xs text-(--color-text-muted)">
-                                {nodes.length} elements · {edges.length} connections
+                        <div className="min-w-0">
+                            <button
+                                type="button"
+                                onClick={() => setIsInfoOpen(true)}
+                                className="flex max-w-full items-center gap-2 text-left"
+                                title="Editar información del proceso"
+                            >
+                                <h1 className="truncate text-sm font-bold text-(--color-text) hover:text-brand">
+                                    {record.meta.name}
+                                </h1>
+                                <span
+                                    className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${processStatusStyles[record.meta.status]}`}
+                                >
+                                    {processStatusLabels[record.meta.status]}
+                                </span>
+                            </button>
+                            <p className="truncate text-xs text-(--color-text-muted)">
+                                {record.meta.code ? `${record.meta.code} · ` : ''}v{record.meta.version} ·{' '}
+                                {nodes.length} elementos · {edges.length} conexiones
+                                {isDirty ? ' · cambios sin guardar' : ''}
                             </p>
                         </div>
                     </div>
@@ -677,21 +755,51 @@ export default function ProcessDesigner() {
                     <div className="flex flex-wrap items-center gap-2">
                         {connectingFromId ? (
                             <span className="animate-pulse rounded-full border border-brand/40 bg-brand-soft px-3 py-1.5 text-xs font-semibold text-brand">
-                                Drop on a target element · Esc to cancel
+                                Suelta sobre el elemento destino · Esc para cancelar
                             </span>
-                        ) : (
-                            <span className="hidden rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1.5 text-xs text-(--color-text-muted) xl:inline">
-                                Wheel to zoom · drag empty canvas to pan · right-click to delete
-                            </span>
-                        )}
+                        ) : null}
+                        <div className="flex items-center overflow-hidden rounded-xl border border-(--color-border)">
+                            <button
+                                type="button"
+                                onClick={diagram.undo}
+                                disabled={!diagram.canUndo}
+                                className="px-2.5 py-1.5 text-sm text-(--color-text) transition-colors hover:bg-(--color-bg-soft) disabled:cursor-not-allowed disabled:opacity-40"
+                                aria-label="Deshacer"
+                                title="Deshacer (Ctrl+Z)"
+                            >
+                                ↶
+                            </button>
+                            <span className="h-5 w-px bg-(--color-border)" aria-hidden="true" />
+                            <button
+                                type="button"
+                                onClick={diagram.redo}
+                                disabled={!diagram.canRedo}
+                                className="px-2.5 py-1.5 text-sm text-(--color-text) transition-colors hover:bg-(--color-bg-soft) disabled:cursor-not-allowed disabled:opacity-40"
+                                aria-label="Rehacer"
+                                title="Rehacer (Ctrl+Y)"
+                            >
+                                ↷
+                            </button>
+                        </div>
+                        <ButtonComponent size="sm" variant="outline" onClick={runValidation}>
+                            Validar
+                        </ButtonComponent>
+                        <ButtonComponent
+                            size="sm"
+                            variant="outline"
+                            leftIcon={<SparkIcon className="size-4" />}
+                            onClick={() => setIsAiOpen(true)}
+                        >
+                            Generar con IA
+                        </ButtonComponent>
                         <ButtonComponent size="sm" variant="outline" onClick={() => importInputRef.current?.click()}>
-                            Import
+                            Importar
                         </ButtonComponent>
                         <ButtonComponent size="sm" variant="outline" onClick={exportDiagram}>
-                            Export JSON
+                            Exportar
                         </ButtonComponent>
                         <ButtonComponent size="sm" variant="primary" onClick={saveDiagram}>
-                            Save
+                            Guardar
                         </ButtonComponent>
                         <ButtonComponent
                             size="sm"
@@ -699,10 +807,10 @@ export default function ProcessDesigner() {
                             leftIcon={<TrashBinIcon className="size-4" />}
                             onClick={() => setIsClearConfirmOpen(true)}
                             disabled={nodes.length === 0}
-                            aria-label="Clear canvas"
-                            title="Clear canvas"
+                            aria-label="Limpiar lienzo"
+                            title="Limpiar lienzo"
                         >
-                            Clear
+                            Limpiar
                         </ButtonComponent>
                         <input
                             ref={importInputRef}
@@ -710,7 +818,7 @@ export default function ProcessDesigner() {
                             accept=".json,application/json"
                             className="hidden"
                             onChange={handleImportFile}
-                            aria-label="Import diagram JSON"
+                            aria-label="Importar diagrama JSON"
                         />
                     </div>
                 </div>
@@ -832,8 +940,8 @@ export default function ProcessDesigner() {
                                     onClick={() => removeEdge(edge.id)}
                                     className="absolute z-20 inline-flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-(--color-border) bg-(--color-surface) text-rose-600 shadow-md transition-transform hover:scale-110 dark:text-rose-300"
                                     style={{ left: midX, top: midY - (edge.label ? 22 : 0) }}
-                                    aria-label="Delete connection"
-                                    title="Delete connection"
+                                    aria-label="Eliminar conexión"
+                                    title="Eliminar conexión"
                                 >
                                     <TrashBinIcon className="size-4" />
                                 </button>
@@ -866,35 +974,18 @@ export default function ProcessDesigner() {
                             <div className="pointer-events-none absolute left-105 top-48 w-80 rounded-3xl border border-dashed border-(--color-border) bg-(--color-surface)/80 p-8 text-center backdrop-blur">
                                 <FlowIcon className="mx-auto size-8 text-(--color-text-muted)" />
                                 <p className="mt-3 text-sm font-semibold text-(--color-text)">
-                                    The canvas is empty
+                                    El lienzo está vacío
                                 </p>
                                 <p className="mt-1 text-xs text-(--color-text-muted)">
-                                    Add elements from the palette on the left, or import a saved diagram.
+                                    Agrega elementos desde la paleta BPMN, genera una propuesta con IA o importa un
+                                    diagrama guardado.
                                 </p>
                             </div>
                         ) : null}
                     </div>
 
-                    {/* Element palette */}
-                    <div
-                        onPointerDown={(event) => event.stopPropagation()}
-                        className="absolute left-3 top-3 z-30 flex flex-col gap-0.5 rounded-2xl border border-(--color-border) bg-(--color-surface)/95 p-1.5 shadow-lg backdrop-blur"
-                        role="toolbar"
-                        aria-label="Add elements"
-                    >
-                        {paletteItems.map((item) => (
-                            <button
-                                key={item.kind}
-                                type="button"
-                                onClick={() => addNode(item.kind)}
-                                className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-(--color-text) transition-colors hover:bg-brand-soft hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                                aria-label={item.label}
-                                title={item.label}
-                            >
-                                <PaletteGlyph kind={item.kind} />
-                            </button>
-                        ))}
-                    </div>
+                    {/* BPMN palette */}
+                    <PalettePanel onAdd={addNode} />
 
                     {/* Zoom controls */}
                     <div
@@ -905,7 +996,7 @@ export default function ProcessDesigner() {
                             type="button"
                             onClick={() => zoomBy(1 / 1.2)}
                             className="inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-(--color-text) transition-colors hover:bg-(--color-bg-soft)"
-                            aria-label="Zoom out"
+                            aria-label="Alejar"
                         >
                             −
                         </button>
@@ -916,7 +1007,7 @@ export default function ProcessDesigner() {
                             type="button"
                             onClick={() => zoomBy(1.2)}
                             className="inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-(--color-text) transition-colors hover:bg-(--color-bg-soft)"
-                            aria-label="Zoom in"
+                            aria-label="Acercar"
                         >
                             +
                         </button>
@@ -924,9 +1015,9 @@ export default function ProcessDesigner() {
                             type="button"
                             onClick={() => setViewport({ scale: 1, tx: 0, ty: 0 })}
                             className="ml-1 rounded-full px-2 py-1 text-[11px] font-semibold text-(--color-text-muted) transition-colors hover:bg-(--color-bg-soft) hover:text-brand"
-                            aria-label="Reset view"
+                            aria-label="Restablecer vista"
                         >
-                            Reset
+                            Reiniciar
                         </button>
                     </div>
 
@@ -936,8 +1027,8 @@ export default function ProcessDesigner() {
                         className="absolute bottom-4 right-4 z-30 hidden cursor-pointer overflow-hidden rounded-xl border border-(--color-border) bg-(--color-surface)/90 shadow-lg backdrop-blur md:block"
                         style={{ width: MINIMAP_WIDTH, height: MINIMAP_HEIGHT }}
                         role="img"
-                        aria-label="Diagram overview — click to move the view"
-                        title="Click to move the view"
+                        aria-label="Vista general del diagrama — clic para mover la vista"
+                        title="Clic para mover la vista"
                     >
                         {nodes.map((node) => (
                             <span
@@ -963,166 +1054,23 @@ export default function ProcessDesigner() {
                     </div>
                 </div>
 
-                {/* Inspector panel */}
+                {/* Properties panel */}
                 <aside
                     className="hidden w-80 shrink-0 overflow-y-auto border-l border-(--color-border) bg-(--color-surface) lg:block"
                     onPointerDown={(event) => event.stopPropagation()}
                 >
-                    {selectedNode ? (
-                        <div className="space-y-5 p-5">
-                            <span className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
-                                {kindLabels[selectedNode.kind]}
-                            </span>
-
-                            <InputComponent
-                                label={selectedNode.kind === 'note' ? 'Note title' : 'Label'}
-                                value={selectedNode.title}
-                                onChange={(event) => updateNode(selectedNode.id, { title: event.target.value })}
-                                placeholder="Element label"
-                            />
-
-                            {!isContainer(selectedNode.kind) ? (
-                                <div>
-                                    <label htmlFor="node-description" className="mb-1.5 block text-sm font-medium text-(--color-text)">
-                                        {selectedNode.kind === 'note' ? 'Content' : 'Description'}
-                                    </label>
-                                    <textarea
-                                        id="node-description"
-                                        value={selectedNode.description}
-                                        onChange={(event) => updateNode(selectedNode.id, { description: event.target.value })}
-                                        rows={3}
-                                        placeholder={selectedNode.kind === 'note' ? 'Write the note content' : 'What happens in this step?'}
-                                        className={textareaClass}
-                                    />
-                                </div>
-                            ) : null}
-
-                            {selectedNode.kind === 'task' || selectedNode.kind === 'data' || selectedNode.kind === 'decision' ? (
-                                <div>
-                                    <label htmlFor="node-note" className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-(--color-text)">
-                                        <NoteIcon className="size-4 text-amber-600 dark:text-amber-400" />
-                                        Attached note
-                                    </label>
-                                    <textarea
-                                        id="node-note"
-                                        value={selectedNode.note}
-                                        onChange={(event) => updateNode(selectedNode.id, { note: event.target.value })}
-                                        rows={3}
-                                        placeholder="Add an annotation for this element"
-                                        className="w-full rounded-xl border border-amber-600/30 bg-amber-50/50 px-4 py-2.5 text-sm text-(--color-text) placeholder:text-(--color-text-muted) transition-all duration-200 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 dark:bg-amber-500/5"
-                                    />
-                                </div>
-                            ) : null}
-
-                            {selectedNode.kind !== 'start' && selectedNode.kind !== 'end' && selectedNode.kind !== 'note' ? (
-                                <div>
-                                    <p className="mb-2 text-sm font-medium text-(--color-text)">Accent color</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {colorOptions.map((option) => (
-                                            <button
-                                                key={option.value}
-                                                type="button"
-                                                onClick={() => updateNode(selectedNode.id, { color: option.value })}
-                                                className={[
-                                                    'h-8 w-8 rounded-full transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-surface)',
-                                                    nodeColorStyles[option.value].swatch,
-                                                    selectedNode.color === option.value
-                                                        ? 'ring-2 ring-(--color-text) ring-offset-2 ring-offset-(--color-surface)'
-                                                        : '',
-                                                ].join(' ')}
-                                                aria-label={`Set accent color to ${option.label}`}
-                                                aria-pressed={selectedNode.color === option.value}
-                                                title={option.label}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            ) : null}
-
-                            <div className="space-y-2 border-t border-(--color-border) pt-4">
-                                <ButtonComponent
-                                    variant="outline"
-                                    size="sm"
-                                    fullWidth
-                                    onClick={() => duplicateNode(selectedNode.id)}
-                                >
-                                    Duplicate element
-                                </ButtonComponent>
-                                <ButtonComponent
-                                    variant="danger"
-                                    size="sm"
-                                    fullWidth
-                                    leftIcon={<TrashBinIcon className="size-4" />}
-                                    onClick={() => removeNode(selectedNode.id)}
-                                >
-                                    Delete element
-                                </ButtonComponent>
-                            </div>
-                        </div>
-                    ) : selectedEdge ? (
-                        <div className="space-y-5 p-5">
-                            <span className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
-                                Connection
-                            </span>
-                            <p className="text-sm text-(--color-text)">
-                                <span className="font-semibold">
-                                    {nodes.find((node) => node.id === selectedEdge.from)?.title ?? 'Unknown element'}
-                                </span>
-                                {' → '}
-                                <span className="font-semibold">
-                                    {nodes.find((node) => node.id === selectedEdge.to)?.title ?? 'Unknown element'}
-                                </span>
-                            </p>
-                            <InputComponent
-                                label="Arrow label"
-                                value={selectedEdge.label}
-                                onChange={(event) => updateEdge(selectedEdge.id, { label: event.target.value })}
-                                placeholder="e.g. Yes / No / Approved"
-                                hint="Shown on the middle of the arrow."
-                            />
-                            <ButtonComponent
-                                variant="danger"
-                                size="sm"
-                                fullWidth
-                                leftIcon={<TrashBinIcon className="size-4" />}
-                                onClick={() => removeEdge(selectedEdge.id)}
-                            >
-                                Delete connection
-                            </ButtonComponent>
-                        </div>
-                    ) : (
-                        <div className="space-y-4 p-5">
-                            <span className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
-                                How it works
-                            </span>
-                            <ul className="space-y-3 text-sm text-(--color-text-muted)">
-                                <li className="flex gap-2.5">
-                                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                                    Add tasks, decisions, start/end points, notes, data, groups and lanes from the left palette.
-                                </li>
-                                <li className="flex gap-2.5">
-                                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                                    Drag from an element's right port and drop on another element to connect them.
-                                </li>
-                                <li className="flex gap-2.5">
-                                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                                    New decisions come with Yes / No outputs; click an arrow to edit its label.
-                                </li>
-                                <li className="flex gap-2.5">
-                                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                                    Zoom with the mouse wheel, pan by dragging empty canvas, and use the minimap to jump around.
-                                </li>
-                                <li className="flex gap-2.5">
-                                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                                    Right-click an element or arrow to delete it, or press Delete with it selected.
-                                </li>
-                                <li className="flex gap-2.5">
-                                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                                    Save keeps the diagram on this device; Export / Import moves it as a JSON file.
-                                </li>
-                            </ul>
-                        </div>
-                    )}
+                    <PropertiesPanel
+                        selectedNode={selectedNode}
+                        selectedEdge={selectedEdge}
+                        nodes={nodes}
+                        onUpdateNode={updateNode}
+                        onUpdateNodeData={updateNodeData}
+                        onUpdateEdge={updateEdge}
+                        onDuplicateNode={duplicateNode}
+                        onRemoveNode={removeNode}
+                        onRemoveEdge={removeEdge}
+                        onStatus={showStatus}
+                    />
                 </aside>
             </div>
 
@@ -1141,7 +1089,7 @@ export default function ProcessDesigner() {
                             onClick={() => duplicateNode(contextMenu.targetId)}
                             className="w-full px-4 py-2 text-left text-sm text-(--color-text) transition-colors hover:bg-(--color-bg-soft)"
                         >
-                            Duplicate
+                            Duplicar
                         </button>
                     ) : null}
                     <button
@@ -1155,7 +1103,7 @@ export default function ProcessDesigner() {
                         className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-rose-600 transition-colors hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-900/30"
                     >
                         <TrashBinIcon className="size-4" />
-                        Delete
+                        Eliminar
                     </button>
                 </div>
             ) : null}
@@ -1171,26 +1119,45 @@ export default function ProcessDesigner() {
             <PopUp
                 isOpen={isClearConfirmOpen}
                 onClose={() => setIsClearConfirmOpen(false)}
-                title="Clear canvas"
-                description="All elements and connections will be removed."
+                title="Limpiar lienzo"
+                description="Se eliminarán todos los elementos y conexiones."
                 size="sm"
                 footer={
                     <>
                         <ButtonComponent variant="outline" onClick={() => setIsClearConfirmOpen(false)}>
-                            Cancel
+                            Cancelar
                         </ButtonComponent>
                         <ButtonComponent variant="danger" onClick={clearCanvas}>
-                            Clear everything
+                            Limpiar todo
                         </ButtonComponent>
                     </>
                 }
             >
                 <p>
-                    You are about to delete {nodes.length} {nodes.length === 1 ? 'element' : 'elements'} and{' '}
-                    {edges.length} {edges.length === 1 ? 'connection' : 'connections'}. Export the diagram first if
-                    you want to keep a copy.
+                    Estás a punto de eliminar {nodes.length} {nodes.length === 1 ? 'elemento' : 'elementos'} y{' '}
+                    {edges.length} {edges.length === 1 ? 'conexión' : 'conexiones'}. Podrás deshacer con Ctrl+Z, o
+                    exporta primero el diagrama si quieres conservar una copia.
                 </p>
             </PopUp>
+
+            {/* Validation results */}
+            <ValidationPanel
+                isOpen={isValidationOpen}
+                onClose={() => setIsValidationOpen(false)}
+                results={validationResults}
+                onGoToNode={goToNode}
+            />
+
+            {/* AI assistant */}
+            <AiAssistantModal isOpen={isAiOpen} onClose={() => setIsAiOpen(false)} onApply={applyAiDraft} />
+
+            {/* Process information */}
+            <ProcessInfoModal
+                isOpen={isInfoOpen}
+                onClose={() => setIsInfoOpen(false)}
+                meta={record.meta}
+                onSave={saveMeta}
+            />
         </div>
     )
 }

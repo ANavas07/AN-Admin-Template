@@ -3,21 +3,21 @@ import SidebarSuperUser from './SidebarSuperUser'
 import type { NavItem } from './SidebarSuperUser'
 
 const NAV_ITEMS: NavItem[] = [
-    { id: 'dashboard', label: 'Dashboard',      icon: '🏠' },
-    { id: 'users',     label: 'Usuarios',        icon: '👥' },
-    { id: 'orgs',      label: 'Organizaciones',  icon: '🏢' },
-    { id: 'reports',   label: 'Reportes',        icon: '📊' },
-    { id: 'settings',  label: 'Configuración',   icon: '⚙️' },
+    { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
+    { id: 'users', label: 'Usuarios', icon: '👥' },
+    { id: 'orgs', label: 'Organizaciones', icon: '🏢' },
+    { id: 'reports', label: 'Reportes', icon: '📊' },
+    { id: 'settings', label: 'Configuración', icon: '⚙️' },
 ]
 
 function SectionContent({ activeItem }: { activeItem: string }) {
     switch (activeItem) {
-        case 'dashboard':  return <h1 className="text-2xl font-bold text-(--color-text)">Dashboard</h1>
-        case 'users':      return <h1 className="text-2xl font-bold text-(--color-text)">Usuarios</h1>
-        case 'orgs':       return <h1 className="text-2xl font-bold text-(--color-text)">Organizaciones</h1>
-        case 'reports':    return <h1 className="text-2xl font-bold text-(--color-text)">Reportes</h1>
-        case 'settings':   return <h1 className="text-2xl font-bold text-(--color-text)">Configuración</h1>
-        default:           return null
+        case 'dashboard': return <h1 className="text-2xl font-bold text-(--color-text)">Dashboard</h1>
+        case 'users': return <h1 className="text-2xl font-bold text-(--color-text)">Usuarios</h1>
+        case 'orgs': return <h1 className="text-2xl font-bold text-(--color-text)">Organizaciones</h1>
+        case 'reports': return <h1 className="text-2xl font-bold text-(--color-text)">Reportes</h1>
+        case 'settings': return <h1 className="text-2xl font-bold text-(--color-text)">Configuración</h1>
+        default: return null
     }
 }
 
