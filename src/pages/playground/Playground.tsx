@@ -50,6 +50,24 @@ const playgroundNavItems: PlaygroundNavItem[] = [
         description: 'Manejo y trazabilidad de proyectos tipo asana',
         path: '/tasks',
         icon: null,
+    },
+    {
+        label: 'Procesos BPMN',
+        description: 'Gestion de procesos BPMN',
+        path: '/process',
+        icon: null,
+    },
+    {
+        label: 'Gestion de Archivos',
+        description: 'Gestion de archivos Drag and drop + visualizacion',
+        path: '/files',
+        icon: null,
+    },
+    {
+        label: 'Gestion de usuarios',
+        description: 'Gestionar usuarios y verlos',
+        path: '/files',
+        icon: null,
     }
 ]
 
@@ -90,7 +108,7 @@ export default function Playground() {
                             </p>
                         </div>
 
-                        <nav className="space-y-2 p-3" aria-label="Playground navigation">
+                        <nav className="space-y-2 p-3 max-h-[50vh] overflow-y-auto" aria-label="Playground navigation">
                             {playgroundNavItems.map((item) => (
                                 <NavLink
                                     key={item.path}

@@ -86,14 +86,14 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
                         <div className="flex items-center justify-between">
                             <div className="inline-flex items-center gap-3">
                                 <span className="inline-flex size-11 items-center justify-center rounded-2xl bg-brand text-lg font-bold text-white shadow-sm">
-                                    CT
+                                    SGC
                                 </span>
                                 <div>
                                     <p className="text-sm font-semibold tracking-[0.08em] text-(--color-text-muted)">
-                                        CRM TOURNAMENTS
+                                        Sistema de Gestion Centralizada
                                     </p>
                                     <h1 className="text-lg font-bold text-(--color-text)">
-                                        System Panel
+                                        Panel administrativo
                                     </h1>
                                 </div>
                             </div>
@@ -117,11 +117,10 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
                             </div>
 
                             <h2 className="mt-6 max-w-xl text-4xl font-bold tracking-tight text-(--color-text) sm:text-5xl">
-                                Entra al centro operativo de tus torneos.
+                                Entra al sistema integrado + completo.
                             </h2>
                             <p className="mt-4 max-w-xl text-base leading-7 text-(--color-text-muted) sm:text-lg">
-                                Controla usuarios, calendarios, reportes y operacion diaria desde una
-                                interfaz enfocada en velocidad, claridad y seguimiento en tiempo real.
+                                Controla usuarios, tareas, procesos desde una plataforma centralizada y en tiempo real.
                             </p>
 
                             <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -132,9 +131,9 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
                                     </p>
                                 </article>
                                 <article className="rounded-2xl border border-(--color-border) bg-(--color-bg-soft) p-4 shadow-sm">
-                                    <p className="text-2xl font-bold text-(--color-text)">+128</p>
+                                    <p className="text-2xl font-bold text-(--color-text)">+10</p>
                                     <p className="mt-1 text-sm text-(--color-text-muted)">
-                                        Eventos, ligas y circuitos conectados en un solo panel.
+                                        Empresas confian en nuestro productos.
                                     </p>
                                 </article>
                                 <article className="rounded-2xl border border-(--color-border) bg-(--color-bg-soft) p-4 shadow-sm">
@@ -165,11 +164,10 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
 
                             <article className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 shadow-sm">
                                 <p className="text-sm font-semibold text-(--color-text)">
-                                    Vista recomendada
+                                    Recomendaciones
                                 </p>
                                 <p className="mt-2 text-sm text-(--color-text-muted)">
-                                    Usa tu correo institucional para entrar y dirigir el panel completo sin
-                                    exponer la navegacion principal antes del acceso.
+                                    Si eres un nuevo usuario debes solicitar acceso a tus administradores
                                 </p>
                             </article>
                         </div>
@@ -183,7 +181,7 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
                                 Iniciar sesion
                             </p>
                             <h3 className="mt-3 text-3xl font-bold tracking-tight text-(--color-text)">
-                                Bienvenido de vuelta
+                                Bienvenido al SGC
                             </h3>
                             <p className="mt-2 text-sm leading-6 text-(--color-text-muted)">
                                 Accede a la administracion del sistema con tu cuenta operativa.
@@ -192,7 +190,7 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
 
                         <form className="space-y-5" onSubmit={handleSubmit}>
                             <InputComponent
-                                label="Correo institucional"
+                                label="Correo electronico"
                                 type="email"
                                 placeholder="admin@crm-tournaments.com"
                                 value={form.email}
@@ -224,11 +222,10 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
                                             }))
                                         }
                                         placeholder="Ingresa tu contrasena"
-                                        className={`h-11 w-full rounded-xl border bg-(--color-surface) px-4 pr-12 text-sm text-(--color-text) placeholder:text-(--color-text-muted) transition-all duration-200 focus:outline-none focus:ring-2 ${
-                                            passwordError
-                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                                                : 'border-(--color-border) focus:border-highlight focus:ring-highlight/25'
-                                        }`}
+                                        className={`h-11 w-full rounded-xl border bg-(--color-surface) px-4 pr-12 text-sm text-(--color-text) placeholder:text-(--color-text-muted) transition-all duration-200 focus:outline-none focus:ring-2 ${passwordError
+                                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                                            : 'border-(--color-border) focus:border-highlight focus:ring-highlight/25'
+                                            }`}
                                     />
 
                                     <button
@@ -276,31 +273,10 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
                                 size="lg"
                                 isLoading={isSubmitting}
                                 loadingText="Ingresando..."
-                                rightIcon={<SparkIcon className='size-4' />}
                             >
                                 Entrar al sistema
                             </ButtonComponent>
                         </form>
-
-                        <div className="mt-8 rounded-2xl border border-(--color-border) bg-(--color-bg-soft) p-4">
-                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-(--color-text-muted)">
-                                Entorno de acceso
-                            </p>
-                            <div className="mt-3 flex items-center justify-between gap-4">
-                                <div>
-                                    <p className="text-sm font-semibold text-(--color-text)">
-                                        Panel central
-                                    </p>
-                                    <p className="text-sm text-(--color-text-muted)">
-                                        Listo para control administrativo y operativo.
-                                    </p>
-                                </div>
-                                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/12 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-300">
-                                    <span className="size-2 rounded-full bg-current" />
-                                    Activo
-                                </span>
-                            </div>
-                        </div>
                     </div>
                 </section>
             </div>

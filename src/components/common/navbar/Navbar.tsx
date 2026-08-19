@@ -41,10 +41,7 @@ type ModuleLink = {
 }
 
 const moduleLinks: ModuleLink[] = [
-    { label: 'Home', path: '/dashboard', icon: <HomeIcon className="size-4.5" /> },
-    { label: 'Users', path: '/users', icon: <UsersIcon className="size-4.5" /> },
-    { label: 'Files', path: '/files', icon: <UploadIcon className="size-4.5" /> },
-    { label: 'Procesos', path: '/process', icon: <FlowIcon className="size-4.5" /> },
+    { label: 'Administrador', path: '/superuser/rbac', icon: <UsersIcon className="size-4.5" /> },
     { label: 'Playground', path: '/playground', icon: <SparkIcon className="size-4.5" /> },
 ]
 
