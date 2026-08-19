@@ -27,8 +27,8 @@ export default function ProcessRepository() {
     const [categoryFilter, setCategoryFilter] = useState<string>('all')
     const [deleteTarget, setDeleteTarget] = useState<ProcessSummary | null>(null)
 
+    // Keeps the current list visible while reloading; `loading` starts true for first render
     const load = useCallback(() => {
-        setLoading(true)
         processService.list().then((items) => {
             setProcesses(items)
             setLoading(false)

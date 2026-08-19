@@ -3,98 +3,103 @@ import type { DiagramSnapshot, FlowEdge, FlowNode } from '../flowTypes'
 
 export type DiagramState = { nodes: FlowNode[]; edges: FlowEdge[] }
 
+type HistoryState = {
+    past: DiagramState[]
+    present: DiagramState
+    future: DiagramState[]
+}
+
 const HISTORY_LIMIT = 60
 
 /**
- * Diagram state with undo/redo.
+ * Diagram state with undo/redo, modelled as pure past/present/future state.
  *
- * - `apply` records the previous state (structural changes: add / remove / move commit).
+ * - `apply` records the previous state (structural changes: add / remove / connect).
  * - `applyTransient` mutates without recording (drag frames, text typing) so the
  *   history keeps one entry per gesture instead of one per pixel/keystroke.
  * - `beginGesture` / `endGesture` bracket pointer gestures: the pre-gesture state
- *   is recorded once, when the gesture actually changed something.
+ *   is recorded once, and only when the gesture actually changed something.
  */
 export function useDiagramHistory(initial: DiagramState) {
-    const [state, setState] = useState<DiagramState>(initial)
-    const undoStack = useRef<DiagramState[]>([])
-    const redoStack = useRef<DiagramState[]>([])
+    const [history, setHistory] = useState<HistoryState>({ past: [], present: initial, future: [] })
     const gestureSnapshot = useRef<DiagramState | null>(null)
-    const [historyVersion, setHistoryVersion] = useState(0)
 
-    const record = useCallback((previous: DiagramState) => {
-        undoStack.current.push(previous)
-        if (undoStack.current.length > HISTORY_LIMIT) undoStack.current.shift()
-        redoStack.current = []
-        setHistoryVersion((version) => version + 1)
-    }, [])
-
-    const apply = useCallback(
-        (updater: (current: DiagramState) => DiagramState) => {
-            setState((current) => {
-                const next = updater(current)
-                if (next !== current) record(current)
-                return next
-            })
-        },
-        [record]
-    )
-
-    const applyTransient = useCallback((updater: (current: DiagramState) => DiagramState) => {
-        setState(updater)
-    }, [])
-
-    const beginGesture = useCallback(() => {
-        setState((current) => {
-            gestureSnapshot.current = current
-            return current
+    const apply = useCallback((updater: (current: DiagramState) => DiagramState) => {
+        setHistory((current) => {
+            const next = updater(current.present)
+            if (next === current.present) return current
+            return {
+                past: [...current.past, current.present].slice(-HISTORY_LIMIT),
+                present: next,
+                future: [],
+            }
         })
     }, [])
+
+    const applyTransient = useCallback((updater: (current: DiagramState) => DiagramState) => {
+        setHistory((current) => {
+            const next = updater(current.present)
+            return next === current.present ? current : { ...current, present: next }
+        })
+    }, [])
+
+    /** Called from a pointer-down handler, so `history.present` is up to date. */
+    function beginGesture() {
+        gestureSnapshot.current = history.present
+    }
 
     const endGesture = useCallback(() => {
         const snapshot = gestureSnapshot.current
         gestureSnapshot.current = null
         if (!snapshot) return
-        setState((current) => {
-            if (current !== snapshot) record(snapshot)
-            return current
+        setHistory((current) => {
+            if (current.present === snapshot) return current
+            return {
+                past: [...current.past, snapshot].slice(-HISTORY_LIMIT),
+                present: current.present,
+                future: [],
+            }
         })
-    }, [record])
+    }, [])
 
     const undo = useCallback(() => {
-        setState((current) => {
-            const previous = undoStack.current.pop()
+        setHistory((current) => {
+            const previous = current.past[current.past.length - 1]
             if (!previous) return current
-            redoStack.current.push(current)
-            setHistoryVersion((version) => version + 1)
-            return previous
+            return {
+                past: current.past.slice(0, -1),
+                present: previous,
+                future: [...current.future, current.present],
+            }
         })
     }, [])
 
     const redo = useCallback(() => {
-        setState((current) => {
-            const next = redoStack.current.pop()
+        setHistory((current) => {
+            const next = current.future[current.future.length - 1]
             if (!next) return current
-            undoStack.current.push(current)
-            setHistoryVersion((version) => version + 1)
-            return next
+            return {
+                past: [...current.past, current.present],
+                present: next,
+                future: current.future.slice(0, -1),
+            }
         })
     }, [])
 
     /** Replaces the whole diagram and clears the history (load / import). */
     const reset = useCallback((next: DiagramState) => {
-        undoStack.current = []
-        redoStack.current = []
         gestureSnapshot.current = null
-        setState(next)
-        setHistoryVersion((version) => version + 1)
+        setHistory({ past: [], present: next, future: [] })
     }, [])
 
-    void historyVersion // re-render trigger for canUndo/canRedo
-
     return {
-        nodes: state.nodes,
-        edges: state.edges,
-        snapshot: (): DiagramSnapshot => ({ version: 2, nodes: state.nodes, edges: state.edges }),
+        nodes: history.present.nodes,
+        edges: history.present.edges,
+        snapshot: (): DiagramSnapshot => ({
+            version: 2,
+            nodes: history.present.nodes,
+            edges: history.present.edges,
+        }),
         apply,
         applyTransient,
         beginGesture,
@@ -102,7 +107,7 @@ export function useDiagramHistory(initial: DiagramState) {
         undo,
         redo,
         reset,
-        canUndo: undoStack.current.length > 0,
-        canRedo: redoStack.current.length > 0,
+        canUndo: history.past.length > 0,
+        canRedo: history.future.length > 0,
     }
 }

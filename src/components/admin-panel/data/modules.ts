@@ -34,6 +34,14 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 requiredRoles: ['admin', 'organizer'],
             },
             {
+                id: 'tasks',
+                title: 'Gestión de tareas',
+                description: 'Tablero, lista, cronograma y calendario de tareas del proyecto',
+                icon: '🗂️',
+                requiredRoles: ['admin', 'organizer', 'analyst'],
+                url: '/tasks',
+            },
+            {
                 id: 'email',
                 title: 'Correo electrónico',
                 description:
