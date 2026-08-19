@@ -2,11 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import {
     ArrowLeftIcon,
-    FlowIcon,
-    HomeIcon,
     SettingsIcon,
     SparkIcon,
-    UploadIcon,
     UsersIcon,
 } from '../../../icons/icons'
 
