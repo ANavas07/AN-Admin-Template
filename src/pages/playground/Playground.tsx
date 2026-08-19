@@ -44,6 +44,12 @@ const playgroundNavItems: PlaygroundNavItem[] = [
         description: 'Formularios dinamicos, validacion y dependencias entre campos',
         path: '/playground/modals',
         icon: null,
+    },
+    {
+        label: 'Tareas',
+        description: 'Manejo y trazabilidad de proyectos tipo asana',
+        path: '/tasks',
+        icon: null,
     }
 ]
 

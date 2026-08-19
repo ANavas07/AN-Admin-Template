@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import PopUp from '../../../components/common/pop-up/PopUp'
 import ButtonComponent from '../../../components/ui/buttons/ButtonComponent'
 import InputComponent from '../../../components/ui/inputs/InputComponent'
@@ -22,9 +22,12 @@ const textareaClass =
 export default function ProcessInfoModal({ isOpen, onClose, meta, onSave }: ProcessInfoModalProps) {
     const [form, setForm] = useState(meta)
 
-    useEffect(() => {
+    // Re-seed the form from the latest meta each time the modal opens
+    const [wasOpen, setWasOpen] = useState(isOpen)
+    if (isOpen !== wasOpen) {
+        setWasOpen(isOpen)
         if (isOpen) setForm(meta)
-    }, [isOpen, meta])
+    }
 
     function patch(field: keyof ProcessMeta, value: string) {
         setForm((current) => ({ ...current, [field]: value }))

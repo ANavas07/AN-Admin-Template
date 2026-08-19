@@ -101,10 +101,16 @@ export default function ProcessDesigner() {
     const idCounterRef = useRef(0)
     const toastTimerRef = useRef<number | null>(null)
 
+    // Reset to the loading state when navigating between processes
+    const [loadedProcessId, setLoadedProcessId] = useState(processId)
+    if (loadedProcessId !== processId) {
+        setLoadedProcessId(processId)
+        setLoadState('loading')
+    }
+
     // --- Load the process from the repository ------------------------------
     useEffect(() => {
         let cancelled = false
-        setLoadState('loading')
         processService.getById(processId ?? '').then((found) => {
             if (cancelled) return
             if (!found) {
