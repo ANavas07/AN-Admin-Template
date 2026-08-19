@@ -131,10 +131,10 @@ export default function Navbar({
                         </span>
                         <span className="hidden min-w-0 xl:block">
                             <span className="block truncate text-sm font-semibold tracking-wide text-(--color-text)">
-                                Sports Tournament Management
+                                Sistema de Gestion
                             </span>
                             <span className="block text-xs text-(--color-text-muted)">
-                                Control panel
+                                Panel de Control
                             </span>
                         </span>
                     </NavLink>

@@ -77,7 +77,7 @@ export default function Playground() {
                                 Playground
                             </span>
                             <h1 className="mt-4 text-xl font-bold text-(--color-text)">
-                                Catalogos UI
+                                Catalogo de componentes
                             </h1>
                             <p className="mt-2 text-sm text-(--color-text-muted)">
                                 Navega entre los componentes reutilizables del panel.
