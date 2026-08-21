@@ -81,8 +81,3 @@ export interface RbacUser {
   id: string
   username: string
 }
-
-export type ToastState = {
-  type: 'success' | 'error'
-  message: string
-}

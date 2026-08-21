@@ -5,6 +5,7 @@ import type {
     ButtonVariant,
 } from '../../components/ui/buttons/ButtonComponent'
 import { ArrowRightIcon, ChartIcon, CheckIcon, PlusIcon, SearchIcon, SettingsIcon, TrashBinIcon } from '../../icons/icons'
+import { sileo } from 'sileo'
 
 type CatalogSectionProps = {
     title: string
@@ -132,7 +133,7 @@ export default function ButtonCatalog() {
                     description="Puedes colocar iconos a la izquierda o derecha sin cambiar el layout."
                 >
                     <div className="flex flex-wrap gap-3">
-                        <ButtonComponent leftIcon={<PlusIcon />}>
+                        <ButtonComponent leftIcon={<PlusIcon />} onClick={() => sileo.info({ title: 'Toast de ejemplo', description: 'El servidor respondió con un error' })}>
                             Crear torneo
                         </ButtonComponent>
                         <ButtonComponent variant="secondary" rightIcon={<ArrowRightIcon />}>

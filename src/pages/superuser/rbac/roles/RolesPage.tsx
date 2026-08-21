@@ -5,17 +5,16 @@ import ButtonComponent from '../../../../components/ui/buttons/ButtonComponent'
 import PopUp from '../../../../components/common/pop-up/PopUp'
 import ModuleHeader from '../../../../components/common/page/ModuleHeader'
 import { ShieldIcon, ChartIcon } from '../../../../icons/icons'
-import RbacToast from '../components/RbacToast'
 import RoleFormModal from './RoleFormModal'
 import RolePermissionsPanel from './RolePermissionsPanel'
 import RoleHierarchyTree from './RoleHierarchyTree'
 import { rolesService } from '../../../../services/rbac/roles.service'
-import type { Role, ToastState } from '../types'
+import { sileo } from 'sileo'
+import type { Role } from '../types'
 
 export default function RolesPage() {
   const [roles, setRoles] = useState<Role[]>([])
   const [loading, setLoading] = useState(true)
-  const [toast, setToast] = useState<ToastState | null>(null)
 
   const [formOpen, setFormOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Role | null>(null)
@@ -34,7 +33,7 @@ export default function RolesPage() {
     rolesService.getAll({ signal })
       .then((res) => setRoles(res.data))
       .catch((err) => {
-        if (err.name !== 'AbortError') setToast({ type: 'error', message: 'Error al cargar los roles.' })
+        if (err.name !== 'AbortError') sileo.error({ title: 'Error al cargar los roles.' })
       })
       .finally(() => setLoading(false))
   }, [])
@@ -72,10 +71,10 @@ export default function RolesPage() {
       await rolesService.remove(deleteTarget.id)
       setDeleteOpen(false)
       setDeleteTarget(null)
-      setToast({ type: 'success', message: `Rol "${deleteTarget.name}" eliminado.` })
+      sileo.success({ title: `Rol "${deleteTarget.name}" eliminado.` })
       load()
     } catch {
-      setToast({ type: 'error', message: 'No se pudo eliminar el rol.' })
+      sileo.error({ title: 'No se pudo eliminar el rol.' })
     } finally {
       setIsDeleting(false)
     }
@@ -83,10 +82,7 @@ export default function RolesPage() {
 
   function handleSaved() {
     setFormOpen(false)
-    setToast({
-      type: 'success',
-      message: editTarget ? 'Rol actualizado correctamente.' : 'Rol creado correctamente.',
-    })
+    sileo.success({ title: editTarget ? 'Rol actualizado correctamente.' : 'Rol creado correctamente.' })
     load()
   }
 
@@ -199,7 +195,7 @@ export default function RolesPage() {
           isOpen={permPanelOpen}
           role={permTarget}
           onClose={() => setPermPanelOpen(false)}
-          onSaved={() => setToast({ type: 'success', message: 'Permisos actualizados.' })}
+          onSaved={() => sileo.success({ title: 'Permisos actualizados.' })}
         />
       )}
 
@@ -241,7 +237,6 @@ export default function RolesPage() {
         </p>
       </PopUp>
 
-      <RbacToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   )
 }

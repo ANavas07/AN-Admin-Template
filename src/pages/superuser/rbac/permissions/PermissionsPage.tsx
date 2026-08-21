@@ -5,17 +5,16 @@ import ButtonComponent from '../../../../components/ui/buttons/ButtonComponent'
 import PopUp from '../../../../components/common/pop-up/PopUp'
 import ModuleHeader from '../../../../components/common/page/ModuleHeader'
 import { PlusIcon } from '../../../../icons/icons'
-import RbacToast from '../components/RbacToast'
 import PermissionFormModal from './PermissionFormModal'
 import { permissionsService } from '../../../../services/rbac/permissions.service'
-import type { Permission, ToastState } from '../types'
+import { sileo } from 'sileo'
+import type { Permission } from '../types'
 
 const ACTIONS = ['create', 'read', 'update', 'delete', 'export'] as const
 
 export default function PermissionsPage() {
   const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
-  const [toast, setToast] = useState<ToastState | null>(null)
 
   const [resourceFilter, setResourceFilter] = useState('')
   const [actionFilter, setActionFilter] = useState('')
@@ -32,7 +31,7 @@ export default function PermissionsPage() {
     permissionsService.getAll({ signal })
       .then((res) => setPermissions(res.data))
       .catch((err) => {
-        if (err.name !== 'AbortError') setToast({ type: 'error', message: 'Error al cargar los permisos.' })
+        if (err.name !== 'AbortError') sileo.error({ title: 'Error al cargar los permisos.' })
       })
       .finally(() => setLoading(false))
   }, [])
@@ -80,10 +79,10 @@ export default function PermissionsPage() {
       await permissionsService.remove(deleteTarget.id)
       setDeleteOpen(false)
       setDeleteTarget(null)
-      setToast({ type: 'success', message: `Permiso "${deleteTarget.code}" eliminado.` })
+      sileo.success({ title: `Permiso "${deleteTarget.code}" eliminado.` })
       load()
     } catch {
-      setToast({ type: 'error', message: 'No se pudo eliminar el permiso.' })
+      sileo.error({ title: 'No se pudo eliminar el permiso.' })
     } finally {
       setIsDeleting(false)
     }
@@ -91,10 +90,7 @@ export default function PermissionsPage() {
 
   function handleSaved() {
     setFormOpen(false)
-    setToast({
-      type: 'success',
-      message: editTarget ? 'Permiso actualizado.' : 'Permiso creado correctamente.',
-    })
+    sileo.success({ title: editTarget ? 'Permiso actualizado.' : 'Permiso creado correctamente.' })
     load()
   }
 
@@ -246,7 +242,6 @@ export default function PermissionsPage() {
         </p>
       </PopUp>
 
-      <RbacToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   )
 }

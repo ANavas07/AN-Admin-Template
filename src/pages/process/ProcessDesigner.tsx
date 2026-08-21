@@ -6,6 +6,7 @@ import PopUp from '../../components/common/pop-up/PopUp'
 import { ArrowLeftIcon, FlowIcon, SparkIcon, TrashBinIcon } from '../../icons/icons'
 import { processService } from '../../services/process/process.service'
 import type { ProcessDraft } from '../../services/process/ai.service'
+import { sileo } from 'sileo'
 import FlowNodeView from './FlowNodeView'
 import AiAssistantModal from './components/AiAssistantModal'
 import PalettePanel from './components/PalettePanel'
@@ -83,7 +84,6 @@ export default function ProcessDesigner() {
     const [viewport, setViewport] = useState<ViewportState>({ scale: 1, tx: 0, ty: 0 })
     const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 })
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
-    const [statusMessage, setStatusMessage] = useState<string | null>(null)
     const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false)
     const [isValidationOpen, setIsValidationOpen] = useState(false)
     const [validationResults, setValidationResults] = useState<ValidationResult[]>([])
@@ -99,7 +99,6 @@ export default function ProcessDesigner() {
     const resizeRef = useRef<{ nodeId: string; startW: number; startH: number; startX: number; startY: number } | null>(null)
     const connectDragRef = useRef<{ startClientX: number; startClientY: number; moved: boolean } | null>(null)
     const idCounterRef = useRef(0)
-    const toastTimerRef = useRef<number | null>(null)
 
     // Reset to the loading state when navigating between processes
     const [loadedProcessId, setLoadedProcessId] = useState(processId)
@@ -219,9 +218,7 @@ export default function ProcessDesigner() {
     })
 
     function showStatus(message: string) {
-        if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current)
-        setStatusMessage(message)
-        toastTimerRef.current = window.setTimeout(() => setStatusMessage(null), 2600)
+        sileo.info({ title: message })
     }
 
     function newId(prefix: string) {
@@ -1114,12 +1111,6 @@ export default function ProcessDesigner() {
                 </div>
             ) : null}
 
-            {/* Status toast */}
-            {statusMessage ? (
-                <div className="pointer-events-none absolute bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-(--color-border) bg-(--color-surface) px-4 py-2 text-sm font-medium text-(--color-text) shadow-lg">
-                    {statusMessage}
-                </div>
-            ) : null}
 
             {/* Clear canvas confirmation */}
             <PopUp

@@ -55,3 +55,7 @@ body {
 	color: var(--color-text);
 	transition: background-color 220ms ease, color 220ms ease;
 }
+
+[data-sileo-viewport] {
+	z-index: 1000 !important;
+}

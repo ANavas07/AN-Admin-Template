@@ -5,17 +5,16 @@ import ButtonComponent from '../../../../components/ui/buttons/ButtonComponent'
 import PopUp from '../../../../components/common/pop-up/PopUp'
 import ModuleHeader from '../../../../components/common/page/ModuleHeader'
 import { PlusIcon, UsersIcon } from '../../../../icons/icons'
-import RbacToast from '../components/RbacToast'
 import GroupFormModal from './GroupFormModal'
 import GroupMembersPanel from './GroupMembersPanel'
 import GroupRolesPanel from './GroupRolesPanel'
 import { groupsService } from '../../../../services/rbac/groups.service'
-import type { Group, ToastState } from '../types'
+import { sileo } from 'sileo'
+import type { Group } from '../types'
 
 export default function GroupsPage() {
   const [groups, setGroups] = useState<Group[]>([])
   const [loading, setLoading] = useState(true)
-  const [toast, setToast] = useState<ToastState | null>(null)
 
   const [formOpen, setFormOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Group | null>(null)
@@ -35,7 +34,7 @@ export default function GroupsPage() {
     groupsService.getAll({ signal })
       .then((res) => setGroups(res.data))
       .catch((err) => {
-        if (err.name !== 'AbortError') setToast({ type: 'error', message: 'Error al cargar los grupos.' })
+        if (err.name !== 'AbortError') sileo.error({ title: 'Error al cargar los grupos.' })
       })
       .finally(() => setLoading(false))
   }, [])
@@ -78,10 +77,10 @@ export default function GroupsPage() {
       await groupsService.remove(deleteTarget.id)
       setDeleteOpen(false)
       setDeleteTarget(null)
-      setToast({ type: 'success', message: `Grupo "${deleteTarget.name}" eliminado.` })
+      sileo.success({ title: `Grupo "${deleteTarget.name}" eliminado.` })
       load()
     } catch {
-      setToast({ type: 'error', message: 'No se pudo eliminar el grupo.' })
+      sileo.error({ title: 'No se pudo eliminar el grupo.' })
     } finally {
       setIsDeleting(false)
     }
@@ -89,10 +88,7 @@ export default function GroupsPage() {
 
   function handleSaved() {
     setFormOpen(false)
-    setToast({
-      type: 'success',
-      message: editTarget ? 'Grupo actualizado.' : 'Grupo creado correctamente.',
-    })
+    sileo.success({ title: editTarget ? 'Grupo actualizado.' : 'Grupo creado correctamente.' })
     load()
   }
 
@@ -206,7 +202,7 @@ export default function GroupsPage() {
           group={membersTarget}
           onClose={() => setMembersOpen(false)}
           onChanged={() => {
-            setToast({ type: 'success', message: 'Miembros del grupo actualizados.' })
+            sileo.success({ title: 'Miembros del grupo actualizados.' })
             load()
           }}
         />
@@ -218,7 +214,7 @@ export default function GroupsPage() {
           group={rolesTarget}
           onClose={() => setRolesOpen(false)}
           onChanged={() => {
-            setToast({ type: 'success', message: 'Roles del grupo actualizados.' })
+            sileo.success({ title: 'Roles del grupo actualizados.' })
             load()
           }}
         />
@@ -253,7 +249,6 @@ export default function GroupsPage() {
         </p>
       </PopUp>
 
-      <RbacToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   )
 }

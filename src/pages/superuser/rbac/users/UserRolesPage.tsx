@@ -5,11 +5,11 @@ import ButtonComponent from '../../../../components/ui/buttons/ButtonComponent'
 import InputComponent from '../../../../components/ui/inputs/InputComponent'
 import ModuleHeader from '../../../../components/common/page/ModuleHeader'
 import { SearchIcon, EyeIcon } from '../../../../icons/icons'
-import RbacToast from '../components/RbacToast'
 import UserRoleAssignModal from './UserRoleAssignModal'
 import UserEffectivePermissionsPanel from './UserEffectivePermissionsPanel'
 import { usersRolesService } from '../../../../services/rbac/users-roles.service'
-import type { RbacUser, UserRoleAssignment, UserGroupRole, ToastState } from '../types'
+import { sileo } from 'sileo'
+import type { RbacUser, UserRoleAssignment, UserGroupRole } from '../types'
 
 export default function UserRolesPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -23,8 +23,6 @@ export default function UserRolesPage() {
 
   const [assignOpen, setAssignOpen] = useState(false)
   const [permsOpen, setPermsOpen] = useState(false)
-
-  const [toast, setToast] = useState<ToastState | null>(null)
 
   function handleSearch() {
     if (!searchQuery.trim() || searchQuery.length < 2) return
@@ -65,16 +63,16 @@ export default function UserRolesPage() {
     if (!selectedUser || !confirm(`¿Revocar el rol "${roleName}" de ${selectedUser.username}?`)) return
     try {
       await usersRolesService.removeRole(selectedUser.id, roleId)
-      setToast({ type: 'success', message: `Rol "${roleName}" revocado.` })
+      sileo.success({ title: `Rol "${roleName}" revocado.` })
       loadUserRoles(selectedUser)
     } catch {
-      setToast({ type: 'error', message: 'No se pudo revocar el rol.' })
+      sileo.error({ title: 'No se pudo revocar el rol.' })
     }
   }
 
   function handleAssigned() {
     setAssignOpen(false)
-    setToast({ type: 'success', message: 'Rol asignado correctamente.' })
+    sileo.success({ title: 'Rol asignado correctamente.' })
     if (selectedUser) loadUserRoles(selectedUser)
   }
 
@@ -273,7 +271,6 @@ export default function UserRolesPage() {
         />
       )}
 
-      <RbacToast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   )
 }
