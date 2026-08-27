@@ -4,6 +4,7 @@ import DataList from '../../../../components/ui/inputs/DataList'
 import { SearchIcon, PlusIcon } from '../../../../icons/icons'
 import { priorityLabels, priorityOrder } from '../../constants'
 import type { Assignee, Priority } from '../../types'
+import Select from '../../../../components/ui/inputs/Select'
 
 export type TaskFilter = {
     search: string
@@ -16,15 +17,15 @@ type Props = {
     onFilterChange: (filter: TaskFilter) => void
     assignees: Assignee[]
     onNewTask: () => void
+    onInvite: () => void
 }
 
-export function TasksToolbar({ filter, onFilterChange, assignees, onNewTask }: Props) {
+export function TasksToolbar({ filter, onFilterChange, assignees, onNewTask, onInvite }: Props) {
     const priorityOptions = [
-        { value: 'all', label: 'Toda prioridad' },
+        { value: 'all', label: 'Todas las prioridades' },
         ...priorityOrder.map((value) => ({ value, label: priorityLabels[value] })),
     ]
     const assigneeOptions = [
-        { value: 'all', label: 'Todos los asignados' },
         ...assignees.map((assignee) => ({ value: assignee.id, label: assignee.name })),
     ]
 
@@ -42,23 +43,26 @@ export function TasksToolbar({ filter, onFilterChange, assignees, onNewTask }: P
                         fullWidth
                     />
                 </div>
-                <div className="w-44">
-                    <DataList
+                <div className="w-65">
+                    <Select
+                        id="priority-select"
                         options={priorityOptions}
+                        value={filter.priority}
                         opKey="value"
                         opValue="label"
-                        value={filter.priority}
+                        placeholder="Seleccionar prioridad"
                         clearable={false}
                         onSelect={(event) =>
                             onFilterChange({ ...filter, priority: (event.target.value || 'all') as Priority | 'all' })
                         }
                     />
                 </div>
-                <div className="w-52">
+                <div className="w-65">
                     <DataList
                         options={assigneeOptions}
                         opKey="value"
                         opValue="label"
+                        placeholder='Buscar por asignado'
                         value={filter.assigneeId}
                         clearable={false}
                         onSelect={(event) =>
@@ -68,9 +72,14 @@ export function TasksToolbar({ filter, onFilterChange, assignees, onNewTask }: P
                 </div>
             </div>
 
-            <ButtonComponent onClick={onNewTask} leftIcon={<PlusIcon />} size="sm" className="shrink-0">
-                Nueva tarea
-            </ButtonComponent>
+            <div className="flex shrink-0 items-center gap-2">
+                <ButtonComponent onClick={onInvite} variant="outline" size="sm">
+                    Invitar
+                </ButtonComponent>
+                <ButtonComponent onClick={onNewTask} leftIcon={<PlusIcon />} size="sm">
+                    Nueva tarea
+                </ButtonComponent>
+            </div>
         </div>
     )
 }

@@ -80,6 +80,10 @@ export function TaskDetailPanel({ taskId, api, onClose }: Props) {
         api.updateTask(task!.id, { priority })
     }
 
+    function changeLocation(location: string) {
+        api.updateTask(task!.id, { location: location.trim() || null })
+    }
+
     function addComment() {
         const body = comment.trim()
         if (!body) return
@@ -167,7 +171,14 @@ export function TaskDetailPanel({ taskId, api, onClose }: Props) {
 
                     {/* Meta fields */}
                     <div className="mt-4">
-                        <TaskMetaFields task={task} onChangePriority={changePriority} />
+                        <TaskMetaFields
+                            task={task}
+                            tagCatalog={api.project.tags}
+                            onChangePriority={changePriority}
+                            onChangeLocation={changeLocation}
+                            onSetTags={(tags) => api.updateTask(task.id, { tags })}
+                            onCreateTag={api.createTag}
+                        />
                     </div>
 
                     {/* Description */}

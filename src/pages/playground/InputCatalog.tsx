@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
 import DataList from '../../components/ui/inputs/DataList'
 import InputComponent from '../../components/ui/inputs/InputComponent'
+import Select from '../../components/ui/inputs/Select'
 
 type TournamentOption = {
     id: string
@@ -32,6 +33,11 @@ const tournamentOptions: TournamentOption[] = [
     },
 ]
 
+const options: TournamentOption[] = [
+    { id: 'champions', name: 'Champions Cup', category: 'Futbol' },
+    { id: 'basket', name: 'Basket Open', category: 'Baloncesto' },
+]
+
 function Block({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
     return (
         <article className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 shadow-sm">
@@ -49,6 +55,7 @@ export default function InputCatalogPlayground() {
     const [quickValue, setQuickValue] = useState('')
     const [tournamentValue, setTournamentValue] = useState('')
     const [requiredTournamentValue, setRequiredTournamentValue] = useState('')
+    const [tournament, setTournament] = useState('')
 
     const emailError = useMemo(() => {
         if (!emailValue) return ''
@@ -271,6 +278,24 @@ export default function InputCatalogPlayground() {
                             onSelect={() => undefined}
                         />
                     </div>
+                </Block>
+
+                <Block
+                    title="Select con validacion"
+                    description="Estado requerido, mensaje de error y estado deshabilitado."
+                >
+                    <Select<TournamentOption>
+                        id="tournament-select"
+                        label="Torneo"
+                        placeholder="Selecciona un torneo"
+                        options={options}
+                        value={tournament}
+                        opKey="id"
+                        opValue="name"
+                        optionP="category"
+                        hint="Se guarda el id del torneo."
+                        onSelect={(event) => setTournament(event.target.value)}
+                    />
                 </Block>
             </section>
         </main>

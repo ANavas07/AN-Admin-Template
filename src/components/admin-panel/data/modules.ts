@@ -42,6 +42,14 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 url: '/tasks',
             },
             {
+                id: 'planning',
+                title: 'Planificación docente',
+                description: 'Formato "Conecta, Nivela y Crea" con íconos e imágenes por celda',
+                icon: '📝',
+                requiredRoles: ['admin', 'organizer', 'analyst'],
+                url: '/planning',
+            },
+            {
                 id: 'email',
                 title: 'Correo electrónico',
                 description:

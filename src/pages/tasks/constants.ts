@@ -47,23 +47,26 @@ export const accentHex: Record<AccentColor, string> = {
 }
 
 export const priorityLabels: Record<Priority, string> = {
+    urgent: "Urgente",
     high: 'Alta',
-    medium: 'Media',
+    normal: 'Media',
     low: 'Baja',
 }
 
 export const priorityStyles: Record<Priority, string> = {
+    urgent: 'bg-red-500/10 text-red-700 border-red-500/30 dark:text-red-300',
     high: 'bg-rose-500/10 text-rose-700 border-rose-500/30 dark:text-rose-300',
-    medium: 'bg-amber-500/10 text-amber-700 border-amber-500/30 dark:text-amber-300',
+    normal: 'bg-amber-500/10 text-amber-700 border-amber-500/30 dark:text-amber-300',
     low: 'bg-slate-500/10 text-slate-600 border-slate-500/30 dark:text-slate-300',
 }
 
 /** Small solid dot used inside the priority badge. */
 export const priorityDot: Record<Priority, string> = {
+    urgent: 'bg-red-500',
     high: 'bg-rose-500',
-    medium: 'bg-amber-500',
+    normal: 'bg-amber-500',
     low: 'bg-slate-400',
 }
 
-/** Natural priority order (high → low). */
-export const priorityOrder: Priority[] = ['high', 'medium', 'low']
+/** Natural priority order (Urgent → low). */
+export const priorityOrder: Priority[] = ['urgent', 'high', 'normal', 'low']

@@ -133,7 +133,8 @@ export default function FormRender({
             const isEmpty = value === '' || value === null || value === undefined
 
             if (field.required && isEmpty) {
-                nextErrors[field.name] = `${field.label} is required.`
+                // Gender-neutral so it reads correctly for any field label (the app UI is in Spanish).
+                nextErrors[field.name] = 'Este campo es obligatorio.'
                 return
             }
 

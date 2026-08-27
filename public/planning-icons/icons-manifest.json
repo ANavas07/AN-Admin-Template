@@ -1,0 +1,266 @@
+{
+  "version": 1,
+  "icons": [
+    {
+      "id": "idea",
+      "label": "Idea / Anticipación",
+      "tags": [
+        "idea",
+        "anticipacion",
+        "foco",
+        "bombilla",
+        "inicio",
+        "motivacion"
+      ],
+      "svgPath": "/planning-icons/svg/idea.svg",
+      "pngPath": "/planning-icons/png/idea@2x.png"
+    },
+    {
+      "id": "target",
+      "label": "Objetivo",
+      "tags": [
+        "objetivo",
+        "meta",
+        "diana",
+        "proposito",
+        "logro"
+      ],
+      "svgPath": "/planning-icons/svg/target.svg",
+      "pngPath": "/planning-icons/png/target@2x.png"
+    },
+    {
+      "id": "book-open",
+      "label": "Lectura",
+      "tags": [
+        "lectura",
+        "libro",
+        "leer",
+        "texto",
+        "comprension"
+      ],
+      "svgPath": "/planning-icons/svg/book-open.svg",
+      "pngPath": "/planning-icons/png/book-open@2x.png"
+    },
+    {
+      "id": "pencil",
+      "label": "Escritura",
+      "tags": [
+        "escritura",
+        "lapiz",
+        "escribir",
+        "redaccion",
+        "tarea"
+      ],
+      "svgPath": "/planning-icons/svg/pencil.svg",
+      "pngPath": "/planning-icons/png/pencil@2x.png"
+    },
+    {
+      "id": "users",
+      "label": "Trabajo colaborativo",
+      "tags": [
+        "grupo",
+        "equipo",
+        "colaboracion",
+        "usuarios",
+        "social"
+      ],
+      "svgPath": "/planning-icons/svg/users.svg",
+      "pngPath": "/planning-icons/png/users@2x.png"
+    },
+    {
+      "id": "clipboard-check",
+      "label": "Evaluación",
+      "tags": [
+        "evaluacion",
+        "revision",
+        "checklist",
+        "criterio",
+        "indicador"
+      ],
+      "svgPath": "/planning-icons/svg/clipboard-check.svg",
+      "pngPath": "/planning-icons/png/clipboard-check@2x.png"
+    },
+    {
+      "id": "calendar",
+      "label": "Calendario",
+      "tags": [
+        "calendario",
+        "fecha",
+        "semana",
+        "cronograma",
+        "planificacion"
+      ],
+      "svgPath": "/planning-icons/svg/calendar.svg",
+      "pngPath": "/planning-icons/png/calendar@2x.png"
+    },
+    {
+      "id": "clock",
+      "label": "Tiempo",
+      "tags": [
+        "tiempo",
+        "reloj",
+        "duracion",
+        "hora",
+        "periodo"
+      ],
+      "svgPath": "/planning-icons/svg/clock.svg",
+      "pngPath": "/planning-icons/png/clock@2x.png"
+    },
+    {
+      "id": "gear",
+      "label": "Proceso / Construcción",
+      "tags": [
+        "construccion",
+        "proceso",
+        "engranaje",
+        "metodologia",
+        "estrategia"
+      ],
+      "svgPath": "/planning-icons/svg/gear.svg",
+      "pngPath": "/planning-icons/png/gear@2x.png"
+    },
+    {
+      "id": "puzzle",
+      "label": "Juego / Consolidación",
+      "tags": [
+        "juego",
+        "consolidacion",
+        "puzzle",
+        "ludico",
+        "refuerzo"
+      ],
+      "svgPath": "/planning-icons/svg/puzzle.svg",
+      "pngPath": "/planning-icons/png/puzzle@2x.png"
+    },
+    {
+      "id": "flask",
+      "label": "Ciencia",
+      "tags": [
+        "ciencia",
+        "experimento",
+        "laboratorio",
+        "quimica",
+        "investigacion"
+      ],
+      "svgPath": "/planning-icons/svg/flask.svg",
+      "pngPath": "/planning-icons/png/flask@2x.png"
+    },
+    {
+      "id": "calculator",
+      "label": "Matemática",
+      "tags": [
+        "matematica",
+        "calculo",
+        "numeros",
+        "calculadora",
+        "operaciones"
+      ],
+      "svgPath": "/planning-icons/svg/calculator.svg",
+      "pngPath": "/planning-icons/png/calculator@2x.png"
+    },
+    {
+      "id": "music-note",
+      "label": "Música",
+      "tags": [
+        "musica",
+        "nota",
+        "sonido",
+        "melodia",
+        "ritmo"
+      ],
+      "svgPath": "/planning-icons/svg/music-note.svg",
+      "pngPath": "/planning-icons/png/music-note@2x.png"
+    },
+    {
+      "id": "palette",
+      "label": "Arte",
+      "tags": [
+        "arte",
+        "pintura",
+        "creatividad",
+        "color",
+        "dibujo"
+      ],
+      "svgPath": "/planning-icons/svg/palette.svg",
+      "pngPath": "/planning-icons/png/palette@2x.png"
+    },
+    {
+      "id": "video",
+      "label": "Video",
+      "tags": [
+        "video",
+        "reproducir",
+        "multimedia",
+        "audiovisual",
+        "recurso"
+      ],
+      "svgPath": "/planning-icons/svg/video.svg",
+      "pngPath": "/planning-icons/png/video@2x.png"
+    },
+    {
+      "id": "image",
+      "label": "Imagen",
+      "tags": [
+        "imagen",
+        "foto",
+        "ilustracion",
+        "grafico",
+        "recurso visual"
+      ],
+      "svgPath": "/planning-icons/svg/image.svg",
+      "pngPath": "/planning-icons/png/image@2x.png"
+    },
+    {
+      "id": "box",
+      "label": "Recursos / Materiales",
+      "tags": [
+        "recursos",
+        "materiales",
+        "caja",
+        "insumos",
+        "kit"
+      ],
+      "svgPath": "/planning-icons/svg/box.svg",
+      "pngPath": "/planning-icons/png/box@2x.png"
+    },
+    {
+      "id": "globe",
+      "label": "Estudios sociales",
+      "tags": [
+        "sociales",
+        "mundo",
+        "globo",
+        "geografia",
+        "ciudadania"
+      ],
+      "svgPath": "/planning-icons/svg/globe.svg",
+      "pngPath": "/planning-icons/png/globe@2x.png"
+    },
+    {
+      "id": "check-badge",
+      "label": "Logro",
+      "tags": [
+        "logro",
+        "meta",
+        "insignia",
+        "aprobado",
+        "destreza"
+      ],
+      "svgPath": "/planning-icons/svg/check-badge.svg",
+      "pngPath": "/planning-icons/png/check-badge@2x.png"
+    },
+    {
+      "id": "chat",
+      "label": "Comunicación",
+      "tags": [
+        "comunicacion",
+        "dialogo",
+        "mensaje",
+        "conversacion",
+        "oral"
+      ],
+      "svgPath": "/planning-icons/svg/chat.svg",
+      "pngPath": "/planning-icons/png/chat@2x.png"
+    }
+  ]
+}

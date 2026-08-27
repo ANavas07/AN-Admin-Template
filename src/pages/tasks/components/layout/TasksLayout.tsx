@@ -1,19 +1,17 @@
 import { useMemo, useState } from 'react'
-import ButtonComponent from '../../../../components/ui/buttons/ButtonComponent'
-import InputComponent from '../../../../components/ui/inputs/InputComponent'
-import DataList from '../../../../components/ui/inputs/DataList'
 import ModuleHeader from '../../../../components/common/page/ModuleHeader'
-import PopUp from '../../../../components/common/pop-up/PopUp'
 import { useTasksMock } from '../../hooks/useTasksMock'
-import { priorityLabels, priorityOrder } from '../../constants'
-import type { Priority, Task, TaskView } from '../../types'
+import type { Task, TaskView } from '../../types'
 import { BoardView } from '../board/BoardView'
 import { ListView } from '../list/ListView'
 import { TimelineView } from '../timeline/TimelineView'
 import { CalendarView } from '../calendar/CalendarView'
 import { TaskDetailPanel } from '../task-detail/TaskDetailPanel'
+import TaskFormModal from '../TaskFormModal'
+import MembersModal from '../MembersModal'
 import { ViewSwitcher } from './ViewSwitcher'
 import { TasksToolbar, type TaskFilter } from './TasksToolbar'
+import { TasksSidebar, type MembersTarget } from './TasksSidebar'
 
 const emptyFilter: TaskFilter = { search: '', priority: 'all', assigneeId: 'all' }
 
@@ -23,11 +21,21 @@ export default function TasksLayout() {
     const [openTaskId, setOpenTaskId] = useState<string | null>(null)
     const [filter, setFilter] = useState<TaskFilter>(emptyFilter)
 
-    // New-task modal state.
-    const [creating, setCreating] = useState(false)
-    const [newTitle, setNewTitle] = useState('')
-    const [newSection, setNewSection] = useState(api.sortedSections[0]?.id ?? '')
-    const [newPriority, setNewPriority] = useState<Priority>('medium')
+    // Create/edit form modal state (mirrors the RoleFormModal flow: null task = create).
+    const [formOpen, setFormOpen] = useState(false)
+    const [formTask, setFormTask] = useState<Task | null>(null)
+    const [formSectionId, setFormSectionId] = useState<string | undefined>(undefined)
+
+    // Members (invite / add) modal state.
+    const [membersOpen, setMembersOpen] = useState(false)
+    const [membersTarget, setMembersTarget] = useState<MembersTarget>({})
+    const [membersMode, setMembersMode] = useState<'invite' | 'add'>('invite')
+
+    function openMembers(target: MembersTarget, mode: 'invite' | 'add') {
+        setMembersTarget(target)
+        setMembersMode(mode)
+        setMembersOpen(true)
+    }
 
     const matches = useMemo(() => {
         const query = filter.search.trim().toLowerCase()
@@ -42,107 +50,87 @@ export default function TasksLayout() {
         }
     }, [filter])
 
-    function openNewTask(sectionId?: string) {
-        setNewSection(sectionId ?? api.sortedSections[0]?.id ?? '')
-        setNewTitle('')
-        setNewPriority('medium')
-        setCreating(true)
+    function openCreate(sectionId?: string) {
+        setFormTask(null)
+        setFormSectionId(sectionId)
+        setFormOpen(true)
     }
-
-    function submitNewTask() {
-        if (!newTitle.trim() || !newSection) return
-        api.createTask(newSection, newTitle, { priority: newPriority })
-        setCreating(false)
-    }
-
-    const sectionOptions = api.sortedSections.map((section) => ({ value: section.id, label: section.name }))
-    const priorityOptions = priorityOrder.map((value) => ({ value, label: priorityLabels[value] }))
 
     return (
-        <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <ModuleHeader
-                eyebrow="Gestión de tareas"
-                title={api.project.name}
-                description={api.project.description}
-                actions={<ViewSwitcher active={view} onChange={setView} />}
+        <div className="flex items-start">
+            <TasksSidebar
+                teams={api.teams}
+                projects={api.projects}
+                members={api.members}
+                activeProjectId={api.activeProjectId}
+                onSelectProject={api.selectProject}
+                onManageMembers={openMembers}
+                onNewProject={(teamId) => {
+                    if (teamId) api.createProject(teamId)
+                }}
             />
 
-            <div className="mt-6">
-                <TasksToolbar
-                    filter={filter}
-                    onFilterChange={setFilter}
-                    assignees={api.project.assignees}
-                    onNewTask={() => openNewTask()}
+            <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
+                <ModuleHeader
+                    eyebrow="Gestión de tareas"
+                    title={api.project.name}
+                    description={api.project.description}
+                    actions={<ViewSwitcher active={view} onChange={setView} />}
                 />
-            </div>
 
-            <div className="mt-5">
-                {view === 'board' && (
-                    <BoardView
-                        api={api}
-                        matches={matches}
-                        onOpenTask={setOpenTaskId}
-                        onAddTask={openNewTask}
-                        onAddSection={() => openNewTask()}
+                <div className="mt-6">
+                    <TasksToolbar
+                        filter={filter}
+                        onFilterChange={setFilter}
+                        assignees={api.project.assignees}
+                        onNewTask={() => openCreate()}
+                        onInvite={() => openMembers({ projectId: api.activeProjectId }, 'invite')}
                     />
-                )}
-                {view === 'list' && (
-                    <ListView api={api} matches={matches} onOpenTask={setOpenTaskId} onAddTask={openNewTask} />
-                )}
-                {view === 'timeline' && <TimelineView project={api.project} />}
-                {view === 'calendar' && <CalendarView api={api} onOpenTask={setOpenTaskId} />}
-            </div>
+                </div>
+
+                <div className="mt-5">
+                    {view === 'board' && (
+                        <BoardView
+                            api={api}
+                            matches={matches}
+                            onOpenTask={setOpenTaskId}
+                            onAddTask={openCreate}
+                            onAddSection={() => openCreate()}
+                        />
+                    )}
+                    {view === 'list' && (
+                        <ListView api={api} matches={matches} onOpenTask={setOpenTaskId} onAddTask={openCreate} />
+                    )}
+                    {view === 'timeline' && <TimelineView project={api.project} />}
+                    {view === 'calendar' && <CalendarView api={api} onOpenTask={setOpenTaskId} />}
+                </div>
+            </main>
 
             <TaskDetailPanel taskId={openTaskId} api={api} onClose={() => setOpenTaskId(null)} />
 
-            <PopUp
-                isOpen={creating}
-                onClose={() => setCreating(false)}
-                title="Nueva tarea"
-                description="Crea una tarea en el proyecto (mock)."
-                size="md"
-                footer={
-                    <>
-                        <ButtonComponent variant="ghost" onClick={() => setCreating(false)}>
-                            Cancelar
-                        </ButtonComponent>
-                        <ButtonComponent onClick={submitNewTask} disabled={!newTitle.trim()}>
-                            Crear tarea
-                        </ButtonComponent>
-                    </>
-                }
-            >
-                <div className="flex flex-col gap-4">
-                    <InputComponent
-                        label="Título"
-                        value={newTitle}
-                        onChange={(event) => setNewTitle(event.target.value)}
-                        placeholder="¿Qué hay que hacer?"
-                        requiredMark
-                        autoFocus
-                    />
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <DataList
-                            label="Sección"
-                            options={sectionOptions}
-                            opKey="value"
-                            opValue="label"
-                            value={newSection}
-                            clearable={false}
-                            onSelect={(event) => setNewSection(event.target.value)}
-                        />
-                        <DataList
-                            label="Prioridad"
-                            options={priorityOptions}
-                            opKey="value"
-                            opValue="label"
-                            value={newPriority}
-                            clearable={false}
-                            onSelect={(event) => setNewPriority((event.target.value || 'medium') as Priority)}
-                        />
-                    </div>
-                </div>
-            </PopUp>
-        </main>
+            <TaskFormModal
+                isOpen={formOpen}
+                task={formTask}
+                defaultSectionId={formSectionId}
+                api={api}
+                onClose={() => setFormOpen(false)}
+                onSaved={() => setFormOpen(false)}
+            />
+
+            <MembersModal
+                isOpen={membersOpen}
+                target={membersTarget}
+                initialMode={membersMode}
+                teams={api.teams}
+                projects={api.projects}
+                members={api.members}
+                onInvite={api.inviteMember}
+                onAddMember={(target, memberId) => {
+                    if (target.teamId) api.addMemberToTeam(target.teamId, memberId)
+                    if (target.projectId) api.addMemberToProject(target.projectId, memberId)
+                }}
+                onClose={() => setMembersOpen(false)}
+            />
+        </div>
     )
 }

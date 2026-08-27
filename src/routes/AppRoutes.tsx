@@ -15,6 +15,7 @@ import FileUploadCenter from '../pages/files/FileUploadCenter'
 import ProcessDesigner from '../pages/process/ProcessDesigner'
 import ProcessRepository from '../pages/process/ProcessRepository'
 import TasksLayout from '../pages/tasks'
+import PlanningLayout from '../pages/planning'
 import {
   RbacLayout,
   RolesPage,
@@ -95,6 +96,7 @@ export function AppRoutes({
         <Route path="/process" element={<ProcessRepository />} />
         <Route path="/process/:id" element={<ProcessDesigner />} />
         <Route path="/tasks" element={<TasksLayout />} />
+        <Route path="/planning" element={<PlanningLayout />} />
 
         <Route path="/superuser/rbac" element={<RbacLayout />}>
           <Route index element={<Navigate to="/superuser/rbac/roles" replace />} />

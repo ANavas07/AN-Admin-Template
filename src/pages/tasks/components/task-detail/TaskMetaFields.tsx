@@ -1,14 +1,19 @@
 import DataList from '../../../../components/ui/inputs/DataList'
 import { priorityLabels, priorityOrder } from '../../constants'
 import { formatLongDate } from '../../utils'
-import type { Priority, Task } from '../../types'
+import type { AccentColor, Priority, Tag, Task } from '../../types'
 import { AssigneeAvatar } from '../shared/AssigneeAvatar'
 import { PriorityBadge } from '../shared/PriorityBadge'
-import { TaskTag } from '../shared/TaskTag'
+import { TagPicker } from './TagPicker'
 
 type Props = {
     task: Task
+    /** Project tag catalog for the picker. */
+    tagCatalog: Tag[]
     onChangePriority: (priority: Priority) => void
+    onChangeLocation: (location: string) => void
+    onSetTags: (tags: Tag[]) => void
+    onCreateTag: (label: string, color: AccentColor) => Tag
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -22,7 +27,16 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     )
 }
 
-export function TaskMetaFields({ task, onChangePriority }: Props) {
+function LocationIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4 shrink-0 text-(--color-text-muted)" aria-hidden="true">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+            <circle cx="12" cy="10" r="3" />
+        </svg>
+    )
+}
+
+export function TaskMetaFields({ task, tagCatalog, onChangePriority, onChangeLocation, onSetTags, onCreateTag }: Props) {
     const priorityOptions = priorityOrder.map((value) => ({ value, label: priorityLabels[value] }))
 
     return (
@@ -67,16 +81,26 @@ export function TaskMetaFields({ task, onChangePriority }: Props) {
                 </div>
             </Field>
 
+            <Field label="Ubicación">
+                <div className="flex items-center gap-2 rounded-lg border border-(--color-border) bg-(--color-surface) px-2.5 focus-within:border-highlight focus-within:ring-2 focus-within:ring-highlight/25">
+                    <LocationIcon />
+                    <input
+                        key={task.id}
+                        defaultValue={task.location ?? ''}
+                        placeholder="Añade un lugar (sede, aula, dirección…)"
+                        onBlur={(event) => onChangeLocation(event.target.value)}
+                        className="w-full bg-transparent py-2 text-sm text-(--color-text) placeholder:text-(--color-text-muted) focus:outline-none"
+                    />
+                </div>
+            </Field>
+
             <Field label="Etiquetas">
-                {task.tags.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5">
-                        {task.tags.map((tag) => (
-                            <TaskTag key={tag.id} tag={tag} />
-                        ))}
-                    </div>
-                ) : (
-                    <span className="text-sm text-(--color-text-muted)">Sin etiquetas</span>
-                )}
+                <TagPicker
+                    appliedTags={task.tags}
+                    catalog={tagCatalog}
+                    onSetTags={onSetTags}
+                    onCreateTag={onCreateTag}
+                />
             </Field>
         </div>
     )
