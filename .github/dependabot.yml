@@ -1,28 +1,42 @@
 version: 2
 
+# Cadencia mensual y agrupada: un solo PR por ecosistema, en vez de uno por
+# paquete. Las alertas de seguridad NO pasan por aqui: se activan en
+# Settings > Code security y llegan al instante, sin esperar al mes.
+
 updates:
-  # Dependencias de npm/pnpm.
+  # Dependencias de package.json (pnpm entra en la categoria npm).
   - package-ecosystem: npm
     directory: "/"
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
-    # Agrupa los updates menores y de parche en un solo PR para no ahogarte
-    # en ruido. Los majors llegan sueltos, que son los que hay que mirar bien.
+      interval: monthly
+    open-pull-requests-limit: 2
     groups:
-      minor-and-patch:
+      all-dependencies:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+          - major
     labels:
       - dependencies
 
-  # Las propias GitHub Actions tambien son dependencias, y son un vector de
-  # ataque real: una action comprometida corre con acceso a tu repo.
+  # Las GitHub Actions tambien son dependencias, y corren con acceso a tu
+  # repositorio. Pocas y de cambio lento, pero conviene no dejarlas atras.
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: weekly
+      interval: monthly
+    open-pull-requests-limit: 2
+    groups:
+      all-actions:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+          - major
     labels:
       - dependencies
       - github-actions
