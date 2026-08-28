@@ -22,7 +22,11 @@ export default function GroupRolesPanel({
 }: GroupRolesPanelProps) {
   const [groupRoles, setGroupRoles] = useState<GroupRole[]>([])
   const [allRoles, setAllRoles] = useState<Role[]>([])
-  const [loading, setLoading] = useState(true)
+  // `loading` se deriva de que grupo tenemos cargado en vez de activarse
+  // dentro del efecto: evita el setState sincrono y ademas descarta los
+  // datos del grupo anterior al cambiar de grupo.
+  const [loadedGroupId, setLoadedGroupId] = useState<string | null>(null)
+  const loading = loadedGroupId !== group.id
 
   const [selectedRoleId, setSelectedRoleId] = useState('')
   const [isAdding, setIsAdding] = useState(false)
@@ -30,7 +34,6 @@ export default function GroupRolesPanel({
 
   const loadData = useCallback(
     (signal?: AbortSignal) => {
-      setLoading(true)
       Promise.all([
         groupsService.getRoles(group.id, signal),
         rolesService.getAll({ signal }),
@@ -40,7 +43,9 @@ export default function GroupRolesPanel({
           setAllRoles(allRes.data)
         })
         .catch(() => {})
-        .finally(() => setLoading(false))
+        .finally(() => {
+          if (!signal?.aborted) setLoadedGroupId(group.id)
+        })
     },
     [group.id]
   )

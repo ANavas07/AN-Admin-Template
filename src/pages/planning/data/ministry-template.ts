@@ -102,7 +102,7 @@ function pair(row: number, col: number, text: string, fieldId: string): Template
 
 const cells: TemplateCell[] = [
   // Títulos
-  label(1, 1, 12, 'Unidad Educativa "Alberto Guerra"', title),
+  label(1, 1, 12, 'Unidad Educativa "Ejemplar"', title),
   label(2, 1, 12, 'Planificación Conecta, Nivela y Crea 2026 – 2027', title),
 
   // Datos informativos

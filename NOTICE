@@ -1,0 +1,44 @@
+System Panel 2026
+Copyright 2026 Ariel Navas <arielnavas05@gmail.com>
+
+This product includes software developed by Ariel Navas.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+--------------------------------------------------------------------------
+Third-party components
+--------------------------------------------------------------------------
+
+This project depends on third-party packages distributed under their own
+licenses. They are not covered by the Apache License above. The full list
+and the resolved versions are in package.json and pnpm-lock.yaml.
+
+Principal runtime dependencies and their licenses:
+
+  React, React DOM                 MIT      https://github.com/facebook/react
+  React Router                     MIT      https://github.com/remix-run/react-router
+  Tailwind CSS                     MIT      https://github.com/tailwindlabs/tailwindcss
+  Vite                             MIT      https://github.com/vitejs/vite
+  dnd-kit (core/sortable/etc.)     MIT      https://github.com/clauderic/dnd-kit
+  TanStack Table                   MIT      https://github.com/TanStack/table
+  date-fns                         MIT      https://github.com/date-fns/date-fns
+  SVAR React Gantt                 MIT      (c) 2025 XB Software Sp. z o.o
+  Sileo                            MIT      https://www.npmjs.com/package/sileo
+
+All of the above were verified as MIT in the installed tree. MIT requires that
+its copyright notice be preserved when you redistribute a build that bundles
+these packages.
+
+Re-verify after changing dependencies:
+
+    pnpm licenses list

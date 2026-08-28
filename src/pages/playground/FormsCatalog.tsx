@@ -15,7 +15,7 @@ export default function FormsCatalog() {
                 label: 'Nombre',
                 type: 'text',
                 required: true,
-                placeholder: 'Ej: Ariel Navas',
+                placeholder: 'Ej: John Doe',
             },
             {
                 name: 'email',

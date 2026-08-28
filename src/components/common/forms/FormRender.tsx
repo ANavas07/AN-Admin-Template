@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import ButtonComponent from '../../ui/buttons/ButtonComponent'
 import DataList from '../../ui/inputs/DataList'
@@ -105,10 +105,15 @@ export default function FormRender({
         [config.fields, values]
     )
 
-    useEffect(() => {
+    // Ajuste de estado cuando cambia una prop: React recomienda hacerlo
+    // durante el render y no en un efecto, para no encadenar renders.
+    // https://react.dev/learn/you-might-not-need-an-effect
+    const [renderedConfig, setRenderedConfig] = useState(config)
+    if (renderedConfig !== config) {
+        setRenderedConfig(config)
         setValues((currentValues) => getInitialValues(config, currentValues))
         setErrors({})
-    }, [config])
+    }
 
     function updateValue(name: string, value: FormValues[string]) {
         const nextValues = { ...values, [name]: value }

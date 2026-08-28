@@ -2,19 +2,9 @@ import { useMemo, useState } from 'react'
 import InputComponent from '../ui/inputs/InputComponent'
 import SidebarPanel from './SidebarPanel'
 import ModuleCard from './ModuleCard'
+import type { ModuleCategory } from './data/modules'
 
-export type ModuleCategory = {
-    name: string
-    icon: string
-    modules: {
-        id: string
-        title: string
-        description: string
-        icon: string
-        requiredRoles?: string[]
-        url?: string
-    }[]
-}
+export type { ModuleCategory }
 
 type MainPanelProps = {
     categories: ModuleCategory[]
@@ -168,7 +158,12 @@ export default function MainPanel({
                                                         icon={module.icon}
                                                         title={module.title}
                                                         description={module.description}
-                                                        onClick={() => onModuleClick?.(module.url!)}
+                                                        isAvailable={Boolean(module.url)}
+                                                        onClick={
+                                                            module.url
+                                                                ? () => onModuleClick?.(module.url as string)
+                                                                : undefined
+                                                        }
                                                     />
                                                 ))}
                                             </div>

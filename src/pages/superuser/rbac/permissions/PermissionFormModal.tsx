@@ -77,7 +77,6 @@ export default function PermissionFormModal({
         },
       ],
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isEdit, resourceOptions, existingPermissions]
   )
 

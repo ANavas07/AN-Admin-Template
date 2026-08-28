@@ -59,16 +59,20 @@ export default function UserRolesPage() {
     loadUserRoles(user)
   }
 
-  async function handleRemoveRole(roleId: string, roleName: string) {
-    if (!selectedUser || !confirm(`¿Revocar el rol "${roleName}" de ${selectedUser.username}?`)) return
-    try {
-      await usersRolesService.removeRole(selectedUser.id, roleId)
-      sileo.success({ title: `Rol "${roleName}" revocado.` })
-      loadUserRoles(selectedUser)
-    } catch {
-      sileo.error({ title: 'No se pudo revocar el rol.' })
-    }
-  }
+  // useCallback para poder declararlo como dependencia de las columnas.
+  const handleRemoveRole = useCallback(
+    async (roleId: string, roleName: string) => {
+      if (!selectedUser || !confirm(`¿Revocar el rol "${roleName}" de ${selectedUser.username}?`)) return
+      try {
+        await usersRolesService.removeRole(selectedUser.id, roleId)
+        sileo.success({ title: `Rol "${roleName}" revocado.` })
+        loadUserRoles(selectedUser)
+      } catch {
+        sileo.error({ title: 'No se pudo revocar el rol.' })
+      }
+    },
+    [selectedUser, loadUserRoles]
+  )
 
   function handleAssigned() {
     setAssignOpen(false)
@@ -115,7 +119,7 @@ export default function UserRolesPage() {
         />
       ),
     },
-  ], [selectedUser])
+  ], [handleRemoveRole])
 
   const groupColumns: ColumnDef<UserGroupRole>[] = useMemo(() => [
     {

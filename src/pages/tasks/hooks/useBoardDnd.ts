@@ -5,7 +5,6 @@ import {
     closestCorners,
     useSensor,
     useSensors,
-    type DragCancelEvent,
     type DragEndEvent,
     type DragOverEvent,
     type DragStartEvent,
@@ -186,7 +185,7 @@ export function useBoardDnd(api: TasksApi) {
     )
 
     const onDragCancel = useCallback(
-        (_event: DragCancelEvent) => {
+        () => {
             // Discard the live mirror edits by re-syncing from the store.
             setContainers(buildContainers(api))
             setColumnOrder(api.sortedSections.map((s) => s.id))

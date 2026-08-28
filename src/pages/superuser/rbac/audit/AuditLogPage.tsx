@@ -44,9 +44,11 @@ export default function AuditLogPage() {
 
   const [detailLog, setDetailLog] = useState<AuditLog | null>(null)
 
+  // El efecto solo dispara la peticion; activar `loading` es tarea de los
+  // handlers (filtros y paginacion), asi el efecto no llama setState de
+  // forma sincrona. En el primer render `loading` ya arranca en true.
   const load = useCallback(
     (p: number, signal?: AbortSignal) => {
-      setLoading(true)
       auditService
         .getAll({
           page: p,
@@ -62,29 +64,48 @@ export default function AuditLogPage() {
           setTotal(res.total)
         })
         .catch(() => {})
-        .finally(() => setLoading(false))
+        .finally(() => {
+          if (!signal?.aborted) setLoading(false)
+        })
     },
     [selectedEventTypes, actorFilter, dateFrom, dateTo]
   )
 
+  // Un solo efecto para pagina y filtros: cambiar cualquiera de los dos
+  // recarga la tabla.
   useEffect(() => {
     const controller = new AbortController()
-    setPage(1)
-    load(1, controller.signal)
+    load(page, controller.signal)
     return () => controller.abort()
-  }, [load])
+  }, [load, page])
+
+  // Cambiar un filtro siempre vuelve a la primera pagina.
+  function applyFilter(update: () => void) {
+    setLoading(true)
+    setPage(1)
+    update()
+  }
+
+  function goToPage(p: number) {
+    setLoading(true)
+    setPage(p)
+  }
 
   function toggleEventType(et: string) {
-    setSelectedEventTypes((prev) =>
-      prev.includes(et) ? prev.filter((t) => t !== et) : [...prev, et]
+    applyFilter(() =>
+      setSelectedEventTypes((prev) =>
+        prev.includes(et) ? prev.filter((t) => t !== et) : [...prev, et]
+      )
     )
   }
 
   function clearFilters() {
-    setSelectedEventTypes([])
-    setActorFilter('')
-    setDateFrom('')
-    setDateTo('')
+    applyFilter(() => {
+      setSelectedEventTypes([])
+      setActorFilter('')
+      setDateFrom('')
+      setDateTo('')
+    })
   }
 
   const hasFilters = selectedEventTypes.length > 0 || actorFilter || dateFrom || dateTo
@@ -150,7 +171,7 @@ export default function AuditLogPage() {
             label="Actor"
             placeholder="Busca por username..."
             value={actorFilter}
-            onChange={(e) => setActorFilter(e.target.value)}
+            onChange={(e) => applyFilter(() => setActorFilter(e.target.value))}
             showSearchIcon
             iconPosition="left"
           />
@@ -158,13 +179,13 @@ export default function AuditLogPage() {
             label="Desde"
             type="date"
             value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
+            onChange={(e) => applyFilter(() => setDateFrom(e.target.value))}
           />
           <InputComponent
             label="Hasta"
             type="date"
             value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
+            onChange={(e) => applyFilter(() => setDateTo(e.target.value))}
           />
         </div>
 
@@ -221,7 +242,7 @@ export default function AuditLogPage() {
               size="sm"
               variant="outline"
               disabled={page <= 1}
-              onClick={() => { const p = 1; setPage(p); load(p) }}
+              onClick={() => goToPage(1)}
             >
               {'<<'}
             </ButtonComponent>
@@ -229,7 +250,7 @@ export default function AuditLogPage() {
               size="sm"
               variant="outline"
               disabled={page <= 1}
-              onClick={() => { const p = page - 1; setPage(p); load(p) }}
+              onClick={() => goToPage(page - 1)}
             >
               {'<'}
             </ButtonComponent>
@@ -237,7 +258,7 @@ export default function AuditLogPage() {
               size="sm"
               variant="outline"
               disabled={page >= totalPages}
-              onClick={() => { const p = page + 1; setPage(p); load(p) }}
+              onClick={() => goToPage(page + 1)}
             >
               {'>'}
             </ButtonComponent>
@@ -245,7 +266,7 @@ export default function AuditLogPage() {
               size="sm"
               variant="outline"
               disabled={page >= totalPages}
-              onClick={() => { const p = totalPages; setPage(p); load(p) }}
+              onClick={() => goToPage(totalPages)}
             >
               {'>>'}
             </ButtonComponent>

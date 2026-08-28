@@ -28,13 +28,18 @@ export default function RolePermissionsPanel({
   const [allPerms, setAllPerms] = useState<Permission[]>([])
   const [assignedIds, setAssignedIds] = useState<Set<string>>(new Set())
   const [inheritedIds, setInheritedIds] = useState<Set<string>>(new Set())
-  const [loading, setLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+
+  // `loading` se deriva del rol cargado en vez de activarse dentro del
+  // efecto: evita el setState sincrono y descarta los permisos del rol
+  // anterior al cambiar de rol.
+  const loadKey = `${role.id}:${role.parentRoleId ?? ''}`
+  const [loadedKey, setLoadedKey] = useState<string | null>(null)
+  const loading = loadedKey !== loadKey
 
   useEffect(() => {
     if (!isOpen) return
     const controller = new AbortController()
-    setLoading(true)
 
     Promise.all([
       permissionsService.getAll({ signal: controller.signal }),
@@ -49,16 +54,22 @@ export default function RolePermissionsPanel({
         setInheritedIds(new Set(parentPerms.map((p) => p.id)))
       })
       .catch(() => {})
-      .finally(() => setLoading(false))
+      .finally(() => {
+        if (!controller.signal.aborted) setLoadedKey(loadKey)
+      })
 
     return () => controller.abort()
-  }, [isOpen, role.id, role.parentRoleId])
+  }, [isOpen, role.id, role.parentRoleId, loadKey])
 
   function toggle(permId: string) {
     if (inheritedIds.has(permId)) return
     setAssignedIds((prev) => {
       const next = new Set(prev)
-      next.has(permId) ? next.delete(permId) : next.add(permId)
+      if (next.has(permId)) {
+        next.delete(permId)
+      } else {
+        next.add(permId)
+      }
       return next
     })
   }

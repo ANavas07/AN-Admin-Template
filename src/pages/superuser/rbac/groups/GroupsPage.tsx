@@ -29,8 +29,10 @@ export default function GroupsPage() {
   const [deleteTarget, setDeleteTarget] = useState<Group | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const load = useCallback((signal?: AbortSignal) => {
-    setLoading(true)
+  // `loading` arranca en true, por eso el fetch inicial no necesita activarlo.
+  // Mantener los setState dentro de callbacks de la promesa evita el
+  // setState sincrono dentro del efecto.
+  const fetchGroups = useCallback((signal?: AbortSignal) => {
     groupsService.getAll({ signal })
       .then((res) => setGroups(res.data))
       .catch((err) => {
@@ -39,11 +41,17 @@ export default function GroupsPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  // Recarga disparada por el usuario (crear / editar / eliminar).
+  const reload = useCallback(() => {
+    setLoading(true)
+    fetchGroups()
+  }, [fetchGroups])
+
   useEffect(() => {
     const controller = new AbortController()
-    load(controller.signal)
+    fetchGroups(controller.signal)
     return () => controller.abort()
-  }, [load])
+  }, [fetchGroups])
 
   function openCreate() {
     setEditTarget(null)
@@ -78,7 +86,7 @@ export default function GroupsPage() {
       setDeleteOpen(false)
       setDeleteTarget(null)
       sileo.success({ title: `Grupo "${deleteTarget.name}" eliminado.` })
-      load()
+      reload()
     } catch {
       sileo.error({ title: 'No se pudo eliminar el grupo.' })
     } finally {
@@ -89,7 +97,7 @@ export default function GroupsPage() {
   function handleSaved() {
     setFormOpen(false)
     sileo.success({ title: editTarget ? 'Grupo actualizado.' : 'Grupo creado correctamente.' })
-    load()
+    reload()
   }
 
   const columns: ColumnDef<Group>[] = useMemo(() => [
@@ -203,7 +211,7 @@ export default function GroupsPage() {
           onClose={() => setMembersOpen(false)}
           onChanged={() => {
             sileo.success({ title: 'Miembros del grupo actualizados.' })
-            load()
+            reload()
           }}
         />
       )}
@@ -215,7 +223,7 @@ export default function GroupsPage() {
           onClose={() => setRolesOpen(false)}
           onChanged={() => {
             sileo.success({ title: 'Roles del grupo actualizados.' })
-            load()
+            reload()
           }}
         />
       )}

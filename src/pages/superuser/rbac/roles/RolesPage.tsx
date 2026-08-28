@@ -28,8 +28,10 @@ export default function RolesPage() {
   const [deleteTarget, setDeleteTarget] = useState<Role | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const load = useCallback((signal?: AbortSignal) => {
-    setLoading(true)
+  // `loading` arranca en true, por eso el fetch inicial no necesita activarlo.
+  // Mantener los setState dentro de callbacks de la promesa evita el
+  // setState sincrono dentro del efecto.
+  const fetchRoles = useCallback((signal?: AbortSignal) => {
     rolesService.getAll({ signal })
       .then((res) => setRoles(res.data))
       .catch((err) => {
@@ -38,11 +40,17 @@ export default function RolesPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  // Recarga disparada por el usuario (crear / editar / eliminar).
+  const reload = useCallback(() => {
+    setLoading(true)
+    fetchRoles()
+  }, [fetchRoles])
+
   useEffect(() => {
     const controller = new AbortController()
-    load(controller.signal)
+    fetchRoles(controller.signal)
     return () => controller.abort()
-  }, [load])
+  }, [fetchRoles])
 
   function openCreate() {
     setEditTarget(null)
@@ -72,7 +80,7 @@ export default function RolesPage() {
       setDeleteOpen(false)
       setDeleteTarget(null)
       sileo.success({ title: `Rol "${deleteTarget.name}" eliminado.` })
-      load()
+      reload()
     } catch {
       sileo.error({ title: 'No se pudo eliminar el rol.' })
     } finally {
@@ -83,7 +91,7 @@ export default function RolesPage() {
   function handleSaved() {
     setFormOpen(false)
     sileo.success({ title: editTarget ? 'Rol actualizado correctamente.' : 'Rol creado correctamente.' })
-    load()
+    reload()
   }
 
   const columns: ColumnDef<Role>[] = useMemo(() => [

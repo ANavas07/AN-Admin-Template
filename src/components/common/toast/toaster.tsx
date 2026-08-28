@@ -1,5 +1,5 @@
 import { Toaster } from 'sileo'
-import { useTheme } from '../../../context/ThemeContext'
+import { useTheme } from '../../../context/theme-context'
 
 
 export default function ThemedToaster() {

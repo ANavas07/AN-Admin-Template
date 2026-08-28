@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import PopUp from '../../../components/common/pop-up/PopUp'
 import ButtonComponent from '../../../components/ui/buttons/ButtonComponent'
 import InputComponent from '../../../components/ui/inputs/InputComponent'
@@ -39,13 +39,18 @@ export default function MembersModal({
     const [email, setEmail] = useState('')
     const [sent, setSent] = useState<string[]>([])
 
-    useEffect(() => {
+    // Reset al abrir. Se ajusta durante el render en lugar de en un efecto
+    // para no encadenar un render extra con el estado anterior.
+    // https://react.dev/learn/you-might-not-need-an-effect
+    const [wasOpen, setWasOpen] = useState(isOpen)
+    if (wasOpen !== isOpen) {
+        setWasOpen(isOpen)
         if (isOpen) {
             setMode(canAdd ? initialMode : 'invite')
             setEmail('')
             setSent([])
         }
-    }, [isOpen, initialMode, canAdd])
+    }
 
     // Members already in the target vs. candidates to add.
     const currentIds = useMemo(() => {

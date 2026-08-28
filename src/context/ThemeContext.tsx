@@ -1,31 +1,20 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { ThemeContext } from './theme-context'
 
-type ThemeContextType = {
-    isDarkMode: boolean
-    toggleTheme: () => void
+// Se resuelve una sola vez, en el inicializador perezoso de useState, para no
+// arrancar en claro y corregir despues (evita el parpadeo y el setState
+// sincrono dentro de un efecto).
+function getInitialTheme(): boolean {
+    const savedTheme = window.localStorage.getItem('theme')
+
+    if (savedTheme === 'dark') return true
+    if (savedTheme === 'light') return false
+
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    const [isDarkMode, setIsDarkMode] = useState(false)
-
-    useEffect(() => {
-        const savedTheme = window.localStorage.getItem('theme')
-
-        if (savedTheme === 'dark') {
-            setIsDarkMode(true)
-            return
-        }
-
-        if (savedTheme === 'light') {
-            setIsDarkMode(false)
-            return
-        }
-
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        setIsDarkMode(prefersDark)
-    }, [])
+    const [isDarkMode, setIsDarkMode] = useState(getInitialTheme)
 
     useEffect(() => {
         document.documentElement.classList.toggle('dark', isDarkMode)
@@ -37,12 +26,4 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             {children}
         </ThemeContext.Provider>
     )
-}
-
-export function useTheme() {
-    const context = useContext(ThemeContext)
-    if (context === undefined) {
-        throw new Error('useTheme debe ser usado dentro de ThemeProvider')
-    }
-    return context
 }

@@ -1,7 +1,14 @@
 {
-  "name": "crm_tournament_panel",
+  "name": "system-panel-2026",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Plantilla de panel administrativo en React 19 + TypeScript + Vite + Tailwind 4, con RBAC, tareas, planificacion, procesos y catalogo de UI.",
+  "license": "Apache-2.0",
+  "author": "Ariel Navas <arielnavas05@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ANavas07/AN-Admin-Template.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

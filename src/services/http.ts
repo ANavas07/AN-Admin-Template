@@ -1,4 +1,6 @@
-const BASE_URL = "http://localhost:3000/api"
+import { appConfig } from '../config/app.config'
+
+const BASE_URL = appConfig.apiBaseUrl
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 

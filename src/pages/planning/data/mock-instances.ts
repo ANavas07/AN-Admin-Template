@@ -9,10 +9,10 @@ export const mockInstance: PlanificacionInstance = {
   title: 'Planificación de nivelación — 8vo EGB',
   updatedAt: new Date('2026-08-24').toISOString(),
   values: {
-    institucion: { kind: 'text', value: 'Unidad Educativa "Alberto Guerra"' },
+    institucion: { kind: 'text', value: 'Unidad Educativa "Ejemplar"' },
     area: { kind: 'text', value: 'Ciencias Naturales' },
     asignatura: { kind: 'text', value: 'Biología' },
-    docente: { kind: 'text', value: 'Ariel Navas' },
+    docente: { kind: 'text', value: 'John Doe' },
     grado: { kind: 'text', value: '8vo EGB' },
     paralelo: { kind: 'text', value: 'A' },
     semanas: { kind: 'text', value: '1, 2, 3, 4 y 5' },

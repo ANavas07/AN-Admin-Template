@@ -66,7 +66,7 @@ const playgroundNavItems: PlaygroundNavItem[] = [
     {
         label: 'Gestion de usuarios',
         description: 'Gestionar usuarios y verlos',
-        path: '/files',
+        path: '/users',
         icon: null,
     }
 ]

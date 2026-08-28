@@ -22,7 +22,11 @@ export default function GroupMembersPanel({
   onChanged,
 }: GroupMembersPanelProps) {
   const [members, setMembers] = useState<GroupMember[]>([])
-  const [loading, setLoading] = useState(true)
+  // `loading` se deriva de que grupo tenemos cargado en vez de activarse
+  // dentro del efecto: evita el setState sincrono y ademas descarta los
+  // datos del grupo anterior al cambiar de grupo.
+  const [loadedGroupId, setLoadedGroupId] = useState<string | null>(null)
+  const loading = loadedGroupId !== group.id
 
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<RbacUser[]>([])
@@ -35,12 +39,13 @@ export default function GroupMembersPanel({
 
   const loadMembers = useCallback(
     (signal?: AbortSignal) => {
-      setLoading(true)
       groupsService
         .getMembers(group.id, signal)
         .then(setMembers)
         .catch(() => {})
-        .finally(() => setLoading(false))
+        .finally(() => {
+          if (!signal?.aborted) setLoadedGroupId(group.id)
+        })
     },
     [group.id]
   )

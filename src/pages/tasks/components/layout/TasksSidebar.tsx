@@ -55,7 +55,11 @@ export function TasksSidebar({
     const toggleTeam = (teamId: string) =>
         setClosedTeams((prev) => {
             const next = new Set(prev)
-            next.has(teamId) ? next.delete(teamId) : next.add(teamId)
+            if (next.has(teamId)) {
+                next.delete(teamId)
+            } else {
+                next.add(teamId)
+            }
             return next
         })
 

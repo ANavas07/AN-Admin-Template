@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, KeyboardEventHandler, ReactNode } from 'react'
 import { ChevronIcon, ClearIcon, SearchIcon } from '../../../icons/icons'
 
@@ -61,11 +61,14 @@ const DataList = <T,>({
     const helpText = error ?? hint
     const describedBy = helpText ? `${inputId}-description` : undefined
 
-    const getTextByKey = (key?: string) => {
-        if (!key) return ''
-        const option = options.find((item) => String(item[opKey]) === String(key))
-        return String(option?.[opValue] ?? '')
-    }
+    const getTextByKey = useCallback(
+        (key?: string) => {
+            if (!key) return ''
+            const option = options.find((item) => String(item[opKey]) === String(key))
+            return String(option?.[opValue] ?? '')
+        },
+        [opKey, options, opValue]
+    )
 
     const [inputValue, setInputValue] = useState(
         isControlled ? getTextByKey(value) : getTextByKey(defaultValue)
@@ -77,7 +80,7 @@ const DataList = <T,>({
 
     const controlledText = useMemo(
         () => (isControlled ? getTextByKey(value) : ''),
-        [isControlled, opKey, options, opValue, value]
+        [getTextByKey, isControlled, value]
     )
 
     const filteredOptions = useMemo(() => {
@@ -97,11 +100,14 @@ const DataList = <T,>({
     const activeOptionId =
         open && activeIndex >= 0 ? `${inputId}-option-${activeIndex}` : undefined
 
-    useEffect(() => {
-        if (isControlled) {
-            setInputValue(controlledText)
-        }
-    }, [controlledText, isControlled])
+    // Sincronizar con el valor controlado durante el render en lugar de en un
+    // efecto evita un render extra con el texto desactualizado.
+    // https://react.dev/learn/you-might-not-need-an-effect
+    const [syncedText, setSyncedText] = useState(controlledText)
+    if (isControlled && syncedText !== controlledText) {
+        setSyncedText(controlledText)
+        setInputValue(controlledText)
+    }
 
     useEffect(() => {
         if (!open) return

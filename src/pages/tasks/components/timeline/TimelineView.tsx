@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { differenceInCalendarDays, parseISO } from 'date-fns'
 import GanttDiagram from '../../../../components/ui/gantt/SvarGantt'
-import { useTheme } from '../../../../context/ThemeContext'
+import { useTheme } from '../../../../context/theme-context'
 import type { Project } from '../../types'
 
 type Props = { project: Project }

@@ -26,8 +26,10 @@ export default function PermissionsPage() {
   const [deleteTarget, setDeleteTarget] = useState<Permission | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const load = useCallback((signal?: AbortSignal) => {
-    setLoading(true)
+  // `loading` arranca en true, por eso el fetch inicial no necesita activarlo.
+  // Mantener los setState dentro de callbacks de la promesa evita el
+  // setState sincrono dentro del efecto.
+  const fetchPermissions = useCallback((signal?: AbortSignal) => {
     permissionsService.getAll({ signal })
       .then((res) => setPermissions(res.data))
       .catch((err) => {
@@ -36,11 +38,17 @@ export default function PermissionsPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  // Recarga disparada por el usuario (crear / editar / eliminar).
+  const reload = useCallback(() => {
+    setLoading(true)
+    fetchPermissions()
+  }, [fetchPermissions])
+
   useEffect(() => {
     const controller = new AbortController()
-    load(controller.signal)
+    fetchPermissions(controller.signal)
     return () => controller.abort()
-  }, [load])
+  }, [fetchPermissions])
 
   const uniqueResources = useMemo(
     () => [...new Set(permissions.map((p) => p.resource))].sort(),
@@ -80,7 +88,7 @@ export default function PermissionsPage() {
       setDeleteOpen(false)
       setDeleteTarget(null)
       sileo.success({ title: `Permiso "${deleteTarget.code}" eliminado.` })
-      load()
+      reload()
     } catch {
       sileo.error({ title: 'No se pudo eliminar el permiso.' })
     } finally {
@@ -91,7 +99,7 @@ export default function PermissionsPage() {
   function handleSaved() {
     setFormOpen(false)
     sileo.success({ title: editTarget ? 'Permiso actualizado.' : 'Permiso creado correctamente.' })
-    load()
+    reload()
   }
 
   const columns: ColumnDef<Permission>[] = useMemo(() => [

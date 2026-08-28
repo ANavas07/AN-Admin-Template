@@ -46,17 +46,22 @@ export default function UserEffectivePermissionsPanel({
   onClose,
 }: UserEffectivePermissionsPanelProps) {
   const [permissions, setPermissions] = useState<EffectivePermission[]>([])
-  const [loading, setLoading] = useState(true)
+  // `loading` se deriva del usuario cargado en vez de activarse dentro del
+  // efecto: evita el setState sincrono y descarta los permisos del usuario
+  // anterior al cambiar de usuario.
+  const [loadedUserId, setLoadedUserId] = useState<string | null>(null)
+  const loading = loadedUserId !== user.id
 
   useEffect(() => {
     if (!isOpen) return
     const controller = new AbortController()
-    setLoading(true)
     usersRolesService
       .getEffectivePermissions(user.id, controller.signal)
       .then(setPermissions)
       .catch(() => {})
-      .finally(() => setLoading(false))
+      .finally(() => {
+        if (!controller.signal.aborted) setLoadedUserId(user.id)
+      })
     return () => controller.abort()
   }, [isOpen, user.id])
 

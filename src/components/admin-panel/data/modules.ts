@@ -1,226 +1,124 @@
-// datos y configuración de módulos
+/**
+ * Catalogo de modulos del home (dashboard).
+ *
+ * PLANTILLA: esta lista es intencionalmente corta. Solo incluye modulos que
+ * existen como ruta real en src/routes/AppRoutes.tsx, para que ninguna tarjeta
+ * lleve a una pantalla vacia.
+ *
+ * Para agregar un modulo:
+ *   1. Crea la pagina en src/pages/<modulo>/
+ *   2. Registra la ruta en src/routes/AppRoutes.tsx (usa lazy())
+ *   3. Agrega la entrada aqui con su `url` y sus `requiredRoles`
+ *
+ * `requiredRoles` filtra la tarjeta segun el rol activo. Si se omite, el modulo
+ * es visible para todos los roles.
+ */
+
+export type ModuleDefinition = {
+    id: string
+    title: string
+    description: string
+    icon: string
+    /** Ruta interna. Si falta, la tarjeta se muestra deshabilitada. */
+    url?: string
+    /** Roles con acceso. Sin valor = todos. */
+    requiredRoles?: string[]
+}
+
 export type ModuleCategory = {
     name: string
     icon: string
-    modules: {
-        id: string
-        title: string
-        description: string
-        icon: string
-        requiredRoles?: string[]
-        url?: string
-    }[]
+    modules: ModuleDefinition[]
 }
 
 export const MODULE_CATEGORIES: ModuleCategory[] = [
     {
-        name: 'ADMINISTRATIVOS',
+        name: 'OPERACION',
         icon: '📋',
         modules: [
             {
-                id: 'attendance',
-                title: 'Atención bienestar universitario',
-                description: 'Atención bienestar universitario online',
-                icon: '📅',
-                requiredRoles: ['admin', 'organizer'],
-                url: '/rutas'
-            },
-            {
-                id: 'calendar',
-                title: 'Calendario',
-                description:
-                    'Calendario de actividades de la institución',
-                icon: '📅',
-                requiredRoles: ['admin', 'organizer'],
-            },
-            {
                 id: 'tasks',
-                title: 'Gestión de tareas',
-                description: 'Tablero, lista, cronograma y calendario de tareas del proyecto',
+                title: 'Gestion de tareas',
+                description: 'Tablero, lista, cronograma y calendario de tareas',
                 icon: '🗂️',
-                requiredRoles: ['admin', 'organizer', 'analyst'],
                 url: '/tasks',
+                requiredRoles: ['admin', 'organizer', 'analyst'],
             },
             {
                 id: 'planning',
-                title: 'Planificación docente',
-                description: 'Formato "Conecta, Nivela y Crea" con íconos e imágenes por celda',
+                title: 'Planificacion',
+                description: 'Grilla de plantillas con iconos e imagenes por celda',
                 icon: '📝',
-                requiredRoles: ['admin', 'organizer', 'analyst'],
                 url: '/planning',
-            },
-            {
-                id: 'email',
-                title: 'Correo electrónico',
-                description:
-                    'Word, excel online, calendario, creative, forms etc.',
-                icon: '📧',
                 requiredRoles: ['admin', 'organizer', 'analyst'],
             },
             {
-                id: 'surveys',
-                title: 'Encuestas',
-                description: 'Responder encuestas',
-                icon: '📊',
-                requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
-            },
-            {
-                id: 'evaluation-360',
-                title: 'Evaluación del desempeño 360°',
-                description: 'Retroalimentación 360 para evaluar fortalezas y mejoras.',
-                icon: '🎯',
+                id: 'process',
+                title: 'Procesos',
+                description: 'Repositorio y disenador de diagramas de proceso',
+                icon: '🔀',
+                url: '/process',
                 requiredRoles: ['admin', 'organizer'],
             },
             {
-                id: 'institutional-eval',
-                title: 'Evaluación institucional (responsable)',
-                description: 'Carga de evidencias de la evaluación',
-                icon: '🏛️',
-                requiredRoles: ['admin'],
-            },
-            {
-                id: 'inst-eval-revisor',
-                title: 'Evaluación institucional (revisor)',
-                description: 'Revisión de evidencias de la evaluación',
-                icon: '👁️',
-                requiredRoles: ['admin', 'analyst'],
-            },
-            {
-                id: 'health-research',
-                title: 'Investigación en salud',
-                description: 'Protocolos y redes de investigación',
-                icon: '🔬',
-                requiredRoles: ['admin', 'organizer', 'analyst'],
-            },
-            {
-                id: 'manuals',
-                title: 'Manuales y documentos',
-                description: 'Manuales y documentos',
-                icon: '📖',
+                id: 'files',
+                title: 'Documentos',
+                description: 'Centro de carga y seguimiento de archivos',
+                icon: '📁',
+                url: '/files',
                 requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
-            },
-            {
-                id: 'messages',
-                title: 'Mensajes',
-                description: 'Mensajería interna',
-                icon: '💬',
-                requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
-            },
-            {
-                id: 'help-desk',
-                title: 'Mesa ayuda',
-                description: 'Mesa ayuda',
-                icon: '🆘',
-                requiredRoles: ['admin', 'organizer'],
-            },
-            {
-                id: 'reports',
-                title: 'Reports',
-                description: 'Listado de reportes',
-                icon: '📑',
-                requiredRoles: ['admin', 'analyst'],
-            },
-            {
-                id: 'doc-responsible',
-                title: 'Responsable gestión documental',
-                description: 'Gestión de documentos administrativos',
-                icon: '📋',
-                requiredRoles: ['admin'],
-            },
-            {
-                id: 'doc-reviewer',
-                title: 'Revisor gestión documental',
-                description: 'Revisión de documentos administrativos',
-                icon: '✅',
-                requiredRoles: ['admin', 'analyst'],
-            },
-            {
-                id: 'support-request',
-                title: 'Solicitar soporte',
-                description: 'Solicitar soporte técnico',
-                icon: '⚙️',
-                requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
-            },
-            {
-                id: 'requests',
-                title: 'Solicitudes',
-                description: 'Gestor de solicitudes',
-                icon: '📝',
-                requiredRoles: ['admin', 'organizer'],
-            },
-            {
-                id: 'escalated-requests',
-                title: 'Solicitudes escaladas',
-                description: 'Solicitudes escaladas a nivel superior',
-                icon: '🚀',
-                requiredRoles: ['admin'],
             },
         ],
     },
     {
-        name: 'ASEGURAMIENTO DE LA CALIDAD',
-        icon: '✅',
+        name: 'ADMINISTRACION',
+        icon: '🛡️',
         modules: [
             {
-                id: 'quality-assurance',
-                title: 'Aseguramiento de Calidad',
-                description: 'Proceso de verificación de calidad',
-                icon: '🏅',
-                requiredRoles: ['admin', 'analyst'],
-            },
-            {
-                id: 'compliance',
-                title: 'Cumplimiento Normativo',
-                description: 'Verificación de cumplimiento normativo',
-                icon: '📜',
-                requiredRoles: ['admin'],
-            },
-        ],
-    },
-    {
-        name: 'MANTENIMIENTO',
-        icon: '🔧',
-        modules: [
-            {
-                id: 'system-maintenance',
-                title: 'Mantenimiento del Sistema',
-                description: 'Tareas de mantenimiento preventivo',
-                icon: '🛠️',
-                requiredRoles: ['admin'],
-            },
-            {
-                id: 'backups',
-                title: 'Respaldos',
-                description: 'Gestión de copias de seguridad',
-                icon: '💾',
-                requiredRoles: ['admin'],
-            },
-        ],
-    },
-    {
-        name: 'SISTEMAS',
-        icon: '💻',
-        modules: [
-            {
-                id: 'user-management',
-                title: 'Gestión de Usuarios',
-                description: 'Administrar usuarios del sistema',
+                id: 'users',
+                title: 'Gestion de usuarios',
+                description: 'Alta, edicion y estado de los usuarios del sistema',
                 icon: '👥',
+                url: '/users',
                 requiredRoles: ['admin'],
             },
             {
-                id: 'permissions',
-                title: 'Permisos y Roles',
-                description: 'Configurar permisos y roles de usuario',
+                id: 'rbac',
+                title: 'Roles y permisos',
+                description: 'Roles, permisos, grupos y asignaciones (RBAC)',
                 icon: '🔐',
+                url: '/superuser/rbac',
                 requiredRoles: ['admin'],
             },
             {
-                id: 'system-config',
-                title: 'Configuración del Sistema',
-                description: 'Parámetros generales del sistema',
-                icon: '⚙️',
-                requiredRoles: ['admin'],
+                id: 'audit',
+                title: 'Auditoria',
+                description: 'Bitacora de cambios sobre roles y permisos',
+                icon: '🧾',
+                url: '/superuser/rbac/audit',
+                requiredRoles: ['admin', 'analyst'],
+            },
+        ],
+    },
+    {
+        name: 'HERRAMIENTAS',
+        icon: '🧩',
+        modules: [
+            {
+                id: 'gantt',
+                title: 'Gantt',
+                description: 'Vista Gantt independiente para cronogramas',
+                icon: '📊',
+                url: '/gantt',
+                requiredRoles: ['admin', 'organizer', 'analyst'],
+            },
+            {
+                id: 'playground',
+                title: 'Catalogo de UI',
+                description: 'Inputs, botones, tablas, formularios y modales',
+                icon: '🎨',
+                url: '/playground',
+                requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
             },
         ],
     },
