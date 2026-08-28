@@ -10,6 +10,10 @@
     "url": "git+https://github.com/ANavas07/AN-Admin-Template.git"
   },
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.19"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

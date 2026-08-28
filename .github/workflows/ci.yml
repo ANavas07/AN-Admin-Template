@@ -1,0 +1,53 @@
+name: CI
+
+# `pull_request` (NO `pull_request_target`): los PR desde forks corren con un
+# token de solo lectura y SIN acceso a los secrets del repo. Nunca cambies esto
+# a `pull_request_target` sin entender que eso le daria a codigo de un fork
+# acceso de escritura al repositorio.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Permisos minimos para todo el workflow.
+permissions:
+  contents: read
+
+# Un PR con varios pushes seguidos cancela las corridas viejas.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 20.19 es el minimo declarado en el README; 24 es la version de desarrollo.
+        node: [20, 24]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+
+      # --frozen-lockfile falla si package.json y pnpm-lock.yaml no coinciden.
+      # Es lo que impide que un PR agregue una dependencia sin que quede
+      # registrada y revisable en el lockfile.
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type-check and build
+        run: pnpm build

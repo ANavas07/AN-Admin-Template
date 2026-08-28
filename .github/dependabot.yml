@@ -1,0 +1,28 @@
+version: 2
+
+updates:
+  # Dependencias de npm/pnpm.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # Agrupa los updates menores y de parche en un solo PR para no ahogarte
+    # en ruido. Los majors llegan sueltos, que son los que hay que mirar bien.
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    labels:
+      - dependencies
+
+  # Las propias GitHub Actions tambien son dependencias, y son un vector de
+  # ataque real: una action comprometida corre con acceso a tu repo.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+      - github-actions
