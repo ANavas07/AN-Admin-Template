@@ -1,4 +1,2 @@
-# Todo el repositorio requiere tu revision.
-# Combinado con la regla "Require review from Code Owners" en el ruleset de
-# `main`, ningun PR puede mergearse sin que lo apruebes.
+# Default code owner
 * @ANavas07
