@@ -14,6 +14,8 @@ export const appConfig = {
     location: import.meta.env.VITE_APP_LOCATION ?? 'Sede principal',
     /** URL base del API REST consumido por src/services/http.ts. */
     apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api',
+    /** URL del servicio de analisis de CV (FastAPI), independiente del API principal. */
+    cvAnalyzerApiUrl: import.meta.env.VITE_CV_ANALYZER_API_URL ?? 'http://localhost:8000',
 } as const
 
 export type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'

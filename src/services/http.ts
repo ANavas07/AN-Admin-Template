@@ -7,6 +7,34 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 interface RequestConfig {
     headers?: Record<string, string>
     signal?: AbortSignal
+    /** Sobrescribe la URL base: para servicios que viven en otro backend. */
+    baseUrl?: string
+    /** Aborta la peticion pasado este tiempo. Sin valor, no hay limite propio. */
+    timeoutMs?: number
+}
+
+/**
+ * Combina el `signal` del llamante con un timeout propio.
+ * Sin `timeoutMs` no crea nada: se usa el signal tal cual.
+ */
+function withTimeout(config?: RequestConfig) {
+    if (!config?.timeoutMs) {
+        return { signal: config?.signal, cleanup: () => { }, timedOut: () => false }
+    }
+
+    const controller = new AbortController()
+    let timedOut = false
+    const timer = setTimeout(() => {
+        timedOut = true
+        controller.abort()
+    }, config.timeoutMs)
+    config.signal?.addEventListener('abort', () => controller.abort(), { once: true })
+
+    return {
+        signal: controller.signal,
+        cleanup: () => clearTimeout(timer),
+        timedOut: () => timedOut,
+    }
 }
 
 export class ApiError extends Error {
@@ -32,18 +60,31 @@ async function request<T>(
     body?: unknown,
     config?: RequestConfig,
 ): Promise<T> {
+    // Con FormData el navegador debe poner el Content-Type (incluye el boundary).
+    const isFormData = body instanceof FormData
     const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...getAuthHeader(),
         ...config?.headers,
     }
 
-    const response = await fetch(`${BASE_URL}${path}`, {
-        method,
-        headers,
-        body: body !== undefined ? JSON.stringify(body) : undefined,
-        signal: config?.signal,
-    })
+    const timeout = withTimeout(config)
+    let response: Response
+    try {
+        response = await fetch(`${config?.baseUrl ?? BASE_URL}${path}`, {
+            method,
+            headers,
+            body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
+            signal: timeout.signal,
+        })
+    } catch (error) {
+        if (timeout.timedOut()) {
+            throw new ApiError(408, 'La peticion supero el tiempo maximo de espera.')
+        }
+        throw error
+    } finally {
+        timeout.cleanup()
+    }
 
     if (!response.ok) {
         const errorData = await response.json().catch(() => null)
@@ -60,6 +101,10 @@ export const http = {
         request<T>('GET', path, undefined, config),
 
     post: <T>(path: string, body?: unknown, config?: RequestConfig) =>
+        request<T>('POST', path, body, config),
+
+    /** POST multipart/form-data: subida de archivos. */
+    postForm: <T>(path: string, body: FormData, config?: RequestConfig) =>
         request<T>('POST', path, body, config),
 
     put: <T>(path: string, body?: unknown, config?: RequestConfig) =>

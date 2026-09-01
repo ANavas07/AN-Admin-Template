@@ -18,6 +18,7 @@ const ProcessDesigner = lazy(() => import('../pages/process/ProcessDesigner'))
 const TasksLayout = lazy(() => import('../pages/tasks/components/layout/TasksLayout'))
 const PlanningLayout = lazy(() => import('../pages/planning/components/layout/PlanningLayout'))
 const GanttStandalone = lazy(() => import('../pages/gantt/GanttStandalone'))
+const CvAnalyzer = lazy(() => import('../pages/cv_analyzer/CvAnalyzer'))
 
 const RbacLayout = lazy(() => import('../pages/superuser/rbac/components/RbacLayout'))
 const RolesPage = lazy(() => import('../pages/superuser/rbac/roles/RolesPage'))
@@ -106,6 +107,7 @@ export function AppRoutes({
           <Route path="/process/:id" element={<ProcessDesigner />} />
           <Route path="/tasks" element={<TasksLayout />} />
           <Route path="/planning" element={<PlanningLayout />} />
+          <Route path="/cvanalyzer" element={<CvAnalyzer />} />
 
           <Route path="/superuser/rbac" element={<RbacLayout />}>
             <Route index element={<Navigate to="/superuser/rbac/roles" replace />} />

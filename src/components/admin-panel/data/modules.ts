@@ -68,6 +68,14 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 url: '/files',
                 requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
             },
+            {
+                id: 'cvanalyzer',
+                title: 'RRHH talentos',
+                description: 'Revision de perfiles',
+                icon: '📝',
+                url: '/cvanalyzer',
+                requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
+            },
         ],
     },
     {
