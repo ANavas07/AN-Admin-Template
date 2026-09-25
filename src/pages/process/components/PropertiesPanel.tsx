@@ -13,6 +13,7 @@ import {
     nodeColorStyles,
 } from '../flowTypes'
 import type { AttachmentRef, BpmnType, EdgeKind, ElementData, FlowEdge, FlowNode } from '../flowTypes'
+import { formatBytes, formatDate } from '../format'
 import BpmnGlyph from './BpmnGlyph'
 
 const textareaClass =
@@ -28,18 +29,6 @@ const edgeKindLabels: Record<EdgeKind, string> = {
     sequence: 'Flujo de secuencia',
     message: 'Flujo de mensaje',
     association: 'Asociación',
-}
-
-function formatBytes(size: number) {
-    if (size <= 0) return '—'
-    if (size < 1024) return `${size} B`
-    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`
-    return `${(size / (1024 * 1024)).toFixed(1)} MB`
-}
-
-function formatDate(iso: string) {
-    const date = new Date(iso)
-    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString()
 }
 
 type ListInputProps = {

@@ -1,9 +1,9 @@
-import type { PointerEvent as ReactPointerEvent, MouseEvent as ReactMouseEvent } from 'react'
+import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent, ReactNode, Ref } from 'react'
 import { NoteIcon } from '../../icons/icons'
+import { cn } from '../../utils/cn'
 import BpmnGlyph from './components/BpmnGlyph'
 import {
     bpmnTypeLabels,
-    getDefaultDimensions,
     getNodeHeight,
     getNodeWidth,
     isContainer,
@@ -13,6 +13,8 @@ import type { FlowNode } from './flowTypes'
 
 type FlowNodeViewProps = {
     node: FlowNode
+    /** Lets the designer measure the rendered size of the node */
+    measureRef?: Ref<HTMLDivElement>
     isSelected: boolean
     isConnectSource: boolean
     /** True while a connection from another node is pending — highlights input ports */
@@ -30,12 +32,9 @@ type FlowNodeViewProps = {
     onResizeEnd: (event: ReactPointerEvent) => void
 }
 
-function cn(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(' ')
-}
-
 export default function FlowNodeView({
     node,
+    measureRef,
     isSelected,
     isConnectSource,
     isConnectCandidate,
@@ -53,9 +52,9 @@ export default function FlowNodeView({
 }: FlowNodeViewProps) {
     const colorStyle = nodeColorStyles[node.color]
     const width = getNodeWidth(node)
-    const portY = getDefaultDimensions(node.kind).portY
     const container = isContainer(node.kind)
 
+    // Ports sit on the vertical middle of the node, where a single connection is anchored
     const ports = (
         <>
             {/* Input port (left) */}
@@ -64,11 +63,10 @@ export default function FlowNodeView({
                 data-flow-port="input"
                 onPointerDown={onCompleteConnection}
                 className={cn(
-                    'absolute -left-2.5 z-10 h-5 w-5 rounded-full border-2 bg-(--color-surface) transition-transform',
+                    'absolute -left-2.5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 rounded-full border-2 bg-(--color-surface) transition-transform',
                     colorStyle.border,
                     isConnectCandidate ? 'scale-125 animate-pulse cursor-pointer' : 'cursor-crosshair'
                 )}
-                style={{ top: portY - 10 }}
                 aria-label={`Connect into ${node.title}`}
                 title="Input port"
             />
@@ -80,18 +78,17 @@ export default function FlowNodeView({
                 onPointerMove={onPortPointerMove}
                 onPointerUp={onPortPointerUp}
                 className={cn(
-                    'absolute -right-2.5 z-10 h-5 w-5 cursor-crosshair touch-none rounded-full border-2 bg-(--color-surface) transition-transform hover:scale-125',
+                    'absolute -right-2.5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 cursor-crosshair touch-none rounded-full border-2 bg-(--color-surface) transition-transform hover:scale-125',
                     colorStyle.border,
                     isConnectSource ? 'scale-125 ring-2 ring-brand/40' : ''
                 )}
-                style={{ top: portY - 10 }}
                 aria-label={`Start connection from ${node.title}`}
                 title="Output port — drag to another element to connect"
             />
         </>
     )
 
-    let body: React.ReactNode
+    let body: ReactNode
 
     switch (node.kind) {
         case 'start':
@@ -314,6 +311,7 @@ export default function FlowNodeView({
 
     return (
         <div
+            ref={measureRef}
             data-node-id={node.id}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}

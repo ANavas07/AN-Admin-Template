@@ -1,53 +1,53 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { ChangeEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react'
+import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
 import PopUp from '../../components/common/pop-up/PopUp'
-import { ArrowLeftIcon, FlowIcon, SparkIcon, TrashBinIcon } from '../../icons/icons'
+import { FlowIcon } from '../../icons/icons'
 import { processService } from '../../services/process/process.service'
 import type { ProcessDraft } from '../../services/process/ai.service'
 import { sileo } from 'sileo'
 import FlowNodeView from './FlowNodeView'
 import AiAssistantModal from './components/AiAssistantModal'
+import CanvasContextMenu from './components/CanvasContextMenu'
+import type { ContextMenuState } from './components/CanvasContextMenu'
+import DesignerToolbar from './components/DesignerToolbar'
+import EdgeLayer from './components/EdgeLayer'
+import Minimap from './components/Minimap'
 import PalettePanel from './components/PalettePanel'
 import ProcessInfoModal from './components/ProcessInfoModal'
 import PropertiesPanel from './components/PropertiesPanel'
 import ValidationPanel from './components/ValidationPanel'
+import ZoomControls from './components/ZoomControls'
+import { useCanvasViewport } from './hooks/useCanvasViewport'
 import { useDiagramHistory } from './hooks/useDiagramHistory'
+import { useNodeSizes } from './hooks/useNodeSizes'
 import { validateDiagram } from './validation'
 import type { ValidationResult } from './validation'
 import type { PaletteItem } from './bpmnCatalog'
+import { previewCurve, routeEdges } from './connectors'
+import type { Box, Point } from './connectors'
 import {
     CANVAS_HEIGHT,
     CANVAS_WIDTH,
-    MAX_SCALE,
-    MIN_SCALE,
-    edgePath,
     emptyElementData,
     getDefaultDimensions,
     getNodeHeight,
     getNodeWidth,
-    getPorts,
     isContainer,
-    nodeColorStyles,
     parseDiagram,
 } from './flowTypes'
 import type { DiagramSnapshot, ElementData, FlowEdge, FlowNode } from './flowTypes'
-import { processStatusLabels, processStatusStyles } from './types'
 import type { ProcessMeta, ProcessRecord } from './types'
 
-type ViewportState = { scale: number; tx: number; ty: number }
+type PanGesture = { startX: number; startY: number; startTx: number; startTy: number; moved: boolean }
+type DragGesture = { nodeId: string; offsetX: number; offsetY: number }
+type ResizeGesture = { nodeId: string; startW: number; startH: number; startX: number; startY: number }
+type ConnectGesture = { startClientX: number; startClientY: number; moved: boolean }
 
-type ContextMenuState = {
-    x: number
-    y: number
-    targetType: 'node' | 'edge'
-    targetId: string
-}
-
-const MINIMAP_WIDTH = 168
-const MINIMAP_SCALE = MINIMAP_WIDTH / CANVAS_WIDTH
-const MINIMAP_HEIGHT = Math.round(CANVAS_HEIGHT * MINIMAP_SCALE)
+/** Pointer movement (in px) below which a gesture is still considered a click. */
+const PAN_THRESHOLD = 3
+const CONNECT_DRAG_THRESHOLD = 4
 
 function isTypingTarget(target: EventTarget | null) {
     const element = target as HTMLElement | null
@@ -60,11 +60,19 @@ function isTypingTarget(target: EventTarget | null) {
     )
 }
 
-function approximateNodeHeight(node: FlowNode) {
-    if (isContainer(node.kind)) return getNodeHeight(node)
-    if (node.kind === 'decision') return 128
-    if (node.kind === 'task') return 90
-    return 64
+function capturePointer(event: ReactPointerEvent) {
+    ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+}
+
+function releasePointer(event: ReactPointerEvent) {
+    ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+}
+
+function toFileSlug(text: string) {
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
 }
 
 export default function ProcessDesigner() {
@@ -80,9 +88,7 @@ export default function ProcessDesigner() {
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null)
     const [connectingFromId, setConnectingFromId] = useState<string | null>(null)
-    const [pointerPos, setPointerPos] = useState<{ x: number; y: number } | null>(null)
-    const [viewport, setViewport] = useState<ViewportState>({ scale: 1, tx: 0, ty: 0 })
-    const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 })
+    const [pointerPos, setPointerPos] = useState<Point | null>(null)
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
     const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false)
     const [isValidationOpen, setIsValidationOpen] = useState(false)
@@ -93,12 +99,15 @@ export default function ProcessDesigner() {
 
     const rootRef = useRef<HTMLDivElement>(null)
     const viewportRef = useRef<HTMLDivElement>(null)
-    const importInputRef = useRef<HTMLInputElement>(null)
-    const dragRef = useRef<{ nodeId: string; offsetX: number; offsetY: number } | null>(null)
-    const panRef = useRef<{ startX: number; startY: number; startTx: number; startTy: number; moved: boolean } | null>(null)
-    const resizeRef = useRef<{ nodeId: string; startW: number; startH: number; startX: number; startY: number } | null>(null)
-    const connectDragRef = useRef<{ startClientX: number; startClientY: number; moved: boolean } | null>(null)
+    const panRef = useRef<PanGesture | null>(null)
+    const dragRef = useRef<DragGesture | null>(null)
+    const resizeRef = useRef<ResizeGesture | null>(null)
+    const connectDragRef = useRef<ConnectGesture | null>(null)
     const idCounterRef = useRef(0)
+
+    const { viewport, viewportSize, toWorld, centerInWorld, centerOn, panTo, zoomBy, resetView } =
+        useCanvasViewport(viewportRef)
+    const { sizes: nodeSizes, measureRef } = useNodeSizes()
 
     // Reset to the loading state when navigating between processes
     const [loadedProcessId, setLoadedProcessId] = useState(processId)
@@ -146,47 +155,6 @@ export default function ProcessDesigner() {
         [nodes, connectingFromId]
     )
 
-    // Track viewport dimensions for the minimap and centered placement
-    useEffect(() => {
-        const element = viewportRef.current
-        if (!element) return
-        const observer = new ResizeObserver((entries) => {
-            const entry = entries[0]
-            if (entry) {
-                setViewportSize({ width: entry.contentRect.width, height: entry.contentRect.height })
-            }
-        })
-        observer.observe(element)
-        return () => observer.disconnect()
-    }, [])
-
-    // Mouse-wheel zoom keeps the world point under the cursor fixed.
-    // Native listener because React wheel handlers cannot preventDefault (passive).
-    useEffect(() => {
-        const element = viewportRef.current
-        if (!element) return
-
-        function handleWheel(event: WheelEvent) {
-            event.preventDefault()
-            const rect = element!.getBoundingClientRect()
-            const px = event.clientX - rect.left
-            const py = event.clientY - rect.top
-            setViewport((current) => {
-                const factor = Math.exp(-event.deltaY * 0.0014)
-                const scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, current.scale * factor))
-                const ratio = scale / current.scale
-                return {
-                    scale,
-                    tx: px - ratio * (px - current.tx),
-                    ty: py - ratio * (py - current.ty),
-                }
-            })
-        }
-
-        element.addEventListener('wheel', handleWheel, { passive: false })
-        return () => element.removeEventListener('wheel', handleWheel)
-    }, [])
-
     // Keyboard shortcuts: Delete removes, Escape cancels, Ctrl+Z / Ctrl+Y history
     useEffect(() => {
         function handleKeyDown(event: KeyboardEvent) {
@@ -226,19 +194,30 @@ export default function ProcessDesigner() {
         return `${prefix}-${Date.now().toString(36)}-${idCounterRef.current}`
     }
 
-    function worldPoint(event: { clientX: number; clientY: number }) {
-        const rect = viewportRef.current?.getBoundingClientRect()
-        if (!rect) return { x: 0, y: 0 }
-        return {
-            x: (event.clientX - rect.left - viewport.tx) / viewport.scale,
-            y: (event.clientY - rect.top - viewport.ty) / viewport.scale,
-        }
+    function selectNode(nodeId: string | null) {
+        setSelectedNodeId(nodeId)
+        setSelectedEdgeId(null)
     }
 
-    function viewportCenterWorld() {
+    function selectEdge(edgeId: string | null) {
+        setSelectedEdgeId(edgeId)
+        setSelectedNodeId(null)
+    }
+
+    function clearSelection() {
+        setSelectedNodeId(null)
+        setSelectedEdgeId(null)
+        setConnectingFromId(null)
+    }
+
+    /** Position and real size of a node: measured in the DOM, estimated until then. */
+    function boxOf(node: FlowNode): Box {
+        const size = nodeSizes.get(node.id)
         return {
-            x: (viewportSize.width / 2 - viewport.tx) / viewport.scale,
-            y: (viewportSize.height / 2 - viewport.ty) / viewport.scale,
+            x: node.x,
+            y: node.y,
+            width: size?.width ?? getNodeWidth(node),
+            height: size?.height ?? getNodeHeight(node),
         }
     }
 
@@ -298,14 +277,31 @@ export default function ProcessDesigner() {
             data: { ...source.data, documents: [...source.data.documents] },
         }
         diagram.apply((current) => ({ ...current, nodes: [...current.nodes, copy] }))
-        setSelectedNodeId(copy.id)
-        setSelectedEdgeId(null)
+        selectNode(copy.id)
         setContextMenu(null)
+    }
+
+    /** Task node created next to a new exclusive gateway, one per branch. */
+    function createBranchTask(gateway: FlowNode, branch: 'yes' | 'no'): FlowNode {
+        const isYes = branch === 'yes'
+        return {
+            ...gateway,
+            id: newId('n'),
+            kind: 'task',
+            bpmnType: 'task',
+            title: isYes ? 'Camino Sí' : 'Camino No',
+            description: isYes ? 'Ocurre cuando se cumple la condición.' : 'Ocurre cuando no se cumple la condición.',
+            color: isYes ? 'emerald' : 'rose',
+            x: Math.min(gateway.x + 260, CANVAS_WIDTH - getDefaultDimensions('task').width),
+            y: isYes ? Math.max(0, gateway.y - 100) : Math.min(gateway.y + 170, CANVAS_HEIGHT - 160),
+            data: emptyElementData(),
+        }
     }
 
     function addNode(item: PaletteItem) {
         const dims = getDefaultDimensions(item.kind)
-        const center = viewportCenterWorld()
+        const center = centerInWorld()
+        // Consecutive additions are offset so they do not stack exactly on top of each other
         const jitter = (idCounterRef.current % 5) * 16
 
         const node: FlowNode = {
@@ -319,35 +315,13 @@ export default function ProcessDesigner() {
             x: Math.max(0, Math.min(center.x - dims.width / 2 + jitter, CANVAS_WIDTH - dims.width)),
             y: Math.max(0, Math.min(center.y - 60 + jitter, CANVAS_HEIGHT - 160)),
             data: emptyElementData(),
-            ...(isContainer(item.kind) ? { width: dims.width, height: dims.defaultHeight } : {}),
+            ...(isContainer(item.kind) ? { width: dims.width, height: dims.height } : {}),
         }
 
         if (item.bpmnType === 'exclusiveGateway') {
             // An exclusive gateway ships with its two labeled outputs
-            const yesNode: FlowNode = {
-                ...node,
-                id: newId('n'),
-                kind: 'task',
-                bpmnType: 'task',
-                title: 'Camino Sí',
-                description: 'Ocurre cuando se cumple la condición.',
-                color: 'emerald',
-                x: Math.min(node.x + 260, CANVAS_WIDTH - 224),
-                y: Math.max(0, node.y - 100),
-                data: emptyElementData(),
-            }
-            const noNode: FlowNode = {
-                ...node,
-                id: newId('n'),
-                kind: 'task',
-                bpmnType: 'task',
-                title: 'Camino No',
-                description: 'Ocurre cuando no se cumple la condición.',
-                color: 'rose',
-                x: Math.min(node.x + 260, CANVAS_WIDTH - 224),
-                y: Math.min(node.y + 170, CANVAS_HEIGHT - 160),
-                data: emptyElementData(),
-            }
+            const yesNode = createBranchTask(node, 'yes')
+            const noNode = createBranchTask(node, 'no')
             diagram.apply((current) => ({
                 nodes: [...current.nodes, node, yesNode, noNode],
                 edges: [
@@ -360,8 +334,7 @@ export default function ProcessDesigner() {
             diagram.apply((current) => ({ ...current, nodes: [...current.nodes, node] }))
         }
 
-        setSelectedNodeId(node.id)
-        setSelectedEdgeId(null)
+        selectNode(node.id)
     }
 
     function completeConnection(targetId: string) {
@@ -386,11 +359,14 @@ export default function ProcessDesigner() {
         })
     }
 
+    function replaceDiagram(next: DiagramSnapshot) {
+        diagram.apply(() => ({ nodes: next.nodes, edges: next.edges }))
+        clearSelection()
+    }
+
     function clearCanvas() {
         diagram.apply(() => ({ nodes: [], edges: [] }))
-        setSelectedNodeId(null)
-        setSelectedEdgeId(null)
-        setConnectingFromId(null)
+        clearSelection()
         setIsClearConfirmOpen(false)
     }
 
@@ -421,27 +397,17 @@ export default function ProcessDesigner() {
         const url = URL.createObjectURL(blob)
         const anchor = document.createElement('a')
         anchor.href = url
-        const slug = (record?.meta.code || record?.meta.name || 'proceso')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '')
-        anchor.download = `${slug || 'proceso'}.json`
+        anchor.download = `${toFileSlug(record?.meta.code || record?.meta.name || 'proceso') || 'proceso'}.json`
         anchor.click()
         URL.revokeObjectURL(url)
         showStatus('Diagrama exportado como JSON.')
     }
 
-    async function handleImportFile(event: ChangeEvent<HTMLInputElement>) {
-        const file = event.target.files?.[0]
-        event.target.value = ''
-        if (!file) return
+    async function importDiagram(file: File) {
         try {
             const parsed = parseDiagram(JSON.parse(await file.text()))
             if (!parsed) throw new Error('invalid diagram')
-            diagram.apply(() => ({ nodes: parsed.nodes, edges: parsed.edges }))
-            setSelectedNodeId(null)
-            setSelectedEdgeId(null)
-            setConnectingFromId(null)
+            replaceDiagram(parsed)
             showStatus(`Se importaron ${parsed.nodes.length} elementos y ${parsed.edges.length} conexiones.`)
         } catch {
             showStatus('No se pudo importar: el archivo no es un diagrama JSON válido.')
@@ -457,21 +423,15 @@ export default function ProcessDesigner() {
     function goToNode(nodeId: string) {
         const node = nodes.find((candidate) => candidate.id === nodeId)
         if (!node) return
-        setSelectedNodeId(nodeId)
-        setSelectedEdgeId(null)
-        setViewport((current) => ({
-            ...current,
-            tx: viewportSize.width / 2 - (node.x + getNodeWidth(node) / 2) * current.scale,
-            ty: viewportSize.height / 2 - (node.y + approximateNodeHeight(node) / 2) * current.scale,
-        }))
+        selectNode(nodeId)
+        const box = boxOf(node)
+        centerOn(box.x + box.width / 2, box.y + box.height / 2)
     }
 
     // --- AI proposal --------------------------------------------------------
     function applyAiDraft(generated: DiagramSnapshot, draft: ProcessDraft) {
-        diagram.apply(() => ({ nodes: generated.nodes, edges: generated.edges }))
-        setSelectedNodeId(null)
-        setSelectedEdgeId(null)
-        setViewport({ scale: 1, tx: 0, ty: 0 })
+        replaceDiagram(generated)
+        resetView()
         if (record && record.meta.name === 'Proceso sin título' && draft.name) {
             saveMeta({ name: draft.name, description: draft.description, area: draft.area })
         }
@@ -489,7 +449,7 @@ export default function ProcessDesigner() {
             startTy: viewport.ty,
             moved: false,
         }
-        ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+        capturePointer(event)
     }
 
     function handleViewportPointerMove(event: ReactPointerEvent) {
@@ -497,24 +457,18 @@ export default function ProcessDesigner() {
         if (pan) {
             const dx = event.clientX - pan.startX
             const dy = event.clientY - pan.startY
-            if (Math.abs(dx) + Math.abs(dy) > 3) pan.moved = true
-            if (pan.moved) {
-                setViewport((current) => ({ ...current, tx: pan.startTx + dx, ty: pan.startTy + dy }))
-            }
+            if (Math.abs(dx) + Math.abs(dy) > PAN_THRESHOLD) pan.moved = true
+            if (pan.moved) panTo(pan.startTx + dx, pan.startTy + dy)
             return
         }
-        if (connectingFromId) setPointerPos(worldPoint(event))
+        if (connectingFromId) setPointerPos(toWorld(event))
     }
 
     function handleViewportPointerUp(event: ReactPointerEvent) {
         const pan = panRef.current
         panRef.current = null
-        if (pan && !pan.moved) {
-            setSelectedNodeId(null)
-            setSelectedEdgeId(null)
-            setConnectingFromId(null)
-        }
-        ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+        if (pan && !pan.moved) clearSelection()
+        releasePointer(event)
     }
 
     // --- Node dragging ------------------------------------------------------
@@ -526,12 +480,11 @@ export default function ProcessDesigner() {
             completeConnection(node.id)
             return
         }
-        const point = worldPoint(event)
+        const point = toWorld(event)
         dragRef.current = { nodeId: node.id, offsetX: point.x - node.x, offsetY: point.y - node.y }
         diagram.beginGesture()
-        ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
-        setSelectedNodeId(node.id)
-        setSelectedEdgeId(null)
+        capturePointer(event)
+        selectNode(node.id)
     }
 
     function handleNodePointerMove(event: ReactPointerEvent) {
@@ -539,7 +492,7 @@ export default function ProcessDesigner() {
         if (!drag) return
         const node = nodes.find((candidate) => candidate.id === drag.nodeId)
         if (!node) return
-        const point = worldPoint(event)
+        const point = toWorld(event)
         const x = Math.min(Math.max(point.x - drag.offsetX, 0), CANVAS_WIDTH - getNodeWidth(node))
         const y = Math.min(Math.max(point.y - drag.offsetY, 0), CANVAS_HEIGHT - 60)
         updateNode(drag.nodeId, { x, y })
@@ -547,7 +500,7 @@ export default function ProcessDesigner() {
 
     function handleNodePointerUp(event: ReactPointerEvent) {
         if (dragRef.current) {
-            ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+            releasePointer(event)
             diagram.endGesture()
         }
         dragRef.current = null
@@ -557,7 +510,7 @@ export default function ProcessDesigner() {
     function handleResizeStart(event: ReactPointerEvent, node: FlowNode) {
         if (event.button !== 0) return
         event.stopPropagation()
-        const point = worldPoint(event)
+        const point = toWorld(event)
         resizeRef.current = {
             nodeId: node.id,
             startW: getNodeWidth(node),
@@ -566,14 +519,14 @@ export default function ProcessDesigner() {
             startY: point.y,
         }
         diagram.beginGesture()
-        ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+        capturePointer(event)
     }
 
     function handleResizeMove(event: ReactPointerEvent) {
         const resize = resizeRef.current
         if (!resize) return
         event.stopPropagation()
-        const point = worldPoint(event)
+        const point = toWorld(event)
         updateNode(resize.nodeId, {
             width: Math.max(180, resize.startW + point.x - resize.startX),
             height: Math.max(96, resize.startH + point.y - resize.startY),
@@ -582,7 +535,7 @@ export default function ProcessDesigner() {
 
     function handleResizeEnd(event: ReactPointerEvent) {
         if (resizeRef.current) {
-            ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+            releasePointer(event)
             diagram.endGesture()
         }
         resizeRef.current = null
@@ -592,27 +545,24 @@ export default function ProcessDesigner() {
     function handleStartConnection(event: ReactPointerEvent, nodeId: string) {
         if (event.button !== 0) return
         event.stopPropagation()
-        ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+        capturePointer(event)
         connectDragRef.current = { startClientX: event.clientX, startClientY: event.clientY, moved: false }
         setConnectingFromId(nodeId)
-        setPointerPos(worldPoint(event))
+        setPointerPos(toWorld(event))
     }
 
     function handlePortPointerMove(event: ReactPointerEvent) {
         const drag = connectDragRef.current
         if (!drag || !connectingFromId) return
-        if (
-            Math.abs(event.clientX - drag.startClientX) + Math.abs(event.clientY - drag.startClientY) > 4
-        ) {
-            drag.moved = true
-        }
-        setPointerPos(worldPoint(event))
+        const distance = Math.abs(event.clientX - drag.startClientX) + Math.abs(event.clientY - drag.startClientY)
+        if (distance > CONNECT_DRAG_THRESHOLD) drag.moved = true
+        setPointerPos(toWorld(event))
     }
 
     function handlePortPointerUp(event: ReactPointerEvent) {
         const drag = connectDragRef.current
         connectDragRef.current = null
-        ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+        releasePointer(event)
         if (!connectingFromId || !drag?.moved) return // simple click keeps the connection pending
 
         const element = document.elementFromPoint(event.clientX, event.clientY)
@@ -635,13 +585,8 @@ export default function ProcessDesigner() {
         event.stopPropagation()
         const rect = rootRef.current?.getBoundingClientRect()
         if (!rect) return
-        if (targetType === 'node') {
-            setSelectedNodeId(targetId)
-            setSelectedEdgeId(null)
-        } else {
-            setSelectedEdgeId(targetId)
-            setSelectedNodeId(null)
-        }
+        if (targetType === 'node') selectNode(targetId)
+        else selectEdge(targetId)
         setContextMenu({
             x: event.clientX - rect.left,
             y: event.clientY - rect.top,
@@ -650,48 +595,17 @@ export default function ProcessDesigner() {
         })
     }
 
+    function removeFromContextMenu(menu: ContextMenuState) {
+        if (menu.targetType === 'node') removeNode(menu.targetId)
+        else removeEdge(menu.targetId)
+    }
+
     // --- Derived geometry ---------------------------------------------------
-    const edgeGeometry = useMemo(() => {
-        const nodeById = new Map(nodes.map((node) => [node.id, node]))
-        return edges.flatMap((edge) => {
-            const from = nodeById.get(edge.from)
-            const to = nodeById.get(edge.to)
-            if (!from || !to) return []
-            const fromPort = getPorts(from).output
-            const toPort = getPorts(to).input
-            return [{
-                edge,
-                path: edgePath(fromPort.x, fromPort.y, toPort.x, toPort.y),
-                midX: (fromPort.x + toPort.x) / 2,
-                midY: (fromPort.y + toPort.y) / 2,
-                isDashed: edge.kind !== 'sequence' || from.kind === 'note' || to.kind === 'note',
-            }]
-        })
-    }, [edges, nodes])
-
-    function jumpFromMinimap(event: ReactPointerEvent) {
-        event.stopPropagation()
-        const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-        const worldX = (event.clientX - rect.left) / MINIMAP_SCALE
-        const worldY = (event.clientY - rect.top) / MINIMAP_SCALE
-        setViewport((current) => ({
-            ...current,
-            tx: viewportSize.width / 2 - worldX * current.scale,
-            ty: viewportSize.height / 2 - worldY * current.scale,
-        }))
-    }
-
-    function zoomBy(factor: number) {
-        const cx = viewportSize.width / 2
-        const cy = viewportSize.height / 2
-        setViewport((current) => {
-            const scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, current.scale * factor))
-            const ratio = scale / current.scale
-            return { scale, tx: cx - ratio * (cx - current.tx), ty: cy - ratio * (cy - current.ty) }
-        })
-    }
-
-    const zoomPercent = Math.round(viewport.scale * 100)
+    const edgeRoutes = routeEdges(nodes, edges, boxOf)
+    const previewPath =
+        connectingFromNode && pointerPos
+            ? previewCurve(connectingFromNode, boxOf(connectingFromNode), pointerPos)
+            : null
 
     if (loadState === 'loading') {
         return (
@@ -715,117 +629,25 @@ export default function ProcessDesigner() {
 
     return (
         <div ref={rootRef} className="relative flex h-[calc(100vh-4rem)] flex-col bg-(--color-bg)">
-            {/* Toolbar */}
-            <div className="border-b border-(--color-border) bg-(--color-surface)/80 backdrop-blur">
-                <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-                    <div className="flex min-w-0 items-center gap-3">
-                        <button
-                            type="button"
-                            onClick={() => navigate('/process')}
-                            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-(--color-border) text-(--color-text-muted) transition-colors hover:bg-(--color-bg-soft) hover:text-(--color-text)"
-                            aria-label="Volver al repositorio de procesos"
-                            title="Volver al repositorio"
-                        >
-                            <ArrowLeftIcon className="size-4" />
-                        </button>
-                        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
-                            <FlowIcon className="size-5" />
-                        </span>
-                        <div className="min-w-0">
-                            <button
-                                type="button"
-                                onClick={() => setIsInfoOpen(true)}
-                                className="flex max-w-full items-center gap-2 text-left"
-                                title="Editar información del proceso"
-                            >
-                                <h1 className="truncate text-sm font-bold text-(--color-text) hover:text-brand">
-                                    {record.meta.name}
-                                </h1>
-                                <span
-                                    className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${processStatusStyles[record.meta.status]}`}
-                                >
-                                    {processStatusLabels[record.meta.status]}
-                                </span>
-                            </button>
-                            <p className="truncate text-xs text-(--color-text-muted)">
-                                {record.meta.code ? `${record.meta.code} · ` : ''}v{record.meta.version} ·{' '}
-                                {nodes.length} elementos · {edges.length} conexiones
-                                {isDirty ? ' · cambios sin guardar' : ''}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                        {connectingFromId ? (
-                            <span className="animate-pulse rounded-full border border-brand/40 bg-brand-soft px-3 py-1.5 text-xs font-semibold text-brand">
-                                Suelta sobre el elemento destino · Esc para cancelar
-                            </span>
-                        ) : null}
-                        <div className="flex items-center overflow-hidden rounded-xl border border-(--color-border)">
-                            <button
-                                type="button"
-                                onClick={diagram.undo}
-                                disabled={!diagram.canUndo}
-                                className="px-2.5 py-1.5 text-sm text-(--color-text) transition-colors hover:bg-(--color-bg-soft) disabled:cursor-not-allowed disabled:opacity-40"
-                                aria-label="Deshacer"
-                                title="Deshacer (Ctrl+Z)"
-                            >
-                                ↶
-                            </button>
-                            <span className="h-5 w-px bg-(--color-border)" aria-hidden="true" />
-                            <button
-                                type="button"
-                                onClick={diagram.redo}
-                                disabled={!diagram.canRedo}
-                                className="px-2.5 py-1.5 text-sm text-(--color-text) transition-colors hover:bg-(--color-bg-soft) disabled:cursor-not-allowed disabled:opacity-40"
-                                aria-label="Rehacer"
-                                title="Rehacer (Ctrl+Y)"
-                            >
-                                ↷
-                            </button>
-                        </div>
-                        <ButtonComponent size="sm" variant="outline" onClick={runValidation}>
-                            Validar
-                        </ButtonComponent>
-                        <ButtonComponent
-                            size="sm"
-                            variant="outline"
-                            leftIcon={<SparkIcon className="size-4" />}
-                            onClick={() => setIsAiOpen(true)}
-                        >
-                            Generar con IA
-                        </ButtonComponent>
-                        <ButtonComponent size="sm" variant="outline" onClick={() => importInputRef.current?.click()}>
-                            Importar
-                        </ButtonComponent>
-                        <ButtonComponent size="sm" variant="outline" onClick={exportDiagram}>
-                            Exportar
-                        </ButtonComponent>
-                        <ButtonComponent size="sm" variant="primary" onClick={saveDiagram}>
-                            Guardar
-                        </ButtonComponent>
-                        <ButtonComponent
-                            size="sm"
-                            variant="outline"
-                            leftIcon={<TrashBinIcon className="size-4" />}
-                            onClick={() => setIsClearConfirmOpen(true)}
-                            disabled={nodes.length === 0}
-                            aria-label="Limpiar lienzo"
-                            title="Limpiar lienzo"
-                        >
-                            Limpiar
-                        </ButtonComponent>
-                        <input
-                            ref={importInputRef}
-                            type="file"
-                            accept=".json,application/json"
-                            className="hidden"
-                            onChange={handleImportFile}
-                            aria-label="Importar diagrama JSON"
-                        />
-                    </div>
-                </div>
-            </div>
+            <DesignerToolbar
+                meta={record.meta}
+                nodeCount={nodes.length}
+                edgeCount={edges.length}
+                isDirty={isDirty}
+                isConnecting={Boolean(connectingFromId)}
+                canUndo={diagram.canUndo}
+                canRedo={diagram.canRedo}
+                onBack={() => navigate('/process')}
+                onOpenInfo={() => setIsInfoOpen(true)}
+                onUndo={diagram.undo}
+                onRedo={diagram.redo}
+                onValidate={runValidation}
+                onOpenAi={() => setIsAiOpen(true)}
+                onImport={importDiagram}
+                onExport={exportDiagram}
+                onSave={saveDiagram}
+                onClear={() => setIsClearConfirmOpen(true)}
+            />
 
             <div className="flex min-h-0 flex-1">
                 {/* Canvas viewport */}
@@ -849,112 +671,23 @@ export default function ProcessDesigner() {
                             backgroundSize: '24px 24px',
                         }}
                     >
-                        {/* Connection layer */}
-                        <svg
-                            className="absolute inset-0 h-full w-full"
-                            width={CANVAS_WIDTH}
-                            height={CANVAS_HEIGHT}
-                            // pointerEvents none lets clicks pass through to containers (z-index 1
-                            // below this layer); edge hit paths re-enable their own stroke events
-                            style={{ zIndex: 2, pointerEvents: 'none' }}
-                            aria-hidden="true"
-                        >
-                            <defs>
-                                <marker id="flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                                    <path d="M 0 0 L 10 5 L 0 10 z" className="fill-(--color-text-muted)" />
-                                </marker>
-                                <marker id="flow-arrow-active" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                                    <path d="M 0 0 L 10 5 L 0 10 z" className="fill-brand" />
-                                </marker>
-                            </defs>
+                        <EdgeLayer
+                            routes={edgeRoutes}
+                            selectedEdgeId={selectedEdgeId}
+                            previewPath={previewPath}
+                            onSelectEdge={(edgeId) => {
+                                selectEdge(edgeId)
+                                setContextMenu(null)
+                            }}
+                            onEdgeContextMenu={(event, edgeId) => openContextMenu(event, 'edge', edgeId)}
+                            onRemoveEdge={removeEdge}
+                        />
 
-                            {edgeGeometry.map(({ edge, path, isDashed }) => {
-                                const isSelected = edge.id === selectedEdgeId
-                                return (
-                                    <g key={edge.id}>
-                                        {/* Wide invisible stroke to make edges easy to click */}
-                                        <path
-                                            d={path}
-                                            fill="none"
-                                            stroke="transparent"
-                                            strokeWidth={16}
-                                            className="cursor-pointer"
-                                            style={{ pointerEvents: 'stroke' }}
-                                            onPointerDown={(event) => {
-                                                event.stopPropagation()
-                                                setSelectedEdgeId(edge.id)
-                                                setSelectedNodeId(null)
-                                                setContextMenu(null)
-                                            }}
-                                            onContextMenu={(event) => openContextMenu(event, 'edge', edge.id)}
-                                        />
-                                        <path
-                                            d={path}
-                                            fill="none"
-                                            strokeWidth={isSelected ? 2.5 : 1.8}
-                                            strokeDasharray={isDashed ? '5 4' : undefined}
-                                            className={isSelected ? 'stroke-brand' : 'stroke-(--color-text-muted)'}
-                                            markerEnd={isSelected ? 'url(#flow-arrow-active)' : 'url(#flow-arrow)'}
-                                            style={{ pointerEvents: 'none' }}
-                                        />
-                                    </g>
-                                )
-                            })}
-
-                            {/* Pending connection preview */}
-                            {connectingFromNode && pointerPos ? (
-                                <path
-                                    d={edgePath(
-                                        getPorts(connectingFromNode).output.x,
-                                        getPorts(connectingFromNode).output.y,
-                                        pointerPos.x,
-                                        pointerPos.y
-                                    )}
-                                    fill="none"
-                                    strokeWidth={2}
-                                    strokeDasharray="6 5"
-                                    className="animate-pulse stroke-brand"
-                                    style={{ pointerEvents: 'none' }}
-                                />
-                            ) : null}
-                        </svg>
-
-                        {/* Edge labels */}
-                        {edgeGeometry
-                            .filter(({ edge }) => edge.label)
-                            .map(({ edge, midX, midY }) => (
-                                <span
-                                    key={`label-${edge.id}`}
-                                    className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-(--color-border) bg-(--color-surface) px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-(--color-text) shadow-sm"
-                                    style={{ left: midX, top: midY, zIndex: 4 }}
-                                >
-                                    {edge.label}
-                                </span>
-                            ))}
-
-                        {/* Delete button on the selected connection */}
-                        {edgeGeometry
-                            .filter(({ edge }) => edge.id === selectedEdgeId)
-                            .map(({ edge, midX, midY }) => (
-                                <button
-                                    key={`delete-${edge.id}`}
-                                    type="button"
-                                    onPointerDown={(event) => event.stopPropagation()}
-                                    onClick={() => removeEdge(edge.id)}
-                                    className="absolute z-20 inline-flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-(--color-border) bg-(--color-surface) text-rose-600 shadow-md transition-transform hover:scale-110 dark:text-rose-300"
-                                    style={{ left: midX, top: midY - (edge.label ? 22 : 0) }}
-                                    aria-label="Eliminar conexión"
-                                    title="Eliminar conexión"
-                                >
-                                    <TrashBinIcon className="size-4" />
-                                </button>
-                            ))}
-
-                        {/* Nodes */}
                         {nodes.map((node) => (
                             <FlowNodeView
                                 key={node.id}
                                 node={node}
+                                measureRef={measureRef}
                                 isSelected={node.id === selectedNodeId}
                                 isConnectSource={node.id === connectingFromId}
                                 isConnectCandidate={Boolean(connectingFromId && connectingFromId !== node.id)}
@@ -972,7 +705,6 @@ export default function ProcessDesigner() {
                             />
                         ))}
 
-                        {/* Empty state */}
                         {nodes.length === 0 ? (
                             <div className="pointer-events-none absolute left-105 top-48 w-80 rounded-3xl border border-dashed border-(--color-border) bg-(--color-surface)/80 p-8 text-center backdrop-blur">
                                 <FlowIcon className="mx-auto size-8 text-(--color-text-muted)" />
@@ -987,77 +719,24 @@ export default function ProcessDesigner() {
                         ) : null}
                     </div>
 
-                    {/* BPMN palette */}
                     <PalettePanel onAdd={addNode} />
 
-                    {/* Zoom controls */}
-                    <div
-                        onPointerDown={(event) => event.stopPropagation()}
-                        className="absolute bottom-4 left-3 z-30 flex items-center gap-1 rounded-full border border-(--color-border) bg-(--color-surface)/95 px-1.5 py-1 shadow-lg backdrop-blur"
-                    >
-                        <button
-                            type="button"
-                            onClick={() => zoomBy(1 / 1.2)}
-                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-(--color-text) transition-colors hover:bg-(--color-bg-soft)"
-                            aria-label="Alejar"
-                        >
-                            −
-                        </button>
-                        <span className="w-11 text-center text-xs font-semibold tabular-nums text-(--color-text-muted)">
-                            {zoomPercent}%
-                        </span>
-                        <button
-                            type="button"
-                            onClick={() => zoomBy(1.2)}
-                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-(--color-text) transition-colors hover:bg-(--color-bg-soft)"
-                            aria-label="Acercar"
-                        >
-                            +
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setViewport({ scale: 1, tx: 0, ty: 0 })}
-                            className="ml-1 rounded-full px-2 py-1 text-[11px] font-semibold text-(--color-text-muted) transition-colors hover:bg-(--color-bg-soft) hover:text-brand"
-                            aria-label="Restablecer vista"
-                        >
-                            Reiniciar
-                        </button>
-                    </div>
+                    <ZoomControls
+                        scale={viewport.scale}
+                        onZoomIn={() => zoomBy(1.2)}
+                        onZoomOut={() => zoomBy(1 / 1.2)}
+                        onReset={resetView}
+                    />
 
-                    {/* Minimap */}
-                    <div
-                        onPointerDown={jumpFromMinimap}
-                        className="absolute bottom-4 right-4 z-30 hidden cursor-pointer overflow-hidden rounded-xl border border-(--color-border) bg-(--color-surface)/90 shadow-lg backdrop-blur md:block"
-                        style={{ width: MINIMAP_WIDTH, height: MINIMAP_HEIGHT }}
-                        role="img"
-                        aria-label="Vista general del diagrama — clic para mover la vista"
-                        title="Clic para mover la vista"
-                    >
-                        {nodes.map((node) => (
-                            <span
-                                key={`mm-${node.id}`}
-                                className={`absolute rounded-xs ${isContainer(node.kind) ? `${nodeColorStyles[node.color].soft} border ${nodeColorStyles[node.color].border}` : nodeColorStyles[node.color].swatch}`}
-                                style={{
-                                    left: node.x * MINIMAP_SCALE,
-                                    top: node.y * MINIMAP_SCALE,
-                                    width: Math.max(3, getNodeWidth(node) * MINIMAP_SCALE),
-                                    height: Math.max(2, approximateNodeHeight(node) * MINIMAP_SCALE),
-                                }}
-                            />
-                        ))}
-                        <span
-                            className="absolute border border-brand bg-brand/10"
-                            style={{
-                                left: (-viewport.tx / viewport.scale) * MINIMAP_SCALE,
-                                top: (-viewport.ty / viewport.scale) * MINIMAP_SCALE,
-                                width: (viewportSize.width / viewport.scale) * MINIMAP_SCALE,
-                                height: (viewportSize.height / viewport.scale) * MINIMAP_SCALE,
-                            }}
-                        />
-                    </div>
+                    <Minimap
+                        nodes={nodes}
+                        boxOf={boxOf}
+                        viewport={viewport}
+                        viewportSize={viewportSize}
+                        onNavigate={centerOn}
+                    />
                 </div>
 
-                {/* Properties panel */}
                 <aside
                     className="hidden w-80 shrink-0 overflow-y-auto border-l border-(--color-border) bg-(--color-surface) lg:block"
                     onPointerDown={(event) => event.stopPropagation()}
@@ -1077,42 +756,10 @@ export default function ProcessDesigner() {
                 </aside>
             </div>
 
-            {/* Context menu */}
             {contextMenu ? (
-                <div
-                    onPointerDown={(event) => event.stopPropagation()}
-                    className="absolute z-50 w-44 overflow-hidden rounded-xl border border-(--color-border) bg-(--color-surface) py-1 shadow-xl"
-                    style={{ left: contextMenu.x, top: contextMenu.y }}
-                    role="menu"
-                >
-                    {contextMenu.targetType === 'node' ? (
-                        <button
-                            type="button"
-                            role="menuitem"
-                            onClick={() => duplicateNode(contextMenu.targetId)}
-                            className="w-full px-4 py-2 text-left text-sm text-(--color-text) transition-colors hover:bg-(--color-bg-soft)"
-                        >
-                            Duplicar
-                        </button>
-                    ) : null}
-                    <button
-                        type="button"
-                        role="menuitem"
-                        onClick={() =>
-                            contextMenu.targetType === 'node'
-                                ? removeNode(contextMenu.targetId)
-                                : removeEdge(contextMenu.targetId)
-                        }
-                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-rose-600 transition-colors hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-900/30"
-                    >
-                        <TrashBinIcon className="size-4" />
-                        Eliminar
-                    </button>
-                </div>
+                <CanvasContextMenu menu={contextMenu} onDuplicate={duplicateNode} onRemove={removeFromContextMenu} />
             ) : null}
 
-
-            {/* Clear canvas confirmation */}
             <PopUp
                 isOpen={isClearConfirmOpen}
                 onClose={() => setIsClearConfirmOpen(false)}
@@ -1137,7 +784,6 @@ export default function ProcessDesigner() {
                 </p>
             </PopUp>
 
-            {/* Validation results */}
             <ValidationPanel
                 isOpen={isValidationOpen}
                 onClose={() => setIsValidationOpen(false)}
@@ -1145,10 +791,8 @@ export default function ProcessDesigner() {
                 onGoToNode={goToNode}
             />
 
-            {/* AI assistant */}
             <AiAssistantModal isOpen={isAiOpen} onClose={() => setIsAiOpen(false)} onApply={applyAiDraft} />
 
-            {/* Process information */}
             <ProcessInfoModal
                 isOpen={isInfoOpen}
                 onClose={() => setIsInfoOpen(false)}

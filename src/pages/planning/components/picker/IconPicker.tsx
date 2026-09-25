@@ -6,6 +6,7 @@ import { validateUploadFile } from '../../validation'
 import { UPLOAD } from '../../constants'
 import type { UploadedAssetRef } from '../../types'
 import type { IconCatalog } from '../../hooks/useIconCatalog'
+import { cn } from '../../../../utils/cn'
 
 // Selector reutilizable de recurso visual:
 //  - pestaña "Catálogo": grid de íconos del manifest con buscador por texto/tags.
@@ -23,10 +24,6 @@ export interface IconPickerProps {
 }
 
 type Tab = 'catalog' | 'upload'
-
-function cn(...c: Array<string | false | null | undefined>) {
-  return c.filter(Boolean).join(' ')
-}
 
 export default function IconPicker({
   catalog,

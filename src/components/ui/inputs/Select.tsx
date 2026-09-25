@@ -1,6 +1,7 @@
 import { useId, useMemo, useState } from 'react'
 import type { ChangeEvent, ReactNode } from 'react'
 import { ChevronIcon, ClearIcon } from '../../../icons/icons'
+import { cn } from '../../../utils/cn'
 
 type OptionValue = string | number | boolean
 
@@ -25,10 +26,6 @@ type SelectProps<T> = {
     isLoading?: boolean
     clearable?: boolean
     leftIcon?: ReactNode
-}
-
-function cn(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(' ')
 }
 
 const Select = <T,>({

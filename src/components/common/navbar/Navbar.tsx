@@ -6,6 +6,7 @@ import {
     SparkIcon,
     UsersIcon,
 } from '../../../icons/icons'
+import { cn } from '../../../utils/cn'
 
 type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
 
@@ -41,10 +42,6 @@ const moduleLinks: ModuleLink[] = [
     { label: 'Administrador', path: '/superuser/rbac', icon: <UsersIcon className="size-4.5" /> },
     { label: 'Playground', path: '/playground', icon: <SparkIcon className="size-4.5" /> },
 ]
-
-function cn(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(' ')
-}
 
 export default function Navbar({
     isDarkMode,

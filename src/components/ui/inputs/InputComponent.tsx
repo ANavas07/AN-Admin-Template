@@ -1,5 +1,6 @@
 import { forwardRef, useId } from 'react'
 import type { ChangeEvent, InputHTMLAttributes, ReactNode } from 'react'
+import { cn } from '../../../utils/cn'
 
 type InputSize = 'sm' | 'md' | 'lg'
 type InputVariant = 'default' | 'search' | 'rounded'
@@ -28,10 +29,6 @@ type InputComponentProps = Omit<
     rightIcon?: ReactNode
     iconPosition?: IconPosition
     fullWidth?: boolean
-}
-
-function cn(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(' ')
 }
 
 const InputComponent = forwardRef<HTMLInputElement, InputComponentProps>(

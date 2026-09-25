@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import { cn } from '../../utils/cn'
 
 type PlaygroundNavItem = {
     label: string
@@ -70,10 +71,6 @@ const playgroundNavItems: PlaygroundNavItem[] = [
         icon: null,
     }
 ]
-
-function cn(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(' ')
-}
 
 
 function DashboardIcon() {
