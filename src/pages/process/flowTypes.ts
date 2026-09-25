@@ -131,20 +131,24 @@ export const colorOptions: { value: NodeColor; label: string }[] = [
 
 type KindDimensions = {
     width: number
-    portY: number
-    defaultHeight?: number
+    /**
+     * Initial height of containers. For the rest of the kinds the real height
+     * depends on the content, so this is only an estimate used until the node
+     * is measured in the DOM.
+     */
+    height: number
 }
 
 const KIND_DIMENSIONS: Record<NodeKind, KindDimensions> = {
-    task: { width: 224, portY: 34 },
-    start: { width: 64, portY: 32 },
-    end: { width: 64, portY: 32 },
-    intermediate: { width: 64, portY: 32 },
-    decision: { width: 128, portY: 64 },
-    note: { width: 200, portY: 26 },
-    data: { width: 200, portY: 34 },
-    group: { width: 340, portY: 22, defaultHeight: 240 },
-    lane: { width: 620, portY: 22, defaultHeight: 180 },
+    task: { width: 224, height: 90 },
+    start: { width: 64, height: 64 },
+    end: { width: 64, height: 64 },
+    intermediate: { width: 64, height: 64 },
+    decision: { width: 128, height: 128 },
+    note: { width: 200, height: 64 },
+    data: { width: 200, height: 64 },
+    group: { width: 340, height: 240 },
+    lane: { width: 620, height: 180 },
 }
 
 export const kindLabels: Record<NodeKind, string> = {
@@ -210,25 +214,13 @@ export function getNodeWidth(node: FlowNode) {
     return node.width ?? KIND_DIMENSIONS[node.kind].width
 }
 
+/** Explicit height for containers, estimated height for the rest (see KIND_DIMENSIONS). */
 export function getNodeHeight(node: FlowNode) {
-    return node.height ?? KIND_DIMENSIONS[node.kind].defaultHeight ?? 64
+    return node.height ?? KIND_DIMENSIONS[node.kind].height
 }
 
 export function getDefaultDimensions(kind: NodeKind) {
     return KIND_DIMENSIONS[kind]
-}
-
-export function getPorts(node: FlowNode) {
-    const portY = node.y + KIND_DIMENSIONS[node.kind].portY
-    return {
-        input: { x: node.x, y: portY },
-        output: { x: node.x + getNodeWidth(node), y: portY },
-    }
-}
-
-export function edgePath(fromX: number, fromY: number, toX: number, toY: number) {
-    const bend = Math.max(Math.abs(toX - fromX) / 2, 48)
-    return `M ${fromX} ${fromY} C ${fromX + bend} ${fromY}, ${toX - bend} ${toY}, ${toX} ${toY}`
 }
 
 const VALID_KINDS = new Set<NodeKind>([
