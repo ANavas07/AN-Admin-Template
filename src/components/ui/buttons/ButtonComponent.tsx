@@ -1,6 +1,7 @@
 import { forwardRef } from 'react'
 import type { ButtonHTMLAttributes, ElementType, ReactNode } from 'react'
 import { Link, type To } from 'react-router-dom'
+import { cn } from '../../../utils/cn'
 
 export type ButtonVariant =
     | 'primary'
@@ -30,10 +31,6 @@ export type ButtonComponentProps = ButtonHTMLAttributes<HTMLButtonElement> & {
     to?: To;               // Para Link de React Router
     href?: string;         // Para anchor normal
     onClick?: () => void;  // Para botones normales
-}
-
-function cn(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(' ')
 }
 
 const variantClasses: Record<ButtonVariant, string> = {

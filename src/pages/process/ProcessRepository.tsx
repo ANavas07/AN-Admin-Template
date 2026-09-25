@@ -8,11 +8,7 @@ import { FlowIcon, PlusIcon, TrashBinIcon } from '../../icons/icons'
 import { processService } from '../../services/process/process.service'
 import { processStatusFlow, processStatusLabels, processStatusStyles } from './types'
 import type { ProcessStatus, ProcessSummary } from './types'
-
-function formatDate(iso: string) {
-    const date = new Date(iso)
-    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString()
-}
+import { formatDate } from './format'
 
 /**
  * Central process repository: the place where the organization finds, filters

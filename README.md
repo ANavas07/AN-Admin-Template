@@ -93,6 +93,7 @@ src/
 │   ├── files/               Upload center
 │   └── playground/          UI component catalog
 ├── services/                HTTP client + per-domain API services
+├── utils/                   Small shared helpers (e.g. `cn` for class names)
 ├── context/ThemeContext.tsx Light/dark theme
 └── css/styles.css           Tailwind entry + design tokens
 ```

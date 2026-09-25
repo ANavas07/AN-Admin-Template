@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import ButtonComponent from '../../ui/buttons/ButtonComponent'
 import FormRender from '../forms/FormRender'
 import type { FormConfig, FormValues } from '../forms/FormRender'
+import { cn } from '../../../utils/cn'
 
 export type PopUpSize = 'sm' | 'md' | 'lg' | 'xl'
 
@@ -23,10 +24,6 @@ export type PopUpProps = {
     // Custom content mode
     children?: ReactNode
     footer?: ReactNode
-}
-
-function cn(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(' ')
 }
 
 const sizeClasses: Record<PopUpSize, string> = {

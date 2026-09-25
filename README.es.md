@@ -95,6 +95,7 @@ src/
 │   ├── files/               Centro de carga de archivos
 │   └── playground/          Catálogo de componentes de UI
 ├── services/                Cliente HTTP + servicios por dominio
+├── utils/                   Utilidades compartidas (p. ej. `cn` para clases)
 ├── context/ThemeContext.tsx Tema claro/oscuro
 └── css/styles.css           Entrada de Tailwind + tokens de diseño
 ```

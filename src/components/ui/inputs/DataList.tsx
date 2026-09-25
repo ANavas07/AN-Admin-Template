@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, KeyboardEventHandler, ReactNode } from 'react'
 import { ChevronIcon, ClearIcon, SearchIcon } from '../../../icons/icons'
+import { cn } from '../../../utils/cn'
 
 type OptionValue = string | number | boolean
 
@@ -25,10 +26,6 @@ type DataListProps<T> = {
     isLoading?: boolean
     clearable?: boolean
     leftIcon?: ReactNode
-}
-
-function cn(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(' ')
 }
 
 

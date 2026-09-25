@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import ButtonComponent from '../../ui/buttons/ButtonComponent'
 import DataList from '../../ui/inputs/DataList'
+import { cn } from '../../../utils/cn'
 
 type FieldType =
     | 'text'
@@ -65,10 +66,6 @@ type FormRenderProps = {
     isSubmitting?: boolean
     onChange?: (values: FormValues) => void
     onSubmit: (values: FormValues) => void | Promise<void>
-}
-
-function cn(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(' ')
 }
 
 function getInitialValues(config: FormConfig, initialValues: FormValues = {}) {

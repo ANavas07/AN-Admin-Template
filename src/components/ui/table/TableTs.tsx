@@ -15,6 +15,7 @@ import React, { useState } from 'react';
 import ButtonComponent from '../buttons/ButtonComponent';
 import InputComponent from '../../ui/inputs/InputComponent';
 import { ChevronIcon, EditIcon, PlusIcon, TrashBinIcon} from '../../../icons/icons';
+import { cn } from '../../../utils/cn';
 
 const statusStyles: Record<string, string> = {
     active: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-300',
@@ -23,13 +24,6 @@ const statusStyles: Record<string, string> = {
     cancelled: 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20 dark:bg-rose-500/15 dark:text-rose-300',
     completed: 'bg-sky-50 text-sky-700 ring-1 ring-sky-600/20 dark:bg-sky-500/15 dark:text-sky-300',
 };
-
-function cn(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(' ');
-}
-
-
-
 
 interface ReusableTableProps<T> {
     data: T[];
