@@ -15,7 +15,7 @@ export default function ActivityPage() {
                 title="Actividad reciente"
                 description="Tu historial de navegación y cómo usas cada módulo."
             />
-            <div className="grid gap-4 lg:grid-cols-12">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
                 <RecentPanel className="lg:col-span-5" />
                 <VisitLog className="lg:col-span-7" />
             </div>

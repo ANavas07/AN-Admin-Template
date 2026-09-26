@@ -37,12 +37,25 @@ const components: Components = {
     },
 }
 
-type MarkdownProps = Omit<ComponentProps<'div'>, 'children'> & { children: string }
+/** Long-form documents (knowledge base, docs): larger headings, same body styles. */
+const articleComponents: Components = {
+    ...components,
+    h1: (props) => <h2 className="mb-3 mt-8 text-xl font-semibold text-fg first:mt-0" {...props} />,
+    h2: (props) => <h3 className="mb-2 mt-7 text-base font-semibold text-fg first:mt-0" {...props} />,
+    h3: (props) => <h4 className="mb-2 mt-5 text-sm font-semibold text-fg first:mt-0" {...props} />,
+    p: (props) => <p className="my-3 leading-relaxed first:mt-0 last:mb-0" {...props} />,
+}
 
-export default function Markdown({ children, className, ...rest }: MarkdownProps) {
+type MarkdownProps = Omit<ComponentProps<'div'>, 'children'> & {
+    children: string
+    /** compact: chat messages; article: documents */
+    variant?: 'compact' | 'article'
+}
+
+export default function Markdown({ children, className, variant = 'compact', ...rest }: MarkdownProps) {
     return (
         <div className={cn('text-sm text-fg', className)} {...rest}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={variant === 'article' ? articleComponents : components}>
                 {children}
             </ReactMarkdown>
         </div>

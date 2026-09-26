@@ -12,7 +12,7 @@ export type SectionTab = {
 /** Route-based tabs for the sections of a module (Support, Account…). */
 export default function SectionTabs({ tabs, label }: { tabs: SectionTab[]; label: string }) {
     return (
-        <nav aria-label={label} className="-mb-px flex gap-1 overflow-x-auto border-b border-line">
+        <nav aria-label={label} className="flex gap-1 overflow-x-auto border-b border-line">
             {tabs.map((tab) => (
                 <NavLink
                     key={tab.to}

@@ -29,6 +29,13 @@ const TasksLayout = lazy(() => import('../pages/operations/tasks/components/layo
 const PlanningLayout = lazy(() => import('../pages/operations/planning/components/layout/PlanningLayout'))
 const GanttStandalone = lazy(() => import('../pages/operations/gantt/GanttStandalone'))
 
+// Comunicacion
+const SupportLayout = lazy(() => import('../pages/communication/support/SupportLayout'))
+const TicketsPage = lazy(() => import('../pages/communication/support/tickets/TicketsPage'))
+const TicketDetailPage = lazy(() => import('../pages/communication/support/tickets/TicketDetailPage'))
+const NewTicketPage = lazy(() => import('../pages/communication/support/new/NewTicketPage'))
+const ContactPage = lazy(() => import('../pages/communication/support/contact/ContactPage'))
+
 // Administracion
 const ApiKeysPage = lazy(() => import('../pages/administration/api-keys/ApiKeysPage'))
 const UserManagement = lazy(() => import('../pages/administration/users/UserManagement'))
@@ -46,6 +53,9 @@ const PreferencesPage = lazy(() => import('../pages/account/preferences/Preferen
 const SecurityPage = lazy(() => import('../pages/account/security/SecurityPage'))
 
 // Ayuda
+const KnowledgeBasePage = lazy(() => import('../pages/help/knowledge-base/KnowledgeBasePage'))
+const KnowledgeBaseBrowser = lazy(() => import('../pages/help/knowledge-base/components/KnowledgeBaseBrowser'))
+const ArticlePage = lazy(() => import('../pages/help/knowledge-base/ArticlePage'))
 const Playground = lazy(() => import('../pages/help/playground/Playground'))
 const InputCatalog = lazy(() => import('../pages/help/playground/InputCatalog'))
 const ButtonCatalog = lazy(() => import('../pages/help/playground/ButtonCatalog'))
@@ -138,6 +148,15 @@ export function AppRoutes({
             <Route path="/tasks" element={<TasksLayout />} />
             <Route path="/planning" element={<PlanningLayout />} />
 
+            <Route path="/support" element={<SupportLayout />}>
+              <Route index element={<Navigate to="/support/tickets" replace />} />
+              <Route path="tickets" element={<TicketsPage />} />
+              <Route path="tickets/:ticketId" element={<TicketDetailPage />} />
+              <Route path="new" element={<NewTicketPage />} />
+              <Route path="knowledge-base" element={<KnowledgeBaseBrowser />} />
+              <Route path="contact" element={<ContactPage />} />
+            </Route>
+
             <Route path="/admin/api-keys" element={<ApiKeysPage />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/superuser/rbac" element={<RbacLayout />}>
@@ -148,6 +167,9 @@ export function AppRoutes({
               <Route path="users" element={<UserRolesPage />} />
               <Route path="audit" element={<AuditLogPage />} />
             </Route>
+
+            <Route path="/help/knowledge-base" element={<KnowledgeBasePage />} />
+            <Route path="/help/knowledge-base/:slug" element={<ArticlePage />} />
 
             <Route path="/account" element={<AccountLayout />}>
               <Route index element={<Navigate to="/account/profile" replace />} />

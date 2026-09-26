@@ -1,4 +1,5 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { useLocation } from 'react-router-dom'
 import AppSidebar from '../sidebar/AppSidebar'
 import { ShellContext } from './shell-context'
 
@@ -27,6 +28,12 @@ type AppShellProps = {
 export default function AppShell({ renderNavbar, children }: AppShellProps) {
     const [isCollapsed, setIsCollapsed] = useState(readCollapsed)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+    const { pathname } = useLocation()
+
+    // A new page starts at the top (the browser keeps the previous scroll otherwise)
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [pathname])
 
     function setCollapsed(next: boolean) {
         setIsCollapsed(next)

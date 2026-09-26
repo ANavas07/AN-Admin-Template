@@ -204,7 +204,7 @@ export default function ApiKeysPage() {
                 )}
             </section>
 
-            <div className="grid gap-4 lg:grid-cols-12">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
                 <Panel title="Auditoría reciente" description="Acciones sobre las claves de la organización." className="lg:col-span-8">
                     <ApiKeyAuditTrail events={audit} limit={8} />
                 </Panel>

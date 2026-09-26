@@ -184,6 +184,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 children: [
                     { id: 'support-tickets', title: 'Mis tickets', url: '/support/tickets' },
                     { id: 'support-new', title: 'Nuevo ticket', url: '/support/new' },
+                    { id: 'support-kb', title: 'Base de conocimiento', url: '/support/knowledge-base' },
                     { id: 'support-contact', title: 'Contactar soporte', url: '/support/contact' },
                 ],
             },
