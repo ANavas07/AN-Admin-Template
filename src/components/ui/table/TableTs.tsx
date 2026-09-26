@@ -13,7 +13,7 @@ import {
 } from '@tanstack/react-table';
 import React, { useState } from 'react';
 import ButtonComponent from '../buttons/ButtonComponent';
-import InputComponent from '../../ui/inputs/InputComponent';
+import InputComponent from '../inputs/InputComponent';
 import { ChevronIcon, EditIcon, PlusIcon, TrashBinIcon} from '../../../icons/icons';
 import { cn } from '../../../utils/cn';
 import Badge from '../badge/Badge';

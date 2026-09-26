@@ -2,8 +2,8 @@
 //   aiService -> ProcessDraft (semantic) -> buildDiagramFromDraft -> DiagramSnapshot -> validation -> user review.
 // Today generateDraft is a local simulation; swapping it for a real model only
 // requires reimplementing generateDraft with the same contract.
-import { emptyElementData } from '../../pages/process/flowTypes'
-import type { BpmnType, DiagramSnapshot, FlowEdge, FlowNode, NodeColor } from '../../pages/process/flowTypes'
+import { emptyElementData } from '../../pages/operations/process/flowTypes'
+import type { BpmnType, DiagramSnapshot, FlowEdge, FlowNode, NodeColor } from '../../pages/operations/process/flowTypes'
 
 export type DraftStep = {
     name: string

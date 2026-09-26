@@ -1,5 +1,5 @@
 import { http } from '../http'
-import type { AuditLog, PaginatedResponse } from '../../pages/superuser/rbac/types'
+import type { AuditLog, PaginatedResponse } from '../../pages/administration/rbac/types'
 
 export const AUDIT_EVENT_TYPES = [
   'ROLE_ASSIGNED',

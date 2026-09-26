@@ -39,6 +39,22 @@ import { ReactComponent as PanelLeftIcon } from './PanelLeft.svg?react';
 import { ReactComponent as BoltIcon } from './Bolt.svg?react';
 import { ReactComponent as BuildingIcon } from './Building.svg?react';
 import { ReactComponent as ActivityIcon } from './Activity.svg?react';
+import { ReactComponent as MailIcon } from './Mail.svg?react';
+import { ReactComponent as AssistantIcon } from './Assistant.svg?react';
+import { ReactComponent as SupportIcon } from './Support.svg?react';
+import { ReactComponent as KeyIcon } from './Key.svg?react';
+import { ReactComponent as HelpIcon } from './Help.svg?react';
+import { ReactComponent as BookIcon } from './Book.svg?react';
+import { ReactComponent as SendIcon } from './Send.svg?react';
+import { ReactComponent as RefreshIcon } from './Refresh.svg?react';
+import { ReactComponent as PinIcon } from './Pin.svg?react';
+import { ReactComponent as ReplyIcon } from './Reply.svg?react';
+import { ReactComponent as ForwardIcon } from './Forward.svg?react';
+import { ReactComponent as ArchiveIcon } from './Archive.svg?react';
+import { ReactComponent as AlertTriangleIcon } from './AlertTriangle.svg?react';
+import { ReactComponent as WrenchIcon } from './Wrench.svg?react';
+import { ReactComponent as PaperclipIcon } from './Paperclip.svg?react';
+import { ReactComponent as MailOpenIcon } from './MailOpen.svg?react';
 
 
 
@@ -84,4 +100,20 @@ export {
     BoltIcon,
     BuildingIcon,
     ActivityIcon,
+    MailIcon,
+    AssistantIcon,
+    SupportIcon,
+    KeyIcon,
+    HelpIcon,
+    BookIcon,
+    SendIcon,
+    RefreshIcon,
+    PinIcon,
+    ReplyIcon,
+    ForwardIcon,
+    ArchiveIcon,
+    AlertTriangleIcon,
+    WrenchIcon,
+    PaperclipIcon,
+    MailOpenIcon,
 }

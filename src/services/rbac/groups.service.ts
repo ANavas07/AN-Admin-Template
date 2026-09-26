@@ -1,6 +1,6 @@
 import { http } from '../http'
 import { sanitize } from '../sanitize'
-import type { Group, GroupMember, GroupRole, PaginatedResponse } from '../../pages/superuser/rbac/types'
+import type { Group, GroupMember, GroupRole, PaginatedResponse } from '../../pages/administration/rbac/types'
 
 interface ListGroupsParams {
   page?: number

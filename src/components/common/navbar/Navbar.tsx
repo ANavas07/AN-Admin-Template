@@ -5,20 +5,21 @@ import { ROLE_LABELS } from '../../../config/app.config'
 import type { CurrentUser, UserRole } from '../../../config/app.config'
 import {
     ArrowLeftIcon,
-    BellIcon,
     ChevronIcon,
+    LockIcon,
     LogOutIcon,
     MenuIcon,
     MoonIcon,
     SearchIcon,
     SettingsIcon,
     SunIcon,
+    SupportIcon,
     UserIcon,
 } from '../../../icons/icons'
 import { signOut } from '../../../services/session'
 import { cn } from '../../../utils/cn'
 import { modifierKeyLabel } from '../../../utils/platform'
-import { HOME_PATH } from '../../admin-panel/data/navigation'
+import { HOME_PATH } from '../../../navigation/navigation'
 import Avatar from '../../ui/avatar/Avatar'
 import { fieldControlClass, fieldSizeClasses } from '../../ui/inputs/fieldStyles'
 import Kbd from '../../ui/kbd/Kbd'
@@ -35,12 +36,13 @@ type NavbarProps = {
 }
 
 /** Entries of the account menu. */
-type AccountMenuItem = { label: string; icon: ReactNode; path?: string }
+type AccountMenuItem = { label: string; icon: ReactNode; path: string }
 
 const accountMenuItems: AccountMenuItem[] = [
-    { label: 'My profile', icon: <UserIcon className="size-4" /> },
-    { label: 'Super user panel', icon: <SettingsIcon className="size-4" />, path: '/super' },
-    { label: 'Notifications', icon: <BellIcon className="size-4" /> },
+    { label: 'Perfil', icon: <UserIcon className="size-4" />, path: '/account/profile' },
+    { label: 'Preferencias', icon: <SettingsIcon className="size-4" />, path: '/account/preferences' },
+    { label: 'Seguridad', icon: <LockIcon className="size-4" />, path: '/account/security' },
+    { label: 'Centro de soporte', icon: <SupportIcon className="size-4" />, path: '/support' },
 ]
 
 const iconButtonClass =
@@ -198,29 +200,17 @@ export default function Navbar({
                                     {roleSelect()}
                                 </div>
                                 <div className="py-1">
-                                    {accountMenuItems.map((item) =>
-                                        item.path ? (
-                                            <NavLink
-                                                key={item.label}
-                                                to={item.path}
-                                                onClick={() => setIsUserMenuOpen(false)}
-                                                className={menuItemClass}
-                                            >
-                                                <span className="text-fg-muted">{item.icon}</span>
-                                                {item.label}
-                                            </NavLink>
-                                        ) : (
-                                            <button
-                                                key={item.label}
-                                                type="button"
-                                                onClick={() => setIsUserMenuOpen(false)}
-                                                className={menuItemClass}
-                                            >
-                                                <span className="text-fg-muted">{item.icon}</span>
-                                                {item.label}
-                                            </button>
-                                        )
-                                    )}
+                                    {accountMenuItems.map((item) => (
+                                        <NavLink
+                                            key={item.label}
+                                            to={item.path}
+                                            onClick={() => setIsUserMenuOpen(false)}
+                                            className={menuItemClass}
+                                        >
+                                            <span className="text-fg-muted">{item.icon}</span>
+                                            {item.label}
+                                        </NavLink>
+                                    ))}
                                 </div>
                                 <div className="border-t border-line py-1">
                                     <button type="button" onClick={signOut} className={cn(menuItemClass, 'text-danger hover:bg-danger-soft')}>

@@ -1,15 +1,15 @@
 // Process repository. Persists to localStorage today, but exposes an async API
 // with the same shape as the http-backed services (see services/rbac) so it can
 // be swapped for a real backend without touching the UI.
-import { LEGACY_STORAGE_KEY, emptyDiagram, parseDiagram } from '../../pages/process/flowTypes'
-import type { DiagramSnapshot } from '../../pages/process/flowTypes'
+import { LEGACY_STORAGE_KEY, emptyDiagram, parseDiagram } from '../../pages/operations/process/flowTypes'
+import type { DiagramSnapshot } from '../../pages/operations/process/flowTypes'
 import type {
     ProcessMeta,
     ProcessRecord,
     ProcessStatus,
     ProcessSummary,
     ProcessVersionEntry,
-} from '../../pages/process/types'
+} from '../../pages/operations/process/types'
 
 const STORAGE_KEY = 'process-repository:v1'
 

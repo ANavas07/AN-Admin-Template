@@ -1,7 +1,7 @@
 // Deterministic demo activity for the template: ~6 months of plausible module
 // visits so the home metrics have something to show before real usage exists.
 // It is flagged (`demo: true`) and can be cleared from the home screen.
-import { describeRoute, findRouteMatch, getAllModules } from '../../components/admin-panel/data/navigation'
+import { describeRoute, findRouteMatch, getAllModules } from '../../navigation/navigation'
 import type { RecentEntry, VisitEvent } from './workspace.service'
 
 const DAY_MS = 24 * 60 * 60 * 1000

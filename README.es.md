@@ -3,11 +3,13 @@
 [![Licencia: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 **Plantilla** de panel administrativo construida con React 19, TypeScript, Vite y
-Tailwind CSS 4. Incluye un dashboard de módulos filtrado por rol, una consola
-RBAC, un espacio de tareas (tablero / lista / cronograma / calendario), una
-grilla de planificación, un diseñador de procesos tipo BPMN y un catálogo de
-componentes de UI — todo sobre datos simulados, para que puedas clonarlo y
-conectar tu propio backend.
+Tailwind CSS 4. Incluye un espacio de trabajo personal, un centro de correo, un
+asistente IA, un centro de soporte con base de conocimiento, gestión de API
+keys, una consola RBAC, un espacio de tareas (tablero / lista / cronograma /
+calendario), una grilla de planificación, un diseñador de procesos tipo BPMN,
+ajustes de cuenta, páginas de error y mantenimiento y un catálogo de componentes
+de UI — todo sobre datos simulados, para que puedas clonarlo y conectar tu
+propio backend.
 
 🇬🇧 [English version](README.md)
 
@@ -71,37 +73,96 @@ variables de entorno declaradas en [`.env.example`](.env.example).
 | `VITE_APP_ORGANIZATION` | `Mi Organizacion` | Organización del panel lateral |
 | `VITE_APP_LOCATION` | `Sede principal` | Ubicación del panel lateral |
 | `VITE_API_BASE_URL` | `http://localhost:3000/api` | URL base de `src/services/http.ts` |
+| `VITE_SUPPORT_EMAIL` / `_PHONE` / `_HOURS` | valores de ejemplo | Canales de soporte (centro de soporte, 403 y páginas de error) |
+| `VITE_MAINTENANCE_MODE` | `false` | `true` reemplaza toda la app por la página de mantenimiento |
+| `VITE_MAINTENANCE_MESSAGE` / `_UNTIL` | vacío | Mensaje opcional y fin estimado (ISO 8601) |
+| `VITE_STATUS_PAGE_URL` | vacío | Enlace opcional a tu página de estado |
 
 > Todo lo que empieza con `VITE_` queda incrustado en el bundle del navegador.
 > Nunca pongas secretos ahí.
 
 ## Estructura del proyecto
 
+Las páginas se agrupan igual que la navegación: `src/pages/<sección>/<módulo>/`.
+Todos los módulos siguen la misma división: la página compone componentes de
+presentación, un hook (`hooks/useX.ts`) concentra el estado y las acciones, y un
+servicio en `src/services/<dominio>/` contiene las reglas de negocio y la
+persistencia.
+
 ```
 src/
-├── app/App.tsx              Shell: navbar, tema, sesión simulada
-├── routes/AppRoutes.tsx     Tabla de rutas (módulos con carga diferida)
+├── app/                     Shell de la app, límite de errores
+├── routes/                  Tabla de rutas (lazy) + protección por rol
+├── navigation/              Registro de módulos, consultas, acciones rápidas
 ├── config/app.config.ts     Punto único de configuración
+├── context/                 Proveedores de tema, cuenta y espacio de trabajo
+├── services/                Servicios por dominio (mail, support, api-keys, assistant,
+│                            knowledge-base, account, workspace, process, rbac…)
 ├── components/
-│   ├── admin-panel/         Espacio de trabajo del home + registro de navegación
-│   ├── common/              Navbar, sidebar, paleta de comandos, formularios, modales, toasts
-│   └── ui/                  Botones, inputs, tabla, gráficos, badge, alert, avatar, tonos
+│   ├── common/              Shell, sidebar, navbar, paleta de comandos, layouts,
+│   │                        drawer, diálogo de confirmación, markdown, adjuntos
+│   └── ui/                  Botones, inputs, switch, control segmentado, tabla,
+│                            gráficos, badge, alert, avatar, estado vacío, tonos
 ├── pages/
-│   ├── tasks/               Tablero, lista, cronograma, calendario (dnd-kit)
-│   ├── planning/            Grilla de plantillas con iconos/imágenes por celda
-│   ├── process/             Repositorio y diseñador de procesos
-│   ├── superuser/rbac/      Roles, permisos, grupos, auditoría
-│   ├── users/               Gestión de usuarios
-│   ├── files/               Centro de carga de archivos
-│   └── playground/          Catálogo de componentes de UI
-├── services/                Cliente HTTP + servicios por dominio
-├── utils/                   Utilidades compartidas (p. ej. `cn` para clases)
-├── context/ThemeContext.tsx Tema claro/oscuro
+│   ├── workspace/           Inicio, módulos, favoritos, actividad reciente
+│   ├── operations/          Tareas, planificación, procesos, documentos, gantt
+│   ├── communication/       Correo, asistente IA, centro de soporte
+│   ├── administration/      API keys, usuarios, roles (RBAC), auditoría
+│   ├── help/                Base de conocimiento, documentación, catálogo de UI
+│   ├── account/             Perfil, preferencias, seguridad
+│   ├── system/              Páginas 404, 403, 500 y mantenimiento
+│   └── auth/                Inicio de sesión
+├── utils/                   Utilidades compartidas (cn, format, attachments, text)
 └── css/
     ├── theme.css            Tokens de diseño (claro + oscuro), fuente única de verdad
     ├── components.css       Clases reutilizables: card, eyebrow, page-title…
     └── styles.css           Entrada de Tailwind, capa base, puentes con terceros
 ```
+
+## Módulos
+
+| Sección | Módulo | Ruta | Destacado |
+| --- | --- | --- | --- |
+| Espacio de trabajo | Inicio, Módulos, Favoritos, Actividad reciente | `/dashboard`, `/workspace/*` | Favoritos por usuario, historial de visitas, gráficos de uso |
+| Comunicación | Correo | `/mail/:carpeta` | Entrada, favoritos, enviados, borradores, archivados, papelera; conversaciones; redactar, responder, responder a todos, reenviar; búsqueda, filtros, etiquetas, adjuntos |
+| Comunicación | Asistente IA | `/assistant` | Varias conversaciones, búsqueda, fijar, renombrar; respuestas en Markdown con código resaltado; copiar, regenerar, detener; adjuntos |
+| Comunicación | Centro de soporte | `/support/*` | Tickets con seguimiento de estado, prioridad, categoría, asignación, notas internas y adjuntos; base de conocimiento; contacto con tiempos de respuesta |
+| Administración | API keys | `/admin/api-keys` | Generar o registrar, rotar, revocar, activar/desactivar, permisos, expiración, uso y auditoría |
+| Administración | Usuarios, Roles, Auditoría | `/users`, `/superuser/rbac/*` | Consola RBAC |
+| Ayuda | Base de conocimiento, Documentación | `/help/*`, `/playground` | Búsqueda sin acentos, valoración de artículos, guía de la plantilla, catálogo de UI |
+| Cuenta | Perfil, Preferencias, Seguridad | `/account/*` | Tema (claro/oscuro/sistema), notificaciones, contraseña, 2FA, sesiones, registro de seguridad |
+
+### Seguridad de las API keys
+
+- La clave completa se muestra **una sola vez**, oculta hasta que se revela, y
+  el diálogo solo se cierra cuando el usuario confirma que la guardó.
+- Se almacena el hash SHA-256, el prefijo y los últimos cuatro caracteres: las
+  listas y el detalle solo muestran `sk_live_••••••••••••a1B2`.
+- Rotar emite un secreto nuevo para la misma clave y anula el anterior al
+  instante; revocar es permanente.
+- Cada acción (crear, registrar, editar, (des)activar, rotar, revocar, copiar)
+  queda en la auditoría de la clave y en el registro de seguridad de quien la
+  realizó.
+
+### Páginas de estado y permisos
+
+`requiredRoles` del registro de navegación controla el acceso en todas partes:
+el módulo desaparece del sidebar, la paleta y el inicio, y `ModuleAccessGuard`
+responde **403** si se abre su URL directamente (con la opción de contactar a
+soporte con un ticket precargado). Las rutas inexistentes muestran **404** con
+búsqueda y sugerencias. Los errores de renderizado los captura
+`AppErrorBoundary`, que muestra **500** con una referencia copiable
+(`ERR-AAAAMMDD-XXXXXX`) que se puede adjuntar a un ticket.
+`VITE_MAINTENANCE_MODE=true` muestra la página de **mantenimiento** en lugar de
+la app (vista previa en `/maintenance`).
+
+### Motor de IA
+
+El asistente depende del contrato `AssistantEngine` de
+[`assistantEngine.ts`](src/services/assistant/assistantEngine.ts). La plantilla
+trae una simulación local; para usar un modelo real, implementa el contrato
+contra **tu backend**, que guarda las credenciales del modelo. Nunca llames a un
+proveedor de modelos con una clave desde el navegador.
 
 ## Cómo funciona el dashboard
 
@@ -113,17 +174,18 @@ ordenan según la frecuencia con que el usuario abre cada módulo.
 
 ### Un único registro de navegación
 
-[`src/components/admin-panel/data/modules.ts`](src/components/admin-panel/data/modules.ts)
+[`src/navigation/modules.ts`](src/navigation/modules.ts)
 es la única fuente de navegación. El sidebar, la paleta de comandos, el home, la
 subnavegación de RBAC y el registro de actividad lo leen a través de
-[`navigation.ts`](src/components/admin-panel/data/navigation.ts). Cada entrada
+[`navigation.ts`](src/navigation/navigation.ts). Cada entrada
 apunta a una ruta real, se filtra por el rol activo (`requiredRoles`) y puede
 declarar páginas anidadas (`children`) y `keywords` para la búsqueda.
 
 Para agregar un módulo:
 
-1. Crea la página en `src/pages/<modulo>/`.
-2. Registra la ruta en `src/routes/AppRoutes.tsx` usando `lazy()`.
+1. Crea la página en `src/pages/<sección>/<módulo>/`.
+2. Registra la ruta en `src/routes/AppRoutes.tsx` usando `lazy()`, dentro de
+   `ModuleAccessGuard`.
 3. Agrega la entrada en `MODULE_CATEGORIES` con su `url`, `requiredRoles`, una
    clave de `icon` de `ModuleIcon.tsx` y, opcionalmente, `children` y `keywords`.
 
@@ -153,7 +215,7 @@ que los gráficos no estén vacíos. Está marcada como demostración y el home 
   rutas y acciones, y lista favoritos e historial reciente. Flechas para moverse,
   Enter para abrir, `Ctrl/⌘ + D` para marcar favorito, Esc para cerrar. Sigue el
   patrón ARIA combobox. Las acciones rápidas se definen una sola vez en
-  [`quickActions.ts`](src/components/admin-panel/data/quickActions.ts) y se
+  [`quickActions.ts`](src/navigation/quickActions.ts) y se
   comparten con el home.
 
 ### Gráficos
@@ -222,15 +284,16 @@ Los nombres anteriores (`--color-bg`, `--color-text`, `--color-border`,
 Qué tocar al arrancar un proyecto nuevo:
 
 - `src/config/app.config.ts` — nombre, organización, URL del API.
-- `src/components/admin-panel/data/modules.ts` — tu catálogo de módulos.
+- `src/navigation/modules.ts` — tu catálogo de módulos.
 - `src/app/App.tsx` — reemplaza `DEMO_USER` y `handleLogin` por auth real.
 - `src/services/` — cambia los servicios simulados por tus endpoints.
 - `src/css/theme.css` — tokens de diseño (ver [Sistema de diseño](#sistema-de-diseño)).
 - `index.html` — título de la página y favicon.
 
 Los datos simulados están aislados en carpetas `data/`
-(`src/pages/tasks/data/`, `src/pages/planning/data/`) y en las páginas
-`*Catalog.tsx` del playground. Algunos aún conservan nombres de ejemplo de un
+(`src/pages/operations/tasks/data/`, `src/pages/operations/planning/data/`), en
+las funciones `seed` de los servicios y en las páginas `*Catalog.tsx` del
+playground. Algunos aún conservan nombres de ejemplo de un
 proyecto anterior de gestión de torneos; son solo fixtures de demo y se pueden
 borrar sin riesgo.
 

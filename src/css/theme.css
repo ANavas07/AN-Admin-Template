@@ -105,6 +105,17 @@
 	--color-chart-muted: var(--color-line-strong);
 	--color-chart-grid: var(--color-line);
 
+	/* ---- Code (syntax highlighting in the assistant and docs) ------------ */
+	--color-code-bg: #f6f8fb;
+	--color-code-fg: #1f2a3d;
+	--color-code-comment: #6a778b;
+	--color-code-keyword: #8a3ab9;
+	--color-code-string: #1d7a55;
+	--color-code-number: #a84d16;
+	--color-code-function: #1f5fae;
+	--color-code-punctuation: #56657a;
+	--color-code-tag: #b0384f;
+
 	/* ---- Typography ----------------------------------------------------- */
 	--font-sans: "Inter Variable", "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
 		"Helvetica Neue", Arial, sans-serif;
@@ -217,6 +228,16 @@
 	--color-accent-orange: #eea06d;
 	--color-accent-teal: #6cc4c9;
 	--color-accent-slate: #a2afc2;
+
+	--color-code-bg: #0d1524;
+	--color-code-fg: #dbe3ee;
+	--color-code-comment: #7f8ca2;
+	--color-code-keyword: #c8a2f0;
+	--color-code-string: #7fd1a8;
+	--color-code-number: #f0a878;
+	--color-code-function: #86b8f4;
+	--color-code-punctuation: #a2afc2;
+	--color-code-tag: #f29bb0;
 }
 
 /* ==========================================================================
