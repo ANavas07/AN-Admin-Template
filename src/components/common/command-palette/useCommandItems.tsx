@@ -4,9 +4,9 @@ import { useTheme } from '../../../context/theme-context'
 import { useWorkspace } from '../../../context/workspace-context'
 import { MoonIcon, LogOutIcon, SunIcon } from '../../../icons/icons'
 import { signOut } from '../../../services/session'
-import ModuleIcon from '../../admin-panel/ModuleIcon'
-import { getAccessibleCategories, getModuleById, hasModuleAccess, HOME_PATH } from '../../admin-panel/data/navigation'
-import { getQuickActions } from '../../admin-panel/data/quickActions'
+import ModuleIcon from '../modules/ModuleIcon'
+import { getAccessibleCategories, getModuleById, hasModuleAccess, HOME_PATH } from '../../../navigation/navigation'
+import { getQuickActions } from '../../../navigation/quickActions'
 
 export type CommandGroup = 'Favoritos' | 'Recientes' | 'Acciones' | 'Módulos' | 'Páginas'
 

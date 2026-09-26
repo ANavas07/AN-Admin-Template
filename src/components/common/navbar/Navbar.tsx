@@ -18,7 +18,7 @@ import {
 import { signOut } from '../../../services/session'
 import { cn } from '../../../utils/cn'
 import { modifierKeyLabel } from '../../../utils/platform'
-import { HOME_PATH } from '../../admin-panel/data/navigation'
+import { HOME_PATH } from '../../../navigation/navigation'
 import Avatar from '../../ui/avatar/Avatar'
 import { fieldControlClass, fieldSizeClasses } from '../../ui/inputs/fieldStyles'
 import Kbd from '../../ui/kbd/Kbd'

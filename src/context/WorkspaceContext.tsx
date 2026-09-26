@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
-import { describeRoute, findRouteMatch } from '../components/admin-panel/data/navigation'
+import { describeRoute, findRouteMatch } from '../navigation/navigation'
 import type { CurrentUser, UserRole } from '../config/app.config'
 import { workspaceService } from '../services/workspace/workspace.service'
 import type { WorkspaceState } from '../services/workspace/workspace.service'

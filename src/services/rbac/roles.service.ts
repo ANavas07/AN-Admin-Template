@@ -1,6 +1,6 @@
 import { http } from '../http'
 import { sanitize } from '../sanitize'
-import type { Role, Permission, PaginatedResponse } from '../../pages/superuser/rbac/types'
+import type { Role, Permission, PaginatedResponse } from '../../pages/administration/rbac/types'
 
 interface ListRolesParams {
   page?: number

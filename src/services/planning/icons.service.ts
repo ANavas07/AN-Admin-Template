@@ -5,8 +5,8 @@
  * backend). Cuando exista el backend Nest.js, basta cambiar la URL por
  * `GET {BASE_URL}/icons` — la forma de la respuesta (IconManifest) es idéntica.
  */
-import { ICONS_MANIFEST_URL } from '../../pages/planning/constants'
-import type { IconManifest } from '../../pages/planning/types'
+import { ICONS_MANIFEST_URL } from '../../pages/operations/planning/constants'
+import type { IconManifest } from '../../pages/operations/planning/types'
 
 export const iconsService = {
   getManifest: async (signal?: AbortSignal): Promise<IconManifest> => {

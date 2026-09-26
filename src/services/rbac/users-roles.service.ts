@@ -5,7 +5,7 @@ import type {
   UserGroupRole,
   EffectivePermission,
   RbacUser,
-} from '../../pages/superuser/rbac/types'
+} from '../../pages/administration/rbac/types'
 
 export interface AssignRoleDto {
   roleId: string

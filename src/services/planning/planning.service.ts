@@ -7,7 +7,7 @@
  */
 import { http } from '../http'
 import { sanitize } from '../sanitize'
-import type { PlanificacionInstance, UploadedAssetRef } from '../../pages/planning/types'
+import type { PlanificacionInstance, UploadedAssetRef } from '../../pages/operations/planning/types'
 
 export const planningService = {
   getInstance: (id: string, signal?: AbortSignal) =>

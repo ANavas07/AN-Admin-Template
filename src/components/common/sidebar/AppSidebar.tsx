@@ -5,7 +5,7 @@ import { useWorkspace } from '../../../context/workspace-context'
 import { BuildingIcon, ChevronIcon, PanelLeftIcon, SearchIcon } from '../../../icons/icons'
 import { cn } from '../../../utils/cn'
 import { modifierKeyLabel } from '../../../utils/platform'
-import ModuleIcon from '../../admin-panel/ModuleIcon'
+import ModuleIcon from '../modules/ModuleIcon'
 import {
     findRouteMatch,
     getAccessibleCategories,
@@ -13,8 +13,8 @@ import {
     hasModuleAccess,
     HOME_PATH,
     isPathActive,
-} from '../../admin-panel/data/navigation'
-import type { ModuleDefinition } from '../../admin-panel/data/modules'
+} from '../../../navigation/navigation'
+import type { ModuleDefinition } from '../../../navigation/modules'
 import Avatar from '../../ui/avatar/Avatar'
 import Kbd from '../../ui/kbd/Kbd'
 import { useCommandPalette } from '../command-palette/command-palette-context'
