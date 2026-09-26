@@ -1,12 +1,8 @@
 // Search and feedback over the knowledge base articles.
+import { normalizeText } from '../../utils/text'
 import { createLocalStore, isRecord } from '../storage/localStore'
 import { ARTICLES } from './articles'
 import type { Article } from './articles'
-
-/** Lowercase without accents, so "sesion" finds "sesión". */
-export function normalizeText(text: string) {
-    return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-}
 
 /**
  * Articles matching every word of the query, best first: a word in the title

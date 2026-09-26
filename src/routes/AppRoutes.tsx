@@ -30,6 +30,7 @@ const PlanningLayout = lazy(() => import('../pages/operations/planning/component
 const GanttStandalone = lazy(() => import('../pages/operations/gantt/GanttStandalone'))
 
 // Comunicacion
+const MailPage = lazy(() => import('../pages/communication/mail/MailPage'))
 const SupportLayout = lazy(() => import('../pages/communication/support/SupportLayout'))
 const TicketsPage = lazy(() => import('../pages/communication/support/tickets/TicketsPage'))
 const TicketDetailPage = lazy(() => import('../pages/communication/support/tickets/TicketDetailPage'))
@@ -147,6 +148,9 @@ export function AppRoutes({
             <Route path="/process/:id" element={<ProcessDesigner />} />
             <Route path="/tasks" element={<TasksLayout />} />
             <Route path="/planning" element={<PlanningLayout />} />
+
+            <Route path="/mail" element={<Navigate to="/mail/inbox" replace />} />
+            <Route path="/mail/:folder/:threadId?" element={<MailPage />} />
 
             <Route path="/support" element={<SupportLayout />}>
               <Route index element={<Navigate to="/support/tickets" replace />} />

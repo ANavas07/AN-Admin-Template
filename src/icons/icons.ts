@@ -53,6 +53,8 @@ import { ReactComponent as ForwardIcon } from './Forward.svg?react';
 import { ReactComponent as ArchiveIcon } from './Archive.svg?react';
 import { ReactComponent as AlertTriangleIcon } from './AlertTriangle.svg?react';
 import { ReactComponent as WrenchIcon } from './Wrench.svg?react';
+import { ReactComponent as PaperclipIcon } from './Paperclip.svg?react';
+import { ReactComponent as MailOpenIcon } from './MailOpen.svg?react';
 
 
 
@@ -112,4 +114,6 @@ export {
     ArchiveIcon,
     AlertTriangleIcon,
     WrenchIcon,
+    PaperclipIcon,
+    MailOpenIcon,
 }

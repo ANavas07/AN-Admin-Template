@@ -1,6 +1,8 @@
-/** Lowercase and without accents, so "auditoria" finds "Auditoría". */
+import { normalizeText as normalizeBase } from '../../../utils/text'
+
+/** Accent-insensitive, lowercase and trimmed (see utils/text). */
 export function normalizeText(text: string) {
-    return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim()
+    return normalizeBase(text).trim()
 }
 
 /**
