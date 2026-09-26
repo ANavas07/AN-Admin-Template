@@ -30,9 +30,12 @@
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-table": "^8.21.3",
     "date-fns": "^4.4.0",
+    "prism-react-renderer": "^2.4.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.18.3",
+    "remark-gfm": "^4.0.1",
     "sileo": "^0.1.5",
     "tailwindcss": "^4.3.3",
     "vite-plugin-svgr": "^5.2.0"

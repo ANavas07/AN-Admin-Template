@@ -1,20 +1,18 @@
 /**
- * Catalogo de modulos del home (dashboard).
- *
- * PLANTILLA: esta lista es intencionalmente corta. Solo incluye modulos que
- * existen como ruta real en src/routes/AppRoutes.tsx, para que ninguna tarjeta
- * lleve a una pantalla vacia.
+ * Registro de navegacion: la unica fuente de modulos de la aplicacion. El
+ * sidebar, la paleta de comandos, el home, los favoritos, las metricas y el
+ * control de acceso por rol lo leen desde aqui (ver navigation.ts).
  *
  * Para agregar un modulo:
- *   1. Crea la pagina en src/pages/<seccion>/<modulo>/ (p. ej. operations/tasks)
+ *   1. Crea la pagina en src/pages/<seccion>/<modulo>/ (p. ej. communication/mail)
  *   2. Registra la ruta en src/routes/AppRoutes.tsx (usa lazy())
- *   3. Agrega la entrada aqui con su `url` y sus `requiredRoles`
+ *   3. Agrega la entrada en la categoria que corresponda con su `url` y sus `requiredRoles`
  *
- * `icon` es una clave del registro de ModuleIcon.tsx (p. ej. 'tasks', 'files').
+ * `icon` es una clave del registro de ModuleIcon.tsx (p. ej. 'tasks', 'mail').
  * Por compatibilidad tambien acepta cualquier texto, como un emoji.
  *
- * `requiredRoles` filtra la tarjeta segun el rol activo. Si se omite, el modulo
- * es visible para todos los roles.
+ * `requiredRoles` limita el acceso: el modulo se oculta del menu, la paleta y
+ * el home, y su ruta responde 403. Si se omite, es visible para todos los roles.
  */
 
 /** Pagina interna de un modulo (menu anidado del sidebar y de la paleta). */
@@ -41,60 +39,173 @@ export type ModuleDefinition = {
 }
 
 export type ModuleCategory = {
+    /** Identificador estable de la seccion. */
+    id?: string
+    /** Nombre visible de la seccion. */
     name: string
     icon: string
     modules: ModuleDefinition[]
+    /** false: no se muestra como grupo propio del sidebar (se llega desde otra entrada). */
+    sidebar?: boolean
+    /** false: no aparece en el catalogo de modulos del home. */
+    catalog?: boolean
 }
+
+const ALL_ROLES = ['admin', 'organizer', 'analyst', 'viewer']
+
+/** Modulos operativos. En el sidebar se agrupan dentro de "Espacio de trabajo › Módulos". */
+const OPERATION_MODULES: ModuleDefinition[] = [
+    {
+        id: 'tasks',
+        title: 'Gestion de tareas',
+        keywords: ['kanban', 'tablero', 'calendario', 'cronograma'],
+        description: 'Tablero, lista, cronograma y calendario de tareas',
+        icon: 'tasks',
+        url: '/tasks',
+        requiredRoles: ['admin', 'organizer', 'analyst'],
+    },
+    {
+        id: 'planning',
+        title: 'Planificacion',
+        description: 'Grilla de plantillas con iconos e imagenes por celda',
+        icon: 'planning',
+        url: '/planning',
+        requiredRoles: ['admin', 'organizer', 'analyst'],
+    },
+    {
+        id: 'process',
+        title: 'Procesos',
+        keywords: ['bpmn', 'diagramas', 'flujos'],
+        description: 'Repositorio y disenador de diagramas de proceso',
+        icon: 'process',
+        url: '/process',
+        requiredRoles: ['admin', 'organizer'],
+    },
+    {
+        id: 'files',
+        title: 'Documentos',
+        keywords: ['archivos', 'subir', 'upload'],
+        description: 'Centro de carga y seguimiento de archivos',
+        icon: 'files',
+        url: '/files',
+        requiredRoles: ALL_ROLES,
+    },
+    {
+        id: 'gantt',
+        title: 'Gantt',
+        description: 'Vista Gantt independiente para cronogramas',
+        icon: 'gantt',
+        url: '/gantt',
+        requiredRoles: ['admin', 'organizer', 'analyst'],
+    },
+]
 
 export const MODULE_CATEGORIES: ModuleCategory[] = [
     {
-        name: 'OPERACION',
+        id: 'workspace',
+        name: 'Espacio de trabajo',
         icon: 'operation',
+        catalog: false,
         modules: [
             {
-                id: 'tasks',
-                title: 'Gestion de tareas',
-                keywords: ['kanban', 'tablero', 'calendario', 'cronograma'],
-                description: 'Tablero, lista, cronograma y calendario de tareas',
-                icon: 'tasks',
-                url: '/tasks',
-                requiredRoles: ['admin', 'organizer', 'analyst'],
+                id: 'modules',
+                title: 'Módulos',
+                description: 'Catálogo de todos los módulos disponibles para tu rol',
+                icon: 'grid',
+                url: '/workspace/modules',
+                keywords: ['catalogo', 'aplicaciones'],
+                children: OPERATION_MODULES.map((module) => ({
+                    id: `modules-${module.id}`,
+                    title: module.title,
+                    url: module.url!,
+                    icon: module.icon,
+                })),
             },
             {
-                id: 'planning',
-                title: 'Planificacion',
-                description: 'Grilla de plantillas con iconos e imagenes por celda',
-                icon: 'planning',
-                url: '/planning',
-                requiredRoles: ['admin', 'organizer', 'analyst'],
+                id: 'favorites',
+                title: 'Favoritos',
+                description: 'Tus módulos fijados',
+                icon: 'star',
+                url: '/workspace/favorites',
             },
             {
-                id: 'process',
-                title: 'Procesos',
-                keywords: ['bpmn', 'diagramas', 'flujos'],
-                description: 'Repositorio y disenador de diagramas de proceso',
-                icon: 'process',
-                url: '/process',
-                requiredRoles: ['admin', 'organizer'],
-            },
-            {
-                id: 'files',
-                title: 'Documentos',
-                keywords: ['archivos', 'subir', 'upload'],
-                description: 'Centro de carga y seguimiento de archivos',
-                icon: 'files',
-                url: '/files',
-                requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
+                id: 'activity',
+                title: 'Actividad reciente',
+                description: 'Historial de navegación y métricas de uso',
+                icon: 'activity',
+                url: '/workspace/activity',
+                keywords: ['historial', 'metricas', 'estadisticas'],
             },
         ],
     },
     {
-        name: 'ADMINISTRACION',
+        id: 'operations',
+        name: 'Operación',
+        icon: 'operation',
+        sidebar: false,
+        modules: OPERATION_MODULES,
+    },
+    {
+        id: 'communication',
+        name: 'Comunicación',
+        icon: 'mail',
+        modules: [
+            {
+                id: 'mail',
+                title: 'Correo',
+                description: 'Bandeja de entrada, envíos, borradores y archivo',
+                icon: 'mail',
+                url: '/mail',
+                keywords: ['email', 'mensajes', 'bandeja', 'inbox', 'redactar'],
+                children: [
+                    { id: 'mail-inbox', title: 'Bandeja de entrada', url: '/mail/inbox' },
+                    { id: 'mail-starred', title: 'Favoritos', url: '/mail/starred' },
+                    { id: 'mail-sent', title: 'Enviados', url: '/mail/sent' },
+                    { id: 'mail-drafts', title: 'Borradores', url: '/mail/drafts' },
+                    { id: 'mail-archive', title: 'Archivados', url: '/mail/archive' },
+                    { id: 'mail-trash', title: 'Papelera', url: '/mail/trash' },
+                ],
+            },
+            {
+                id: 'assistant',
+                title: 'Asistente IA',
+                description: 'Conversaciones con el asistente, código y archivos',
+                icon: 'assistant',
+                url: '/assistant',
+                keywords: ['ia', 'ai', 'chat', 'copilot', 'preguntar'],
+            },
+            {
+                id: 'support',
+                title: 'Centro de soporte',
+                description: 'Tickets, seguimiento y contacto con soporte',
+                icon: 'support',
+                url: '/support',
+                keywords: ['ayuda', 'ticket', 'incidencia', 'helpdesk'],
+                children: [
+                    { id: 'support-tickets', title: 'Mis tickets', url: '/support/tickets' },
+                    { id: 'support-new', title: 'Nuevo ticket', url: '/support/new' },
+                    { id: 'support-contact', title: 'Contactar soporte', url: '/support/contact' },
+                ],
+            },
+        ],
+    },
+    {
+        id: 'administration',
+        name: 'Administración',
         icon: 'administration',
         modules: [
             {
+                id: 'api-keys',
+                title: 'API Keys',
+                description: 'Credenciales de integración, permisos, uso y rotación',
+                icon: 'key',
+                url: '/admin/api-keys',
+                requiredRoles: ['admin'],
+                keywords: ['api', 'tokens', 'credenciales', 'integraciones'],
+            },
+            {
                 id: 'users',
-                title: 'Gestion de usuarios',
+                title: 'Usuarios',
                 description: 'Alta, edicion y estado de los usuarios del sistema',
                 icon: 'users',
                 url: '/users',
@@ -102,12 +213,12 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
             },
             {
                 id: 'rbac',
-                title: 'Roles y permisos',
+                title: 'Roles',
                 description: 'Roles, permisos, grupos y asignaciones (RBAC)',
                 icon: 'rbac',
                 url: '/superuser/rbac',
                 requiredRoles: ['admin'],
-                keywords: ['rbac', 'seguridad', 'accesos'],
+                keywords: ['rbac', 'seguridad', 'accesos', 'permisos'],
                 children: [
                     { id: 'rbac-roles', title: 'Roles', url: '/superuser/rbac/roles', icon: 'administration' },
                     { id: 'rbac-permissions', title: 'Permisos', url: '/superuser/rbac/permissions', icon: 'rbac' },
@@ -118,8 +229,8 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
             },
             {
                 id: 'audit',
-                title: 'Auditoria',
-                keywords: ['logs', 'bitacora', 'eventos'],
+                title: 'Registros de auditoría',
+                keywords: ['logs', 'bitacora', 'eventos', 'auditoria'],
                 description: 'Bitacora de cambios sobre roles y permisos',
                 icon: 'audit',
                 url: '/superuser/rbac/audit',
@@ -128,33 +239,60 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
         ],
     },
     {
-        name: 'HERRAMIENTAS',
-        icon: 'tools',
+        id: 'help',
+        name: 'Ayuda',
+        icon: 'help',
         modules: [
             {
-                id: 'gantt',
-                title: 'Gantt',
-                description: 'Vista Gantt independiente para cronogramas',
-                icon: 'gantt',
-                url: '/gantt',
-                requiredRoles: ['admin', 'organizer', 'analyst'],
+                id: 'knowledge-base',
+                title: 'Base de conocimiento',
+                description: 'Guías y respuestas a las preguntas frecuentes',
+                icon: 'book',
+                url: '/help/knowledge-base',
+                keywords: ['faq', 'articulos', 'guias', 'kb'],
             },
             {
-                id: 'playground',
-                title: 'Catalogo de UI',
-                description: 'Inputs, botones, tablas, formularios y modales',
-                icon: 'playground',
-                url: '/playground',
-                requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
-                keywords: ['componentes', 'ui', 'design system'],
+                id: 'docs',
+                title: 'Documentación',
+                description: 'Guía de la plantilla y catálogo de componentes de UI',
+                icon: 'docs',
+                url: '/help/docs',
+                keywords: ['docs', 'componentes', 'ui', 'design system', 'playground'],
                 children: [
-                    { id: 'playground-inputs', title: 'Inputs', url: '/playground/inputs' },
-                    { id: 'playground-buttons', title: 'Botones', url: '/playground/buttons' },
-                    { id: 'playground-tables', title: 'Tablas', url: '/playground/tables' },
-                    { id: 'playground-gantt', title: 'Gantt', url: '/playground/gantt' },
-                    { id: 'playground-forms', title: 'Formularios', url: '/playground/forms' },
-                    { id: 'playground-modals', title: 'Pop-Ups', url: '/playground/modals' },
+                    { id: 'docs-guide', title: 'Guía de la plantilla', url: '/help/docs' },
+                    { id: 'docs-playground', title: 'Catálogo de UI', url: '/playground' },
                 ],
+            },
+        ],
+    },
+    {
+        id: 'account',
+        name: 'Cuenta',
+        icon: 'user',
+        catalog: false,
+        modules: [
+            {
+                id: 'profile',
+                title: 'Perfil',
+                description: 'Tus datos personales y de contacto',
+                icon: 'user',
+                url: '/account/profile',
+            },
+            {
+                id: 'preferences',
+                title: 'Preferencias',
+                description: 'Tema, navegación y notificaciones',
+                icon: 'settings',
+                url: '/account/preferences',
+                keywords: ['tema', 'oscuro', 'configuracion', 'notificaciones'],
+            },
+            {
+                id: 'security',
+                title: 'Seguridad',
+                description: 'Contraseña, verificación en dos pasos y sesiones',
+                icon: 'lock',
+                url: '/account/security',
+                keywords: ['contrasena', 'password', '2fa', 'sesiones'],
             },
         ],
     },

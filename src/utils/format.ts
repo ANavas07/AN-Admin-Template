@@ -11,3 +11,11 @@ export function formatDate(iso: string) {
     const date = new Date(iso)
     return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString()
 }
+
+/** Local date and time of an ISO timestamp, or "—" when it is not valid. */
+export function formatDateTime(iso: string) {
+    const date = new Date(iso)
+    return Number.isNaN(date.getTime())
+        ? '—'
+        : date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+}

@@ -11,16 +11,13 @@ type ModuleCatalogProps = {
     categories: ModuleCategory[]
     usageOf: (moduleId: string) => number
     onOpen: (url: string) => void
+    title?: string
 }
 
 const chipClass = 'h-7 rounded-full border px-3 text-xs font-medium transition-colors'
 
-function formatCategoryName(name: string) {
-    return name.charAt(0) + name.slice(1).toLowerCase()
-}
-
 /** Every module the role can open, searchable and filterable, with favorite stars. */
-export default function ModuleCatalog({ categories, usageOf, onOpen }: ModuleCatalogProps) {
+export default function ModuleCatalog({ categories, usageOf, onOpen, title = 'Todos los módulos' }: ModuleCatalogProps) {
     const { isFavorite, toggleFavorite } = useWorkspace()
     const [query, setQuery] = useState('')
     const [category, setCategory] = useState<string | null>(null)
@@ -36,7 +33,7 @@ export default function ModuleCatalog({ categories, usageOf, onOpen }: ModuleCat
 
     return (
         <Panel
-            title="Todos los módulos"
+            title={title}
             description={`${modules.length} disponibles para tu rol`}
             headingId="home-catalog"
             actions={
@@ -69,7 +66,7 @@ export default function ModuleCatalog({ categories, usageOf, onOpen }: ModuleCat
                                     : 'border-line text-fg-muted hover:border-line-strong hover:text-fg'
                             )}
                         >
-                            {name ? formatCategoryName(name) : 'Todos'}
+                            {name ?? 'Todos'}
                         </button>
                     )
                 })}

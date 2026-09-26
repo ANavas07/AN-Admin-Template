@@ -37,6 +37,7 @@ export function useCommandItems(): CommandItem[] {
     const { role, favorites, recents, hasDemoActivity, clearDemoActivity } = useWorkspace()
     const categories = getAccessibleCategories(role)
     const modules = categories.flatMap((category) => category.modules)
+    const moduleUrls = new Set(modules.map((module) => module.url))
 
     const items: CommandItem[] = []
 
@@ -133,6 +134,8 @@ export function useCommandItems(): CommandItem[] {
             perform: () => navigate(url),
         })
         for (const page of module.children ?? []) {
+            // Pages that are modules themselves (Workspace › Modules) are already listed
+            if (moduleUrls.has(page.url) && page.url !== url) continue
             items.push({
                 id: `page:${page.id}`,
                 group: 'Páginas',

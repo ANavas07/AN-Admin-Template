@@ -1,5 +1,6 @@
 // Visual + BPMN layer of the diagram. Semantic process-level types live in ./types.
 import { toneBorder, toneSolid } from '../../../components/ui/tone'
+import type { Attachment } from '../../../utils/attachments'
 export type NodeKind =
     | 'task'
     | 'start'
@@ -36,16 +37,8 @@ export type EdgeKind = 'sequence' | 'message' | 'association'
 
 export type NodeColor = 'emerald' | 'sky' | 'amber' | 'violet' | 'rose' | 'slate'
 
-export type AttachmentRef = {
-    id: string
-    name: string
-    /** Bytes */
-    size: number
-    mimeType: string
-    addedAt: string
-    /** Inline content for small files; larger files keep metadata only until a backend exists */
-    dataUrl?: string
-}
+/** Documents attached to an element: the app-wide attachment shape. */
+export type AttachmentRef = Attachment
 
 /** Semantic documentation of an element — independent from its visual representation. */
 export type ElementData = {

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { ModuleCategory } from '../../../navigation/modules'
-import { hasModuleAccess } from '../../../navigation/navigation'
+import { getCatalogCategories } from '../../../navigation/navigation'
+import PageContainer from '../../../components/common/page/PageContainer'
+import { useAccount } from '../../../context/account-context'
 import ActivityMetrics from '../components/ActivityMetrics'
 import FavoritesPanel from '../components/FavoritesPanel'
 import ModuleCatalog from '../components/ModuleCatalog'
@@ -40,55 +42,45 @@ function greeting(hour: number) {
  */
 export default function MainPanel({ categories, userRole, userName, onModuleClick }: MainPanelProps) {
     const insights = useWorkspaceInsights()
+    const { preferences } = useAccount()
     const [now] = useState(() => new Date())
 
-    // Same role filter as before: categories with no visible module are hidden
-    const visibleCategories = useMemo(
-        () =>
-            categories
-                .map((category) => ({
-                    ...category,
-                    modules: category.modules.filter((module) => hasModuleAccess(module, userRole)),
-                }))
-                .filter((category) => category.modules.length > 0),
-        [categories, userRole]
-    )
+    // Same role filter as before; sections flagged catalog: false (workspace, account) are skipped
+    const visibleCategories = useMemo(() => getCatalogCategories(userRole, categories), [categories, userRole])
 
     const openModule = (url: string) => onModuleClick?.(url)
     const firstName = userName.split(' ')[0]
 
     return (
-        <div className="min-h-[calc(100vh-var(--layout-navbar-height))] bg-canvas">
-            <div className="mx-auto max-w-(--layout-content-max-width) space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-                <header className="flex flex-wrap items-end justify-between gap-4">
-                    <div>
-                        <p className="eyebrow first-letter:uppercase">{dateFormatter.format(now)}</p>
-                        <h1 className="page-title mt-1.5">
-                            {greeting(now.getHours())}, {firstName}
-                        </h1>
-                        <p className="mt-1.5 text-sm text-fg-muted">
-                            Tu espacio de trabajo: favoritos, actividad reciente y accesos según cómo usas el sistema.
-                        </p>
-                    </div>
-                </header>
-
-                {/* Tablet: two columns, dense so the narrow panels pair up; desktop: 8 / 4 split */}
-                <div className="grid gap-4 md:grid-flow-dense md:grid-cols-2 xl:grid-flow-row xl:grid-cols-12">
-                    <FavoritesPanel
-                        favorites={insights.favoriteModules}
-                        suggestions={insights.suggestions}
-                        usageOf={insights.usageOf}
-                        className="md:col-span-2 xl:col-span-8"
-                    />
-                    <RecentPanel className="xl:col-span-4" />
-                    <QuickActionsPanel actions={insights.quickActions} className="md:col-span-2 xl:col-span-8" />
-                    <SystemInfoPanel lastVisitAt={insights.summary.lastVisitAt} className="xl:col-span-4" />
+        <PageContainer>
+            <header className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <p className="eyebrow first-letter:uppercase">{dateFormatter.format(now)}</p>
+                    <h1 className="page-title mt-1.5">
+                        {greeting(now.getHours())}, {firstName}
+                    </h1>
+                    <p className="mt-1.5 text-sm text-fg-muted">
+                        Tu espacio de trabajo: favoritos, actividad reciente y accesos según cómo usas el sistema.
+                    </p>
                 </div>
+            </header>
 
-                <ActivityMetrics insights={insights} />
-
-                <ModuleCatalog categories={visibleCategories} usageOf={insights.usageOf} onOpen={openModule} />
+            {/* Tablet: two columns, dense so the narrow panels pair up; desktop: 8 / 4 split */}
+            <div className="grid gap-4 md:grid-flow-dense md:grid-cols-2 xl:grid-flow-row xl:grid-cols-12">
+                <FavoritesPanel
+                    favorites={insights.favoriteModules}
+                    suggestions={insights.suggestions}
+                    usageOf={insights.usageOf}
+                    className="md:col-span-2 xl:col-span-8"
+                />
+                <RecentPanel className="xl:col-span-4" />
+                <QuickActionsPanel actions={insights.quickActions} className="md:col-span-2 xl:col-span-8" />
+                <SystemInfoPanel lastVisitAt={insights.summary.lastVisitAt} className="xl:col-span-4" />
             </div>
-        </div>
+
+            {preferences.showHomeMetrics ? <ActivityMetrics insights={insights} /> : null}
+
+            <ModuleCatalog categories={visibleCategories} usageOf={insights.usageOf} onOpen={openModule} />
+        </PageContainer>
     )
 }

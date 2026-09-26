@@ -13,7 +13,7 @@ type ColumnChartProps<T> = {
     /** Longer title of a column for the tooltip; defaults to the x label */
     tooltipTitle?: Accessor<T, string>
     formatValue?: (value: number) => string
-    /** Show every n-th x label (the last one is always shown) */
+    /** Show every n-th x label, counted back from the last one (always shown) */
     labelEvery?: number
     height?: number
     /** Accessible summary of what the chart shows */
@@ -87,7 +87,7 @@ export default function ColumnChart<T>({
                         const barX = MARGIN.left + index * band + (band - barWidth) / 2
                         const barY = scaleY(value)
                         const isActive = activeIndex === index
-                        const showLabel = index === data.length - 1 || index % labelEvery === 0
+                        const showLabel = (data.length - 1 - index) % labelEvery === 0
                         return (
                             <g key={index}>
                                 {/* Hit area: the whole band, bigger than the mark */}

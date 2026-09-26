@@ -7,7 +7,7 @@ import {
     countByMonth,
     summarizeActivity,
 } from '../../../services/workspace/metrics'
-import { getAccessibleCategories, getModuleById, hasModuleAccess } from '../../../navigation/navigation'
+import { getCatalogCategories, getModuleById, hasModuleAccess } from '../../../navigation/navigation'
 import type { ModuleDefinition } from '../../../navigation/modules'
 import { getQuickActions } from '../../../navigation/quickActions'
 
@@ -27,7 +27,7 @@ export function useWorkspaceInsights() {
 
     return useMemo(() => {
         const since30 = now - 30 * DAY_MS
-        const accessible = getAccessibleCategories(role).flatMap((category) => category.modules)
+        const accessible = getCatalogCategories(role).flatMap((category) => category.modules)
         const visits30 = new Map(countByModule(events, since30).map((entry) => [entry.moduleId, entry.count]))
         const usageOf = (moduleId: string) => visits30.get(moduleId) ?? 0
 

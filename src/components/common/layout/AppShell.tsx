@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import AppSidebar from '../sidebar/AppSidebar'
+import { ShellContext } from './shell-context'
 
 const COLLAPSED_STORAGE_KEY = 'sidebar:collapsed'
 /** Same breakpoint as Tailwind's `lg`, where the sidebar stops being a drawer */
@@ -27,8 +28,7 @@ export default function AppShell({ renderNavbar, children }: AppShellProps) {
     const [isCollapsed, setIsCollapsed] = useState(readCollapsed)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
 
-    function toggleCollapsed() {
-        const next = !isCollapsed
+    function setCollapsed(next: boolean) {
         setIsCollapsed(next)
         try {
             localStorage.setItem(COLLAPSED_STORAGE_KEY, String(next))
@@ -37,13 +37,17 @@ export default function AppShell({ renderNavbar, children }: AppShellProps) {
         }
     }
 
+    function toggleCollapsed() {
+        setCollapsed(!isCollapsed)
+    }
+
     function toggleSidebar() {
         if (window.matchMedia(DESKTOP_QUERY).matches) toggleCollapsed()
         else setIsMobileOpen((current) => !current)
     }
 
     return (
-        <>
+        <ShellContext.Provider value={{ isSidebarCollapsed: isCollapsed, setSidebarCollapsed: setCollapsed }}>
             {renderNavbar(toggleSidebar)}
             <div className="flex">
                 <AppSidebar
@@ -54,6 +58,6 @@ export default function AppShell({ renderNavbar, children }: AppShellProps) {
                 />
                 <div className="min-w-0 flex-1">{children}</div>
             </div>
-        </>
+        </ShellContext.Provider>
     )
 }

@@ -23,6 +23,16 @@ export function getAccessibleCategories(role: string, categories: ModuleCategory
         .filter((category) => category.modules.length > 0)
 }
 
+/** Sections shown as groups in the sidebar. */
+export function getSidebarCategories(role: string) {
+    return getAccessibleCategories(role).filter((category) => category.sidebar !== false)
+}
+
+/** Sections listed in the module catalog (home and Workspace › Modules). */
+export function getCatalogCategories(role: string, categories: ModuleCategory[] = MODULE_CATEGORIES) {
+    return getAccessibleCategories(role, categories).filter((category) => category.catalog !== false)
+}
+
 export function getAllModules(categories: ModuleCategory[] = MODULE_CATEGORIES) {
     return categories.flatMap((category) => category.modules)
 }

@@ -13,7 +13,8 @@ import {
     nodeColorStyles,
 } from '../flowTypes'
 import type { AttachmentRef, BpmnType, EdgeKind, ElementData, FlowEdge, FlowNode } from '../flowTypes'
-import { formatBytes, formatDate } from '../format'
+import { formatBytes, formatDate } from '../../../../utils/format'
+import { downloadAttachment, INLINE_ATTACHMENT_LIMIT, readFilesAsAttachments } from '../../../../utils/attachments'
 import BpmnGlyph from './BpmnGlyph'
 import { fieldInputClass, fieldSelectClass, fieldTextareaClass } from '../../../../components/ui/inputs/fieldStyles'
 
@@ -21,8 +22,6 @@ const textareaClass = fieldTextareaClass
 
 const selectClass = fieldSelectClass
 
-/** Files up to this size keep their content inline (localStorage); larger ones keep metadata only. */
-const INLINE_ATTACHMENT_LIMIT = 300_000
 
 const edgeKindLabels: Record<EdgeKind, string> = {
     sequence: 'Flujo de secuencia',
@@ -99,29 +98,7 @@ export default function PropertiesPanel({
         event.target.value = ''
         if (!selectedNode || files.length === 0) return
 
-        const attachments: AttachmentRef[] = []
-        for (const file of files) {
-            const base: AttachmentRef = {
-                id: `doc-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
-                name: file.name,
-                size: file.size,
-                mimeType: file.type || 'application/octet-stream',
-                addedAt: new Date().toISOString(),
-            }
-            if (file.size <= INLINE_ATTACHMENT_LIMIT) {
-                try {
-                    base.dataUrl = await new Promise<string>((resolve, reject) => {
-                        const reader = new FileReader()
-                        reader.onload = () => resolve(reader.result as string)
-                        reader.onerror = () => reject(reader.error)
-                        reader.readAsDataURL(file)
-                    })
-                } catch {
-                    // Keep metadata only when the file cannot be read
-                }
-            }
-            attachments.push(base)
-        }
+        const attachments = await readFilesAsAttachments(files, INLINE_ATTACHMENT_LIMIT)
 
         onUpdateNodeData(selectedNode.id, {
             documents: [...selectedNode.data.documents, ...attachments],
@@ -134,15 +111,10 @@ export default function PropertiesPanel({
         )
     }
 
-    function downloadAttachment(doc: AttachmentRef) {
-        if (!doc.dataUrl) {
+    function handleDownload(doc: AttachmentRef) {
+        if (!downloadAttachment(doc)) {
             onStatus('Este documento solo tiene referencia: su contenido se gestionará con el servidor de archivos.')
-            return
         }
-        const anchor = document.createElement('a')
-        anchor.href = doc.dataUrl
-        anchor.download = doc.name
-        anchor.click()
     }
 
     function removeAttachment(doc: AttachmentRef) {
@@ -272,7 +244,7 @@ export default function PropertiesPanel({
                                             <FileDocIcon className="size-4 shrink-0 text-fg-muted" />
                                             <button
                                                 type="button"
-                                                onClick={() => downloadAttachment(doc)}
+                                                onClick={() => handleDownload(doc)}
                                                 className="min-w-0 flex-1 text-left"
                                                 title={doc.dataUrl ? 'Descargar documento' : 'Solo referencia'}
                                             >

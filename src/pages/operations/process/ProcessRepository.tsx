@@ -9,7 +9,7 @@ import { processService } from '../../../services/process/process.service'
 import Badge from '../../../components/ui/badge/Badge'
 import { processStatusFlow, processStatusLabels, processStatusTones } from './types'
 import type { ProcessStatus, ProcessSummary } from './types'
-import { formatDate } from './format'
+import { formatDate } from '../../../utils/format'
 
 /**
  * Central process repository: the place where the organization finds, filters

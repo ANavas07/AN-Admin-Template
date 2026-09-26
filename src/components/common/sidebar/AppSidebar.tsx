@@ -8,7 +8,7 @@ import { modifierKeyLabel } from '../../../utils/platform'
 import ModuleIcon from '../modules/ModuleIcon'
 import {
     findRouteMatch,
-    getAccessibleCategories,
+    getSidebarCategories,
     getModuleById,
     hasModuleAccess,
     HOME_PATH,
@@ -134,7 +134,7 @@ export default function AppSidebar({ isCollapsed, onToggleCollapsed, isMobileOpe
     const { pathname } = useLocation()
     const { user, role, favorites } = useWorkspace()
     const { open: openPalette } = useCommandPalette()
-    const categories = getAccessibleCategories(role)
+    const categories = getSidebarCategories(role)
     const activeModuleId = findRouteMatch(pathname)?.module.id ?? null
     const favoriteModules = favorites
         .map((id) => getModuleById(id))
@@ -261,7 +261,7 @@ export default function AppSidebar({ isCollapsed, onToggleCollapsed, isMobileOpe
                     {categories.map((category) => (
                         <section key={category.name} className="mt-4">
                             <h2 className={cn('eyebrow mb-1 px-2.5 text-3xs', isCollapsed && 'lg:sr-only')}>
-                                {category.name.charAt(0) + category.name.slice(1).toLowerCase()}
+                                {category.name}
                             </h2>
                             {isCollapsed ? <div className="mx-2 mb-1 hidden border-t border-line lg:block" aria-hidden="true" /> : null}
                             <ul className="space-y-0.5">
