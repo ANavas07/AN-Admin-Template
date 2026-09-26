@@ -81,9 +81,9 @@ src/
 ├── routes/AppRoutes.tsx     Route table (lazy-loaded modules)
 ├── config/app.config.ts     Single configuration entry point
 ├── components/
-│   ├── admin-panel/         Home dashboard + module catalog
-│   ├── common/              Navbar, forms, modals, toasts
-│   └── ui/                  Buttons, inputs, table, badge, alert, avatar, tones
+│   ├── admin-panel/         Home workspace + navigation registry
+│   ├── common/              Navbar, sidebar, command palette, forms, modals, toasts
+│   └── ui/                  Buttons, inputs, table, charts, badge, alert, avatar, tones
 ├── pages/
 │   ├── tasks/               Board, list, timeline, calendar (dnd-kit)
 │   ├── planning/            Template grid with per-cell icons/images
@@ -103,17 +103,63 @@ src/
 
 ## How the home dashboard works
 
-The dashboard renders a **short, curated catalog** defined in
-[`src/components/admin-panel/data/modules.ts`](src/components/admin-panel/data/modules.ts).
-Every entry maps to a route that actually exists, so no card leads to a dead
-screen. Cards are filtered by the active role via `requiredRoles`, and a module
-without a `url` renders disabled instead of navigating nowhere.
+The home is a **personal workspace**, not a grid of static cards. In order of
+priority it shows the user's favorite modules, the recently visited pages,
+quick actions, system information, usage analytics and, last, the full catalog.
+Favorites and quick actions are ordered by how often the user opens each module.
+
+### One navigation registry
+
+[`src/components/admin-panel/data/modules.ts`](src/components/admin-panel/data/modules.ts)
+is the single source of navigation. The sidebar, the command palette, the home,
+the RBAC sub-navigation and the activity tracking all read it through
+[`navigation.ts`](src/components/admin-panel/data/navigation.ts). Every entry
+maps to a real route, is filtered by the active role (`requiredRoles`), and may
+declare nested pages (`children`) and search `keywords`.
 
 To add a module:
 
 1. Create the page under `src/pages/<module>/`.
 2. Register the route in `src/routes/AppRoutes.tsx` using `lazy()`.
-3. Add an entry to `MODULE_CATEGORIES` with its `url` and `requiredRoles`.
+3. Add an entry to `MODULE_CATEGORIES` with its `url`, `requiredRoles`, an
+   `icon` key from `ModuleIcon.tsx` and, optionally, `children` and `keywords`.
+
+It then appears in the sidebar, the palette, the catalog and the metrics.
+
+### Workspace: favorites, history and metrics
+
+`WorkspaceProvider` ([`src/context/WorkspaceContext.tsx`](src/context/WorkspaceContext.tsx))
+loads the workspace of the signed-in user when the session starts and records a
+visit on every route change. Persistence goes through
+[`workspaceService`](src/services/workspace/workspace.service.ts): localStorage
+today, keyed by user id, with an async API ready for a backend
+(`load`, `recordVisit`, `toggleFavorite`). Metrics are pure functions in
+[`metrics.ts`](src/services/workspace/metrics.ts).
+
+The first time, the workspace is seeded with ~6 months of generated activity so
+the charts are not empty. It is flagged as demo data and the home offers a
+"Borrar demo" link that removes it while keeping favorites and real visits.
+
+### Sidebar and command palette
+
+- **Sidebar** (`AppSidebar`): user, role and organization; favorites; every
+  module with nested pages; active route; collapses to an icon rail on desktop
+  (remembered per browser) and becomes a drawer on tablet and mobile.
+- **Command palette** (`Ctrl + K`, `⌘ + K` on macOS): searches modules, pages,
+  routes and actions, lists favorites and recent history. Arrows to move, Enter
+  to open, `Ctrl/⌘ + D` to toggle a favorite, Esc to close. It follows the ARIA
+  combobox pattern. Quick actions are defined once in
+  [`quickActions.ts`](src/components/admin-panel/data/quickActions.ts) and shared
+  with the home.
+
+### Charts
+
+`src/components/ui/charts/` holds small SVG charts with no extra dependency
+(`ColumnChart`, `AreaLineChart`, `BarList`, `Sparkline`, `StatTile`). Their data
+API uses TanStack-style accessors (`x={(row) => …}`), and `ChartCard` offers a
+**Table** view rendered with TanStack Table from regular `ColumnDef`s, so every
+value is reachable without the chart. Marks use the `--color-chart-*` tokens,
+support hover and keyboard exploration (arrow keys), and work in both themes.
 
 ### Code splitting
 

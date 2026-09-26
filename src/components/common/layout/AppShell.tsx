@@ -1,0 +1,59 @@
+import { useState, type ReactNode } from 'react'
+import AppSidebar from '../sidebar/AppSidebar'
+
+const COLLAPSED_STORAGE_KEY = 'sidebar:collapsed'
+/** Same breakpoint as Tailwind's `lg`, where the sidebar stops being a drawer */
+const DESKTOP_QUERY = '(min-width: 64rem)'
+
+function readCollapsed() {
+    try {
+        return localStorage.getItem(COLLAPSED_STORAGE_KEY) === 'true'
+    } catch {
+        return false
+    }
+}
+
+type AppShellProps = {
+    /** Renders the top bar; receives the sidebar toggle */
+    renderNavbar: (onToggleSidebar: () => void) => ReactNode
+    children: ReactNode
+}
+
+/**
+ * Authenticated layout: top navbar, collapsible sidebar and the page. The
+ * collapsed state is a per-viewer preference kept in localStorage.
+ */
+export default function AppShell({ renderNavbar, children }: AppShellProps) {
+    const [isCollapsed, setIsCollapsed] = useState(readCollapsed)
+    const [isMobileOpen, setIsMobileOpen] = useState(false)
+
+    function toggleCollapsed() {
+        const next = !isCollapsed
+        setIsCollapsed(next)
+        try {
+            localStorage.setItem(COLLAPSED_STORAGE_KEY, String(next))
+        } catch {
+            // Preference simply not remembered
+        }
+    }
+
+    function toggleSidebar() {
+        if (window.matchMedia(DESKTOP_QUERY).matches) toggleCollapsed()
+        else setIsMobileOpen((current) => !current)
+    }
+
+    return (
+        <>
+            {renderNavbar(toggleSidebar)}
+            <div className="flex">
+                <AppSidebar
+                    isCollapsed={isCollapsed}
+                    onToggleCollapsed={toggleCollapsed}
+                    isMobileOpen={isMobileOpen}
+                    onCloseMobile={() => setIsMobileOpen(false)}
+                />
+                <div className="min-w-0 flex-1">{children}</div>
+            </div>
+        </>
+    )
+}

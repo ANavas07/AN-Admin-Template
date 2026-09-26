@@ -97,6 +97,14 @@
 	--color-accent-teal-soft: color-mix(in oklab, var(--color-accent-teal) var(--tint-strength), var(--color-surface));
 	--color-accent-slate-soft: color-mix(in oklab, var(--color-accent-slate) var(--tint-strength), var(--color-surface));
 
+	/* ---- Charts --------------------------------------------------------- */
+	/* Single-series marks use the brand (validated for both themes with the
+	   dataviz palette checks); comparisons use the recessive neutral. */
+	--color-chart-series: var(--color-brand);
+	--color-chart-series-strong: var(--color-brand-strong);
+	--color-chart-muted: var(--color-line-strong);
+	--color-chart-grid: var(--color-line);
+
 	/* ---- Typography ----------------------------------------------------- */
 	--font-sans: "Inter Variable", "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
 		"Helvetica Neue", Arial, sans-serif;

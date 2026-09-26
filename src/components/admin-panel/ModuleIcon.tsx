@@ -2,15 +2,19 @@ import type { ComponentType, SVGProps } from 'react'
 import {
     ChartIcon,
     ClipboardIcon,
+    ClockIcon,
     FlowIcon,
     FolderIcon,
     GridIcon,
+    HomeIcon,
     LayersIcon,
     ListChecksIcon,
     LockIcon,
     ShieldIcon,
     SparkIcon,
+    StarIcon,
     TimelineIcon,
+    UserIcon,
     UsersIcon,
 } from '../../icons/icons'
 import { cn } from '../../utils/cn'
@@ -29,6 +33,10 @@ const MODULE_ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
     operation: LayersIcon,
     administration: ShieldIcon,
     tools: ChartIcon,
+    home: HomeIcon,
+    user: UserIcon,
+    star: StarIcon,
+    recent: ClockIcon,
 }
 
 type ModuleIconProps = {

@@ -1,14 +1,15 @@
 import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
-import { ClipboardIcon, LockIcon, ShieldIcon, UserIcon, UsersIcon } from '../../../../icons/icons'
+import ModuleIcon from '../../../../components/admin-panel/ModuleIcon'
+import { getModuleById } from '../../../../components/admin-panel/data/navigation'
 
-const NAV_ITEMS = [
-  { to: '/superuser/rbac/roles', label: 'Roles', icon: ShieldIcon },
-  { to: '/superuser/rbac/permissions', label: 'Permisos', icon: LockIcon },
-  { to: '/superuser/rbac/groups', label: 'Grupos', icon: UsersIcon },
-  { to: '/superuser/rbac/users', label: 'Asignación de Usuarios', icon: UserIcon },
-  { to: '/superuser/rbac/audit', label: 'Log de Auditoría', icon: ClipboardIcon },
-] as const
+// The RBAC pages come from the navigation registry (modules.ts), shared with
+// the global sidebar and the command palette
+const NAV_ITEMS = (getModuleById('rbac')?.children ?? []).map((page) => ({
+  to: page.url,
+  label: page.title,
+  icon: page.icon ?? 'rbac',
+}))
 
 interface RbacSidebarProps {
   isOpen: boolean
@@ -78,7 +79,7 @@ export default function RbacSidebar({ isOpen, onClose }: RbacSidebarProps) {
                 }
               `}
             >
-              <item.icon className="size-4 shrink-0" aria-hidden="true" />
+              <ModuleIcon name={item.icon} className="size-4 shrink-0" />
               <span className="truncate">{item.label}</span>
             </NavLink>
           ))}

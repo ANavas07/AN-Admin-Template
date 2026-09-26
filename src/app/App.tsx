@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Navbar from '../components/common/navbar/Navbar'
+import AppShell from '../components/common/layout/AppShell'
+import { CommandPaletteProvider } from '../components/common/command-palette/CommandPaletteProvider'
+import { WorkspaceProvider } from '../context/WorkspaceContext'
 import { useTheme } from '../context/theme-context'
 import { AppRoutes } from '../routes/AppRoutes'
 import { DEMO_USER } from '../config/app.config'
@@ -32,26 +35,42 @@ function App() {
     setIsAuthenticated(true)
   }
 
+  const routes = (
+    <AppRoutes
+      currentRole={currentRole}
+      currentUser={currentUser}
+      isAuthenticated={isAuthenticated}
+      isDarkMode={isDarkMode}
+      onToggleTheme={toggleTheme}
+      onLogin={handleLogin}
+    />
+  )
+
   return (
     <div className="min-h-screen bg-canvas text-fg transition-colors duration-300">
       {shouldShowNavbar ? (
-        <Navbar
-          isDarkMode={isDarkMode}
-          onToggleTheme={toggleTheme}
-          currentUser={currentUser}
-          currentRole={currentRole}
-          onChangeRole={setCurrentRole}
-        />
-      ) : null}
-
-      <AppRoutes
-        currentRole={currentRole}
-        currentUser={currentUser}
-        isAuthenticated={isAuthenticated}
-        isDarkMode={isDarkMode}
-        onToggleTheme={toggleTheme}
-        onLogin={handleLogin}
-      />
+        // The workspace (favorites, history) and the command palette only exist in a session
+        <WorkspaceProvider user={currentUser} role={currentRole}>
+          <CommandPaletteProvider>
+            <AppShell
+              renderNavbar={(onToggleSidebar) => (
+                <Navbar
+                  isDarkMode={isDarkMode}
+                  onToggleTheme={toggleTheme}
+                  currentUser={currentUser}
+                  currentRole={currentRole}
+                  onChangeRole={setCurrentRole}
+                  onToggleSidebar={onToggleSidebar}
+                />
+              )}
+            >
+              {routes}
+            </AppShell>
+          </CommandPaletteProvider>
+        </WorkspaceProvider>
+      ) : (
+        routes
+      )}
     </div>
   )
 }

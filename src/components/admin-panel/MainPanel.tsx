@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react'
-import InputComponent from '../ui/inputs/InputComponent'
-import SidebarPanel from './SidebarPanel'
-import ModuleCard from './ModuleCard'
-import ModuleIcon from './ModuleIcon'
-import { ChevronIcon } from '../../icons/icons'
 import type { ModuleCategory } from './data/modules'
+import { hasModuleAccess } from './data/navigation'
+import ActivityMetrics from './workspace/ActivityMetrics'
+import FavoritesPanel from './workspace/FavoritesPanel'
+import ModuleCatalog from './workspace/ModuleCatalog'
+import QuickActionsPanel from './workspace/QuickActionsPanel'
+import RecentPanel from './workspace/RecentPanel'
+import SystemInfoPanel from './workspace/SystemInfoPanel'
+import { useWorkspaceInsights } from './workspace/useWorkspaceInsights'
 
 export type { ModuleCategory }
 
@@ -12,163 +15,80 @@ type MainPanelProps = {
     categories: ModuleCategory[]
     userRole: string
     userName: string
-    userEmail: string
-    organization: string
-    identifier: string
-    location: string
+    /** @deprecated The user's details now live in the sidebar; kept for compatibility. */
+    userEmail?: string
+    /** @deprecated See userEmail. */
+    organization?: string
+    /** @deprecated See userEmail. */
+    identifier?: string
+    /** @deprecated See userEmail. */
+    location?: string
     onModuleClick?: (moduleUrl: string) => void
 }
 
-export default function MainPanel({
-    categories,
-    userRole,
-    userName,
-    userEmail,
-    organization,
-    identifier,
-    location,
-    onModuleClick,
-}: MainPanelProps) {
-    const [searchQuery, setSearchQuery] = useState('')
-    const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
+const dateFormatter = new Intl.DateTimeFormat('es', { weekday: 'long', day: 'numeric', month: 'long' })
 
-    // Filtrar módulos según búsqueda y rol
-    const filteredCategories = useMemo(() => {
-        return categories
-            .map((category) => ({
-                ...category,
-                modules: category.modules.filter((module) => {
-                    const matchesSearch =
-                        module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        module.description
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase())
+function greeting(hour: number) {
+    if (hour < 12) return 'Buenos días'
+    if (hour < 19) return 'Buenas tardes'
+    return 'Buenas noches'
+}
 
-                    const hasAccess =
-                        !module.requiredRoles || module.requiredRoles.includes(userRole)
+/**
+ * Home as a personal workspace: favorites, recent history, quick actions and
+ * system context first, then the user's activity metrics and the full catalog.
+ */
+export default function MainPanel({ categories, userRole, userName, onModuleClick }: MainPanelProps) {
+    const insights = useWorkspaceInsights()
+    const [now] = useState(() => new Date())
 
-                    return matchesSearch && hasAccess
-                }),
-            }))
-            .filter((category) => category.modules.length > 0)
-    }, [categories, searchQuery, userRole])
-
-    // Auto-expandir primer categoría al iniciar
-    const firstCategoryName = useMemo(
-        () => filteredCategories[0]?.name || null,
-        [filteredCategories]
+    // Same role filter as before: categories with no visible module are hidden
+    const visibleCategories = useMemo(
+        () =>
+            categories
+                .map((category) => ({
+                    ...category,
+                    modules: category.modules.filter((module) => hasModuleAccess(module, userRole)),
+                }))
+                .filter((category) => category.modules.length > 0),
+        [categories, userRole]
     )
 
-    const activeCategory = expandedCategory || firstCategoryName
+    const openModule = (url: string) => onModuleClick?.(url)
+    const firstName = userName.split(' ')[0]
 
     return (
-        <div className="min-h-[calc(100vh-var(--layout-navbar-height))] bg-canvas py-6">
-            <div className="mx-auto max-w-(--layout-content-max-width) px-4 sm:px-6 lg:px-8">
-                {/* Breadcrumb */}
-                <nav className="mb-6 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
-                    <span className="text-fg-muted">Inicio</span>
-                    <span className="text-fg-subtle" aria-hidden="true">/</span>
-                    <span className="font-medium text-fg">Panel Admin</span>
-                </nav>
+        <div className="min-h-[calc(100vh-var(--layout-navbar-height))] bg-canvas">
+            <div className="mx-auto max-w-(--layout-content-max-width) space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+                <header className="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p className="eyebrow first-letter:uppercase">{dateFormatter.format(now)}</p>
+                        <h1 className="page-title mt-1.5">
+                            {greeting(now.getHours())}, {firstName}
+                        </h1>
+                        <p className="mt-1.5 text-sm text-fg-muted">
+                            Tu espacio de trabajo: favoritos, actividad reciente y accesos según cómo usas el sistema.
+                        </p>
+                    </div>
+                </header>
 
-                <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
-                    <aside>
-                        <SidebarPanel
-                            userName={userName}
-                            userEmail={userEmail}
-                            organization={organization}
-                            identifier={identifier}
-                            location={location}
-                            onUploadPhoto={() => console.log('Subir foto clicked')}
-                            onIdentification={() => console.log('Identificación clicked')}
-                        />
-                    </aside>
-
-                    <main className="min-w-0 space-y-6">
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                            <div>
-                                <p className="eyebrow">Espacio de trabajo</p>
-                                <h1 className="page-title mt-1.5">Módulos disponibles</h1>
-                                <p className="mt-1.5 text-sm text-fg-muted">
-                                    {filteredCategories.length} grupos ·{' '}
-                                    {filteredCategories.reduce((total, c) => total + c.modules.length, 0)} módulos con
-                                    acceso para tu rol
-                                </p>
-                            </div>
-                            <div className="w-full sm:max-w-sm">
-                                <InputComponent
-                                    aria-label="Buscar módulos por nombre o descripción"
-                                    placeholder="Buscar módulos…"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    showSearchIcon
-                                    iconPosition="left"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-3">
-                            {filteredCategories.length > 0 ? (
-                                filteredCategories.map((category) => {
-                                    const isOpen = activeCategory === category.name
-                                    return (
-                                        <section key={category.name} className="card">
-                                            <button
-                                                type="button"
-                                                onClick={() => setExpandedCategory(isOpen ? null : category.name)}
-                                                aria-expanded={isOpen}
-                                                className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-left transition-colors hover:bg-canvas-subtle/60"
-                                            >
-                                                <span className="inline-flex size-8 items-center justify-center rounded-md bg-canvas-subtle text-fg-muted">
-                                                    <ModuleIcon name={category.icon} className="size-4" />
-                                                </span>
-                                                <span className="text-sm font-semibold text-fg">
-                                                    {formatCategoryName(category.name)}
-                                                </span>
-                                                <span className="rounded-full bg-canvas-subtle px-2 py-0.5 text-2xs font-medium text-fg-muted">
-                                                    {category.modules.length}
-                                                </span>
-                                                <ChevronIcon
-                                                    className={`ml-auto size-4 text-fg-subtle transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                                                />
-                                            </button>
-
-                                            {isOpen && (
-                                                <div className="grid grid-cols-1 gap-3 border-t border-line p-4 sm:grid-cols-2 xl:grid-cols-3">
-                                                    {category.modules.map((module) => (
-                                                        <ModuleCard
-                                                            key={module.id}
-                                                            icon={module.icon}
-                                                            title={module.title}
-                                                            description={module.description}
-                                                            isAvailable={Boolean(module.url)}
-                                                            onClick={
-                                                                module.url
-                                                                    ? () => onModuleClick?.(module.url as string)
-                                                                    : undefined
-                                                            }
-                                                        />
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </section>
-                                    )
-                                })
-                            ) : (
-                                <div className="rounded-2xl border border-dashed border-line-strong p-12 text-center">
-                                    <p className="text-sm font-semibold text-fg">No hay módulos disponibles</p>
-                                    <p className="mt-1 text-sm text-fg-muted">Intenta ajustar tu búsqueda</p>
-                                </div>
-                            )}
-                        </div>
-                    </main>
+                {/* Tablet: two columns, dense so the narrow panels pair up; desktop: 8 / 4 split */}
+                <div className="grid gap-4 md:grid-flow-dense md:grid-cols-2 xl:grid-flow-row xl:grid-cols-12">
+                    <FavoritesPanel
+                        favorites={insights.favoriteModules}
+                        suggestions={insights.suggestions}
+                        usageOf={insights.usageOf}
+                        className="md:col-span-2 xl:col-span-8"
+                    />
+                    <RecentPanel className="xl:col-span-4" />
+                    <QuickActionsPanel actions={insights.quickActions} className="md:col-span-2 xl:col-span-8" />
+                    <SystemInfoPanel lastVisitAt={insights.summary.lastVisitAt} className="xl:col-span-4" />
                 </div>
+
+                <ActivityMetrics insights={insights} />
+
+                <ModuleCatalog categories={visibleCategories} usageOf={insights.usageOf} onOpen={openModule} />
             </div>
         </div>
     )
-}
-
-/** "OPERACION" → "Operacion": category ids are stored uppercase. */
-function formatCategoryName(name: string) {
-    return name.charAt(0) + name.slice(1).toLowerCase()
 }
