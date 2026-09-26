@@ -1,18 +1,11 @@
 import { useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { findRouteMatch } from '../../../../components/admin-panel/data/navigation'
 import RbacSidebar from './RbacSidebar'
 
-const SECTION_LABELS: Record<string, string> = {
-  roles: 'Roles',
-  permissions: 'Permisos',
-  groups: 'Grupos',
-  users: 'Asignación de Usuarios',
-  audit: 'Log de Auditoría',
-}
-
+/** Title of the current RBAC page, from the navigation registry. */
 function getLabel(pathname: string): string {
-  const segment = pathname.split('/').at(-1) ?? ''
-  return SECTION_LABELS[segment] ?? 'Control de Acceso'
+  return findRouteMatch(pathname)?.page?.title ?? 'Control de Acceso'
 }
 
 export default function RbacLayout() {

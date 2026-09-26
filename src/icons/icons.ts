@@ -33,6 +33,12 @@ import { ReactComponent as LockIcon } from './Lock.svg?react';
 import { ReactComponent as ClipboardIcon } from './Clipboard.svg?react';
 import { ReactComponent as LayersIcon } from './Layers.svg?react';
 import { ReactComponent as TimelineIcon } from './Timeline.svg?react';
+import { ReactComponent as StarIcon } from './Star.svg?react';
+import { ReactComponent as ClockIcon } from './Clock.svg?react';
+import { ReactComponent as PanelLeftIcon } from './PanelLeft.svg?react';
+import { ReactComponent as BoltIcon } from './Bolt.svg?react';
+import { ReactComponent as BuildingIcon } from './Building.svg?react';
+import { ReactComponent as ActivityIcon } from './Activity.svg?react';
 
 
 
@@ -72,4 +78,10 @@ export {
     ClipboardIcon,
     LayersIcon,
     TimelineIcon,
+    StarIcon,
+    ClockIcon,
+    PanelLeftIcon,
+    BoltIcon,
+    BuildingIcon,
+    ActivityIcon,
 }

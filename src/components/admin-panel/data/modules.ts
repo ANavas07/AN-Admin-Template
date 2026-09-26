@@ -17,6 +17,14 @@
  * es visible para todos los roles.
  */
 
+/** Pagina interna de un modulo (menu anidado del sidebar y de la paleta). */
+export type ModulePage = {
+    id: string
+    title: string
+    url: string
+    icon?: string
+}
+
 export type ModuleDefinition = {
     id: string
     title: string
@@ -26,6 +34,10 @@ export type ModuleDefinition = {
     url?: string
     /** Roles con acceso. Sin valor = todos. */
     requiredRoles?: string[]
+    /** Paginas internas del modulo. Opcional: habilita el submenu del sidebar. */
+    children?: ModulePage[]
+    /** Palabras extra para la busqueda de la paleta de comandos. */
+    keywords?: string[]
 }
 
 export type ModuleCategory = {
@@ -42,6 +54,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
             {
                 id: 'tasks',
                 title: 'Gestion de tareas',
+                keywords: ['kanban', 'tablero', 'calendario', 'cronograma'],
                 description: 'Tablero, lista, cronograma y calendario de tareas',
                 icon: 'tasks',
                 url: '/tasks',
@@ -58,6 +71,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
             {
                 id: 'process',
                 title: 'Procesos',
+                keywords: ['bpmn', 'diagramas', 'flujos'],
                 description: 'Repositorio y disenador de diagramas de proceso',
                 icon: 'process',
                 url: '/process',
@@ -66,6 +80,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
             {
                 id: 'files',
                 title: 'Documentos',
+                keywords: ['archivos', 'subir', 'upload'],
                 description: 'Centro de carga y seguimiento de archivos',
                 icon: 'files',
                 url: '/files',
@@ -92,10 +107,19 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 icon: 'rbac',
                 url: '/superuser/rbac',
                 requiredRoles: ['admin'],
+                keywords: ['rbac', 'seguridad', 'accesos'],
+                children: [
+                    { id: 'rbac-roles', title: 'Roles', url: '/superuser/rbac/roles', icon: 'administration' },
+                    { id: 'rbac-permissions', title: 'Permisos', url: '/superuser/rbac/permissions', icon: 'rbac' },
+                    { id: 'rbac-groups', title: 'Grupos', url: '/superuser/rbac/groups', icon: 'users' },
+                    { id: 'rbac-users', title: 'Asignación de Usuarios', url: '/superuser/rbac/users', icon: 'user' },
+                    { id: 'rbac-audit', title: 'Log de Auditoría', url: '/superuser/rbac/audit', icon: 'audit' },
+                ],
             },
             {
                 id: 'audit',
                 title: 'Auditoria',
+                keywords: ['logs', 'bitacora', 'eventos'],
                 description: 'Bitacora de cambios sobre roles y permisos',
                 icon: 'audit',
                 url: '/superuser/rbac/audit',
@@ -122,6 +146,15 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 icon: 'playground',
                 url: '/playground',
                 requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
+                keywords: ['componentes', 'ui', 'design system'],
+                children: [
+                    { id: 'playground-inputs', title: 'Inputs', url: '/playground/inputs' },
+                    { id: 'playground-buttons', title: 'Botones', url: '/playground/buttons' },
+                    { id: 'playground-tables', title: 'Tablas', url: '/playground/tables' },
+                    { id: 'playground-gantt', title: 'Gantt', url: '/playground/gantt' },
+                    { id: 'playground-forms', title: 'Formularios', url: '/playground/forms' },
+                    { id: 'playground-modals', title: 'Pop-Ups', url: '/playground/modals' },
+                ],
             },
         ],
     },

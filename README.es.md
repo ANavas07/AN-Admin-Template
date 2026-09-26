@@ -83,9 +83,9 @@ src/
 ├── routes/AppRoutes.tsx     Tabla de rutas (módulos con carga diferida)
 ├── config/app.config.ts     Punto único de configuración
 ├── components/
-│   ├── admin-panel/         Dashboard del home + catálogo de módulos
-│   ├── common/              Navbar, formularios, modales, toasts
-│   └── ui/                  Botones, inputs, tabla, badge, alert, avatar, tonos
+│   ├── admin-panel/         Espacio de trabajo del home + registro de navegación
+│   ├── common/              Navbar, sidebar, paleta de comandos, formularios, modales, toasts
+│   └── ui/                  Botones, inputs, tabla, gráficos, badge, alert, avatar, tonos
 ├── pages/
 │   ├── tasks/               Tablero, lista, cronograma, calendario (dnd-kit)
 │   ├── planning/            Grilla de plantillas con iconos/imágenes por celda
@@ -105,18 +105,66 @@ src/
 
 ## Cómo funciona el dashboard
 
-El home renderiza un **catálogo corto y curado** definido en
-[`src/components/admin-panel/data/modules.ts`](src/components/admin-panel/data/modules.ts).
-Cada entrada apunta a una ruta que existe de verdad, así ninguna tarjeta lleva a
-una pantalla vacía. Las tarjetas se filtran por el rol activo mediante
-`requiredRoles`, y un módulo sin `url` se muestra deshabilitado en vez de navegar
-a la nada.
+El home es un **espacio de trabajo personal**, no una grilla de tarjetas
+estáticas. En orden de prioridad muestra los módulos favoritos del usuario, las
+páginas visitadas recientemente, accesos rápidos, información del sistema,
+métricas de uso y, al final, el catálogo completo. Favoritos y accesos rápidos se
+ordenan según la frecuencia con que el usuario abre cada módulo.
+
+### Un único registro de navegación
+
+[`src/components/admin-panel/data/modules.ts`](src/components/admin-panel/data/modules.ts)
+es la única fuente de navegación. El sidebar, la paleta de comandos, el home, la
+subnavegación de RBAC y el registro de actividad lo leen a través de
+[`navigation.ts`](src/components/admin-panel/data/navigation.ts). Cada entrada
+apunta a una ruta real, se filtra por el rol activo (`requiredRoles`) y puede
+declarar páginas anidadas (`children`) y `keywords` para la búsqueda.
 
 Para agregar un módulo:
 
 1. Crea la página en `src/pages/<modulo>/`.
 2. Registra la ruta en `src/routes/AppRoutes.tsx` usando `lazy()`.
-3. Agrega la entrada en `MODULE_CATEGORIES` con su `url` y sus `requiredRoles`.
+3. Agrega la entrada en `MODULE_CATEGORIES` con su `url`, `requiredRoles`, una
+   clave de `icon` de `ModuleIcon.tsx` y, opcionalmente, `children` y `keywords`.
+
+Con eso aparece en el sidebar, la paleta, el catálogo y las métricas.
+
+### Espacio de trabajo: favoritos, historial y métricas
+
+`WorkspaceProvider` ([`src/context/WorkspaceContext.tsx`](src/context/WorkspaceContext.tsx))
+carga el espacio del usuario al iniciar sesión y registra una visita en cada
+cambio de ruta. La persistencia pasa por
+[`workspaceService`](src/services/workspace/workspace.service.ts): hoy
+localStorage, por id de usuario, con una API asíncrona lista para un backend
+(`load`, `recordVisit`, `toggleFavorite`). Las métricas son funciones puras en
+[`metrics.ts`](src/services/workspace/metrics.ts).
+
+La primera vez el espacio se inicializa con ~6 meses de actividad generada para
+que los gráficos no estén vacíos. Está marcada como demostración y el home ofrece
+"Borrar demo", que la elimina conservando favoritos y visitas reales.
+
+### Sidebar y paleta de comandos
+
+- **Sidebar** (`AppSidebar`): usuario, rol y organización; favoritos; todos los
+  módulos con sus páginas anidadas; ruta activa; se contrae a una barra de iconos
+  en escritorio (recordado por navegador) y es un panel deslizable en tablet y
+  móvil.
+- **Paleta de comandos** (`Ctrl + K`, `⌘ + K` en macOS): busca módulos, páginas,
+  rutas y acciones, y lista favoritos e historial reciente. Flechas para moverse,
+  Enter para abrir, `Ctrl/⌘ + D` para marcar favorito, Esc para cerrar. Sigue el
+  patrón ARIA combobox. Las acciones rápidas se definen una sola vez en
+  [`quickActions.ts`](src/components/admin-panel/data/quickActions.ts) y se
+  comparten con el home.
+
+### Gráficos
+
+`src/components/ui/charts/` contiene gráficos SVG livianos sin dependencias extra
+(`ColumnChart`, `AreaLineChart`, `BarList`, `Sparkline`, `StatTile`). Su API de
+datos usa accessors al estilo TanStack (`x={(row) => …}`) y `ChartCard` ofrece una
+vista **Tabla** renderizada con TanStack Table a partir de `ColumnDef` normales,
+así todo valor es accesible sin ver el gráfico. Las marcas usan los tokens
+`--color-chart-*`, admiten exploración con mouse y teclado (flechas) y funcionan
+en ambos temas.
 
 ### División de código (code splitting)
 

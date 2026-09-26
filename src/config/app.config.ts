@@ -18,11 +18,21 @@ export const appConfig = {
 
 export type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
 
+/** Etiqueta visible de cada rol (navbar, sidebar, paleta de comandos). */
+export const ROLE_LABELS: Record<UserRole, string> = {
+    admin: 'Administrator',
+    organizer: 'Organizer',
+    analyst: 'Analyst',
+    viewer: 'Viewer',
+}
+
 export type CurrentUser = {
     id: string
     name: string
     email: string
     roles: UserRole[]
+    /** Area o departamento del usuario, mostrado en el sidebar. Opcional. */
+    department?: string
 }
 
 /**
@@ -34,4 +44,5 @@ export const DEMO_USER: CurrentUser = {
     name: 'Usuario Demo',
     email: 'demo@example.com',
     roles: ['admin', 'organizer', 'analyst'],
+    department: 'Dirección de Tecnología',
 }
