@@ -2,6 +2,8 @@ import { useId, useMemo, useState } from 'react'
 import type { ChangeEvent, ReactNode } from 'react'
 import { ChevronIcon, ClearIcon } from '../../../icons/icons'
 import { cn } from '../../../utils/cn'
+import { FieldLabel, FieldMessage } from './field'
+import { fieldControlClass, fieldSizeClasses } from './fieldStyles'
 
 type OptionValue = string | number | boolean
 
@@ -113,15 +115,14 @@ const Select = <T,>({
     return (
         <div className={cn('w-full', containerClassName)}>
             {label ? (
-                <label htmlFor={selectId} className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                <FieldLabel htmlFor={selectId} required={requiredMark}>
                     {label}
-                    {requiredMark ? <span className="ml-1 text-red-500">*</span> : null}
-                </label>
+                </FieldLabel>
             ) : null}
 
             <div className={cn('relative', className)}>
                 {leftIcon ? (
-                    <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-(--color-text-muted)">
+                    <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-fg-muted">
                         {leftIcon}
                     </span>
                 ) : null}
@@ -134,15 +135,11 @@ const Select = <T,>({
                     aria-invalid={Boolean(error)}
                     aria-describedby={describedBy}
                     className={cn(
-                        'h-11 w-full appearance-none rounded-xl border bg-(--color-surface) py-2.5 text-sm text-(--color-text)',
-                        leftIcon ? 'pl-10' : 'pl-3',
-                        clearable && selectedValue && !selectDisabled ? 'pr-20' : 'pr-11',
-                        'transition-all duration-200',
-                        'focus:outline-none focus:ring-2 focus:ring-highlight/25',
-                        'disabled:cursor-not-allowed disabled:opacity-60',
-                        error
-                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                            : 'border-(--color-border) focus:border-highlight'
+                        fieldControlClass(Boolean(error)),
+                        fieldSizeClasses.md,
+                        'appearance-none',
+                        leftIcon ? 'pl-9' : 'pl-3',
+                        clearable && selectedValue && !selectDisabled ? 'pr-18' : 'pr-10'
                     )}
                 >
                     <option value="" disabled={requiredMark}>
@@ -156,11 +153,11 @@ const Select = <T,>({
                     ))}
                 </select>
 
-                <div className="absolute inset-y-0 right-2 flex items-center gap-1 text-(--color-text-muted)">
+                <div className="absolute inset-y-0 right-2 flex items-center gap-1 text-fg-muted">
                     {clearable && selectedValue && !selectDisabled ? (
                         <button
                             type="button"
-                            className="inline-flex size-8 items-center justify-center rounded-lg hover:bg-(--color-bg-soft) hover:text-(--color-text)"
+                            className="inline-flex size-8 items-center justify-center rounded-lg hover:bg-canvas-subtle hover:text-fg"
                             aria-label="Limpiar seleccion"
                             onClick={clearSelection}
                         >
@@ -174,17 +171,7 @@ const Select = <T,>({
                 </div>
             </div>
 
-            {helpText ? (
-                <p
-                    id={`${selectId}-description`}
-                    className={cn(
-                        'mt-1 text-xs',
-                        error ? 'text-red-600 dark:text-red-400' : 'text-(--color-text-muted)'
-                    )}
-                >
-                    {helpText}
-                </p>
-            ) : null}
+            <FieldMessage id={`${selectId}-description`} error={error} hint={hint} />
         </div>
     )
 }

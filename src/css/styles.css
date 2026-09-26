@@ -1,45 +1,75 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "./theme.css";
+@import "./components.css";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
 
-@theme {
-	--color-brand: #0ea55b;
-	--color-brand-soft: color-mix(in oklab, var(--color-brand) 24%, transparent);
-	--color-highlight: #0ea5e9;
-	--color-highlight-soft: color-mix(in oklab, var(--color-highlight) 24%, transparent);
+/* ==========================================================================
+   Base layer. Only element defaults live here; every value comes from
+   theme.css so this file never needs to change when the palette does.
+   ========================================================================== */
+@layer base {
+	html,
+	body,
+	#root {
+		min-height: 100%;
+	}
+
+	body {
+		margin: 0;
+		background: var(--color-canvas);
+		color: var(--color-fg);
+		font-family: var(--font-sans);
+		font-feature-settings: "cv11", "ss01";
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
+		transition:
+			background-color var(--duration-base) var(--ease-standard),
+			color var(--duration-base) var(--ease-standard);
+	}
+
+	::selection {
+		background: color-mix(in oklab, var(--color-brand) 22%, transparent);
+	}
+
+	/* Keyboard focus is always visible, with the brand color */
+	:focus-visible {
+		outline-color: var(--color-brand);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.01ms !important;
+			scroll-behavior: auto !important;
+		}
+	}
 }
 
-:root {
-	--color-bg: #f4f8f3;
-	--color-bg-soft: #eaf2e8;
-	--color-surface: #ffffff;
-	--color-text: #182222;
-	--color-text-muted: #536369;
-	--color-border: #d2dfd5;
-}
-
-.dark {
-	--color-bg: #0c1518;
-	--color-bg-soft: #152227;
-	--color-surface: #111e23;
-	--color-text: #e5f1ef;
-	--color-text-muted: #a7bfbb;
-	--color-border: #274148;
-	--color-brand: #22c26f;
-	--color-highlight: #38bdf8;
-}
-
-html,
-body,
-#root {
-	min-height: 100%;
-}
+/* ==========================================================================
+   Third-party integration
+   ========================================================================== */
 
 /* SVAR theme wrappers need explicit height to enable internal Gantt scrolling */
 .wx-material-theme,
 .wx-willow-theme,
 .wx-willow-dark-theme {
 	height: 100%;
+}
+
+/* Bridge the SVAR Gantt themes to our tokens (the `:root` prefix outranks the
+   theme's own declarations, which load later with the lazy Gantt chunk) */
+:root :is(.wx-willow-theme, .wx-willow-dark-theme, .wx-material-theme) {
+	--wx-font-family: var(--font-sans);
+	--wx-gantt-task-color: var(--color-brand-solid);
+	--wx-gantt-task-border-color: var(--color-brand-solid);
+	--wx-gantt-task-fill-color: color-mix(in oklab, var(--color-brand-solid) 70%, black);
+	--wx-gantt-critical-color: var(--color-danger-solid);
 }
 
 /* ContextMenu (@svar-ui/react-menu) wraps children in a <span display:inline>.
@@ -49,13 +79,12 @@ span[data-menu-ignore] {
 	height: 100%;
 }
 
-body {
-	margin: 0;
-	background: var(--color-bg);
-	color: var(--color-text);
-	transition: background-color 220ms ease, color 220ms ease;
+[data-sileo-viewport] {
+	z-index: var(--z-toast) !important;
 }
 
-[data-sileo-viewport] {
-	z-index: 1000 !important;
+/* Sileo paints the toast shape with an SVG `fill` attribute; CSS takes precedence */
+[data-sileo-pill],
+[data-sileo-body] {
+	fill: var(--color-toast);
 }

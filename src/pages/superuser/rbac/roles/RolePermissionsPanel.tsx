@@ -114,18 +114,18 @@ export default function RolePermissionsPanel({
       }
     >
       {role.isSystem && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-800/50 dark:bg-amber-950/50 dark:text-amber-300">
-          🔒 Este es un rol de sistema. Sus permisos no se pueden modificar.
+        <div className="mb-4 rounded-lg border border-warning/25 bg-warning-soft px-3 py-2 text-xs text-warning">
+          Este es un rol de sistema. Sus permisos no se pueden modificar.
         </div>
       )}
 
       {loading ? (
-        <p className="text-sm text-(--color-text-muted) py-4 text-center">Cargando permisos...</p>
+        <p className="text-sm text-fg-muted py-4 text-center">Cargando permisos...</p>
       ) : (
         <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-1">
           {Object.entries(grouped).map(([resource, perms]) => (
             <div key={resource}>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-(--color-text-muted)">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-caps text-fg-muted">
                 {resource}
               </p>
               <div className="grid gap-1.5 sm:grid-cols-2">
@@ -139,7 +139,7 @@ export default function RolePermissionsPanel({
                       className={`flex items-start gap-2.5 rounded-lg border px-3 py-2 text-sm cursor-pointer transition-colors ${
                         isChecked
                           ? 'border-brand/40 bg-brand/5'
-                          : 'border-(--color-border) hover:bg-(--color-bg-soft)'
+                          : 'border-line hover:bg-canvas-subtle'
                       } ${isInherited || role.isSystem ? 'opacity-70 cursor-default' : ''}`}
                     >
                       <input
@@ -147,12 +147,12 @@ export default function RolePermissionsPanel({
                         checked={isChecked}
                         disabled={isInherited || role.isSystem}
                         onChange={() => toggle(perm.id)}
-                        className="mt-0.5 size-4 accent-brand shrink-0"
+                        className="mt-0.5 size-4 accent-brand-solid shrink-0"
                       />
                       <div className="min-w-0">
-                        <span className="font-mono text-xs text-(--color-text)">{perm.code}</span>
+                        <span className="font-mono text-xs text-fg">{perm.code}</span>
                         {perm.description && (
-                          <p className="text-xs text-(--color-text-muted) truncate">{perm.description}</p>
+                          <p className="text-xs text-fg-muted truncate">{perm.description}</p>
                         )}
                         {isInherited && (
                           <p className="text-xs text-brand/70 font-medium">
@@ -168,7 +168,7 @@ export default function RolePermissionsPanel({
           ))}
 
           {Object.keys(grouped).length === 0 && (
-            <p className="text-sm text-(--color-text-muted) text-center py-4">
+            <p className="text-sm text-fg-muted text-center py-4">
               No hay permisos disponibles.
             </p>
           )}

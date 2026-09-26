@@ -17,7 +17,7 @@ function SubtaskCounter({ task }: { task: Task }) {
     if (task.subtasks.length === 0) return null
     const done = task.subtasks.filter((s) => s.completed).length
     return (
-        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-(--color-text-muted)">
+        <span className="inline-flex items-center gap-1 text-2xs font-medium text-fg-muted">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5" aria-hidden="true">
                 <path d="M9 11l3 3L22 4" />
                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
@@ -44,7 +44,7 @@ export function TaskCardContent({
         // drag); here we only wire mouse click-to-open to avoid nested buttons.
         <div
             onClick={() => onOpen(task.id)}
-            className={`group flex cursor-pointer flex-col gap-2.5 rounded-xl border border-(--color-border) bg-(--color-surface) p-3 text-left shadow-sm transition-all duration-200 ${
+            className={`group flex cursor-pointer flex-col gap-2.5 rounded-xl border border-line bg-surface p-3 text-left shadow-sm transition-all duration-200 ${
                 overlay ? 'rotate-2 shadow-xl ring-1 ring-brand/20' : 'hover:-translate-y-0.5 hover:shadow-md'
             } ${dragging ? 'opacity-40' : ''}`}
         >
@@ -58,8 +58,8 @@ export function TaskCardContent({
                     />
                 </div>
                 <p
-                    className={`line-clamp-2 text-sm font-medium leading-snug text-(--color-text) ${
-                        task.completed ? 'text-(--color-text-muted) line-through' : ''
+                    className={`line-clamp-2 text-sm font-medium leading-snug text-fg ${
+                        task.completed ? 'text-fg-muted line-through' : ''
                     }`}
                 >
                     {task.title}
@@ -79,8 +79,8 @@ export function TaskCardContent({
                 <div className="flex items-center gap-3">
                     {due ? (
                         <span
-                            className={`inline-flex items-center gap-1 text-[11px] font-medium ${
-                                overdue ? 'text-rose-600 dark:text-rose-400' : 'text-(--color-text-muted)'
+                            className={`inline-flex items-center gap-1 text-2xs font-medium ${
+                                overdue ? 'text-danger' : 'text-fg-muted'
                             }`}
                         >
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5" aria-hidden="true">
@@ -96,7 +96,7 @@ export function TaskCardContent({
             </div>
 
             {task.location ? (
-                <div className="flex items-center gap-1 pl-[26px] text-[11px] text-(--color-text-muted)">
+                <div className="flex items-center gap-1 pl-[26px] text-2xs text-fg-muted">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5 shrink-0" aria-hidden="true">
                         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                         <circle cx="12" cy="10" r="3" />

@@ -68,14 +68,14 @@ export function TasksSidebar({
     return (
         <aside
             aria-label="Navegador de equipos y proyectos"
-            className={`sticky top-16 flex h-[calc(100vh-4rem)] shrink-0 flex-col border-r border-(--color-border) bg-(--color-surface) ${
+            className={`sticky top-16 flex h-[calc(100vh-var(--layout-navbar-height))] shrink-0 flex-col border-r border-line bg-surface ${
                 collapsed ? 'w-16' : 'w-72'
             }`}
         >
             {/* Header */}
-            <div className={`flex items-center gap-2 border-b border-(--color-border) px-3 py-3 ${collapsed ? 'justify-center' : 'justify-between'}`}>
+            <div className={`flex items-center gap-2 border-b border-line px-3 py-3 ${collapsed ? 'justify-center' : 'justify-between'}`}>
                 {!collapsed ? (
-                    <span className="text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
+                    <span className="eyebrow">
                         Espacio de trabajo
                     </span>
                 ) : null}
@@ -84,7 +84,7 @@ export function TasksSidebar({
                     onClick={() => setCollapsed((value) => !value)}
                     aria-label={collapsed ? 'Expandir panel' : 'Colapsar panel'}
                     aria-expanded={!collapsed}
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-(--color-text-muted) transition-colors hover:bg-(--color-bg-soft) hover:text-(--color-text)"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-canvas-subtle hover:text-fg"
                 >
                     <span className={`transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`}>
                         <ChevronLeft />
@@ -106,7 +106,7 @@ export function TasksSidebar({
                                         onClick={() => onSelectProject(project.id)}
                                         title={project.name}
                                         aria-current={active ? 'page' : undefined}
-                                        className={`flex w-full justify-center rounded-lg p-1 ${active ? 'bg-brand/10 ring-1 ring-inset ring-brand/30' : 'hover:bg-(--color-bg-soft)'}`}
+                                        className={`flex w-full justify-center rounded-lg p-1 ${active ? 'bg-brand/10 ring-1 ring-inset ring-brand/30' : 'hover:bg-canvas-subtle'}`}
                                     >
                                         <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold ${accentAvatar[team?.color ?? 'slate']}`}>
                                             {initials(project.name)}
@@ -132,13 +132,13 @@ export function TasksSidebar({
                                             type="button"
                                             onClick={() => toggleTeam(team.id)}
                                             aria-expanded={open}
-                                            className="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-1.5 py-1 text-left hover:bg-(--color-bg-soft)"
+                                            className="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-1.5 py-1 text-left hover:bg-canvas-subtle"
                                         >
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`h-3 w-3 shrink-0 text-(--color-text-muted) transition-transform ${open ? 'rotate-90' : ''}`} aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`h-3 w-3 shrink-0 text-fg-muted transition-transform ${open ? 'rotate-90' : ''}`} aria-hidden="true">
                                                 <path d="m9 18 6-6-6-6" />
                                             </svg>
                                             <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${accentDot[team.color]}`} aria-hidden="true" />
-                                            <span className="truncate text-sm font-semibold text-(--color-text)">{team.name}</span>
+                                            <span className="truncate text-sm font-semibold text-fg">{team.name}</span>
                                         </button>
 
                                         {/* Members preview */}
@@ -154,7 +154,7 @@ export function TasksSidebar({
                                                 aria-label={`Opciones de ${team.name}`}
                                                 aria-haspopup="menu"
                                                 aria-expanded={menuTeamId === team.id}
-                                                className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-(--color-text-muted) opacity-0 transition-colors hover:bg-(--color-bg-soft) hover:text-(--color-text) focus-visible:opacity-100 group-hover/team:opacity-100"
+                                                className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-fg-muted opacity-0 transition-colors hover:bg-canvas-subtle hover:text-fg focus-visible:opacity-100 group-hover/team:opacity-100"
                                             >
                                                 <DotsMenuIcon />
                                             </button>
@@ -171,7 +171,7 @@ export function TasksSidebar({
                                                     />
                                                     <div
                                                         role="menu"
-                                                        className="absolute right-0 top-8 z-50 w-52 overflow-hidden rounded-xl border border-(--color-border) bg-(--color-surface) py-1 shadow-lg"
+                                                        className="absolute right-0 top-8 z-50 w-52 overflow-hidden rounded-xl border border-line bg-surface py-1 shadow-lg"
                                                     >
                                                         <MenuItem
                                                             label="Invitar usuario…"
@@ -181,7 +181,7 @@ export function TasksSidebar({
                                                             label="Agregar miembro"
                                                             onClick={() => { setMenuTeamId(null); onManageMembers({ teamId: team.id }, 'add') }}
                                                         />
-                                                        <div className="my-1 h-px bg-(--color-border)" />
+                                                        <div className="my-1 h-px bg-line" />
                                                         <MenuItem
                                                             label="Nuevo proyecto"
                                                             onClick={() => { setMenuTeamId(null); onNewProject(team.id) }}
@@ -205,17 +205,17 @@ export function TasksSidebar({
                                                             onClick={() => onSelectProject(project.id)}
                                                             aria-current={active ? 'page' : undefined}
                                                             className={`flex w-full items-center gap-2.5 rounded-lg p-1.5 text-left transition-colors ${
-                                                                active ? 'bg-brand/10 ring-1 ring-inset ring-brand/30' : 'hover:bg-(--color-bg-soft)'
+                                                                active ? 'bg-brand/10 ring-1 ring-inset ring-brand/30' : 'hover:bg-canvas-subtle'
                                                             }`}
                                                         >
-                                                            <span className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold ${accentAvatar[team.color]}`}>
+                                                            <span className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-2xs font-bold ${accentAvatar[team.color]}`}>
                                                                 {initials(project.name)}
                                                             </span>
                                                             <span className="min-w-0 flex-1">
-                                                                <span className={`block truncate text-sm font-medium ${active ? 'text-brand' : 'text-(--color-text)'}`}>
+                                                                <span className={`block truncate text-sm font-medium ${active ? 'text-brand' : 'text-fg'}`}>
                                                                     {project.name}
                                                                 </span>
-                                                                <span className="block truncate text-[11px] text-(--color-text-muted)">
+                                                                <span className="block truncate text-2xs text-fg-muted">
                                                                     {done}/{project.tasks.length} tareas
                                                                 </span>
                                                             </span>
@@ -228,7 +228,7 @@ export function TasksSidebar({
                                                 <button
                                                     type="button"
                                                     onClick={() => onNewProject(team.id)}
-                                                    className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1.5 text-xs font-medium text-(--color-text-muted) transition-colors hover:bg-(--color-bg-soft) hover:text-brand"
+                                                    className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1.5 text-xs font-medium text-fg-muted transition-colors hover:bg-canvas-subtle hover:text-brand"
                                                 >
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3.5 w-3.5" aria-hidden="true">
                                                         <path d="M12 5v14M5 12h14" />
@@ -246,14 +246,14 @@ export function TasksSidebar({
             )}
 
             {/* Footer: workspace-level invite */}
-            <div className="border-t border-(--color-border) p-2">
+            <div className="border-t border-line p-2">
                 <button
                     type="button"
                     onClick={() => onManageMembers({}, 'invite')}
                     title="Invitar usuarios"
-                    className={`flex w-full items-center gap-2.5 rounded-lg p-1.5 text-sm font-medium text-(--color-text-muted) transition-colors hover:bg-(--color-bg-soft) hover:text-brand ${collapsed ? 'justify-center' : ''}`}
+                    className={`flex w-full items-center gap-2.5 rounded-lg p-1.5 text-sm font-medium text-fg-muted transition-colors hover:bg-canvas-subtle hover:text-brand ${collapsed ? 'justify-center' : ''}`}
                 >
-                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-dashed border-(--color-border)">
+                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-dashed border-line">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4" aria-hidden="true">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M22 11h-6" />
                         </svg>
@@ -271,7 +271,7 @@ function MenuItem({ label, onClick }: { label: string; onClick: () => void }) {
             type="button"
             role="menuitem"
             onClick={onClick}
-            className="flex w-full items-center px-3 py-2 text-left text-sm text-(--color-text) transition-colors hover:bg-(--color-bg-soft)"
+            className="flex w-full items-center px-3 py-2 text-left text-sm text-fg transition-colors hover:bg-canvas-subtle"
         >
             {label}
         </button>

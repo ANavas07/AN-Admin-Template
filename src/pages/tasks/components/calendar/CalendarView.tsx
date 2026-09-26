@@ -52,17 +52,17 @@ function DayCell({
     return (
         <div
             ref={setNodeRef}
-            className={`flex min-h-24 flex-col gap-1 border-b border-r border-(--color-border) p-1.5 transition-colors ${
-                inMonth ? 'bg-(--color-surface)' : 'bg-(--color-bg-soft)/40'
+            className={`flex min-h-24 flex-col gap-1 border-b border-r border-line p-1.5 transition-colors ${
+                inMonth ? 'bg-surface' : 'bg-canvas-subtle/40'
             } ${isOver ? 'bg-brand/10 ring-1 ring-inset ring-brand/40' : ''}`}
         >
             <span
                 className={`inline-flex h-6 w-6 items-center justify-center self-start rounded-full text-xs font-medium ${
                     isToday
-                        ? 'bg-brand text-white'
+                        ? 'bg-brand-solid text-on-solid'
                         : inMonth
-                          ? 'text-(--color-text)'
-                          : 'text-(--color-text-muted)'
+                          ? 'text-fg'
+                          : 'text-fg-muted'
                 }`}
             >
                 {format(date, 'd')}
@@ -118,16 +118,16 @@ export function CalendarView({ api, onOpenTask }: Props) {
 
     return (
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-            <div className="overflow-hidden rounded-2xl border border-(--color-border) bg-(--color-surface)">
+            <div className="overflow-hidden rounded-2xl border border-line bg-surface">
                 <div className="flex items-center justify-between px-4 py-3">
-                    <h3 className="text-sm font-semibold capitalize text-(--color-text)">
+                    <h3 className="text-sm font-semibold capitalize text-fg">
                         {format(cursor, 'MMMM yyyy', { locale: es })}
                     </h3>
                     <div className="flex items-center gap-1">
                         <button
                             type="button"
                             onClick={() => setCursor((value) => subMonths(value, 1))}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-(--color-border) text-(--color-text-muted) hover:bg-(--color-bg-soft) hover:text-(--color-text)"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-line text-fg-muted hover:bg-canvas-subtle hover:text-fg"
                             aria-label="Mes anterior"
                         >
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4" aria-hidden="true">
@@ -137,14 +137,14 @@ export function CalendarView({ api, onOpenTask }: Props) {
                         <button
                             type="button"
                             onClick={() => setCursor(new Date(2026, 7, 1))}
-                            className="rounded-lg border border-(--color-border) px-2.5 py-1.5 text-xs font-medium text-(--color-text-muted) hover:bg-(--color-bg-soft) hover:text-(--color-text)"
+                            className="rounded-lg border border-line px-2.5 py-1.5 text-xs font-medium text-fg-muted hover:bg-canvas-subtle hover:text-fg"
                         >
                             Hoy
                         </button>
                         <button
                             type="button"
                             onClick={() => setCursor((value) => addMonths(value, 1))}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-(--color-border) text-(--color-text-muted) hover:bg-(--color-bg-soft) hover:text-(--color-text)"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-line text-fg-muted hover:bg-canvas-subtle hover:text-fg"
                             aria-label="Mes siguiente"
                         >
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4" aria-hidden="true">
@@ -154,9 +154,9 @@ export function CalendarView({ api, onOpenTask }: Props) {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-7 border-t border-(--color-border) bg-(--color-bg-soft)/60">
+                <div className="grid grid-cols-7 border-t border-line bg-canvas-subtle/60">
                     {WEEKDAYS.map((day) => (
-                        <div key={day} className="border-r border-(--color-border) px-2 py-1.5 text-center text-[11px] font-semibold uppercase tracking-wide text-(--color-text-muted) last:border-r-0">
+                        <div key={day} className="border-r border-line px-2 py-1.5 text-center text-2xs font-semibold uppercase tracking-caps text-fg-muted last:border-r-0">
                             {day}
                         </div>
                     ))}

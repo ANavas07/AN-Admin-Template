@@ -19,7 +19,7 @@ type Props = {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div className="grid grid-cols-[7rem_1fr] items-start gap-2 py-2">
-            <span className="pt-1 text-xs font-medium uppercase tracking-wide text-(--color-text-muted)">
+            <span className="pt-1 text-xs font-medium uppercase tracking-caps text-fg-muted">
                 {label}
             </span>
             <div className="min-w-0">{children}</div>
@@ -29,7 +29,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function LocationIcon() {
     return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4 shrink-0 text-(--color-text-muted)" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4 shrink-0 text-fg-muted" aria-hidden="true">
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
             <circle cx="12" cy="10" r="3" />
         </svg>
@@ -40,24 +40,24 @@ export function TaskMetaFields({ task, tagCatalog, onChangePriority, onChangeLoc
     const priorityOptions = priorityOrder.map((value) => ({ value, label: priorityLabels[value] }))
 
     return (
-        <div className="divide-y divide-(--color-border)">
+        <div className="divide-y divide-line">
             <Field label="Asignados">
                 {task.assignees.length > 0 ? (
                     <div className="flex flex-wrap items-center gap-2">
                         {task.assignees.map((assignee) => (
-                            <span key={assignee.id} className="inline-flex items-center gap-1.5 rounded-full border border-(--color-border) py-0.5 pl-0.5 pr-2 text-xs text-(--color-text)">
+                            <span key={assignee.id} className="inline-flex items-center gap-1.5 rounded-full border border-line py-0.5 pl-0.5 pr-2 text-xs text-fg">
                                 <AssigneeAvatar assignee={assignee} size="sm" />
                                 {assignee.name}
                             </span>
                         ))}
                     </div>
                 ) : (
-                    <span className="text-sm text-(--color-text-muted)">Sin asignar</span>
+                    <span className="text-sm text-fg-muted">Sin asignar</span>
                 )}
             </Field>
 
             <Field label="Vencimiento">
-                <span className="text-sm text-(--color-text)">
+                <span className="text-sm text-fg">
                     {formatLongDate(task.dueDate) ?? 'Sin fecha'}
                 </span>
             </Field>
@@ -82,14 +82,14 @@ export function TaskMetaFields({ task, tagCatalog, onChangePriority, onChangeLoc
             </Field>
 
             <Field label="Ubicación">
-                <div className="flex items-center gap-2 rounded-lg border border-(--color-border) bg-(--color-surface) px-2.5 focus-within:border-highlight focus-within:ring-2 focus-within:ring-highlight/25">
+                <div className="flex items-center gap-2 rounded-lg border border-line bg-surface px-2.5 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/25">
                     <LocationIcon />
                     <input
                         key={task.id}
                         defaultValue={task.location ?? ''}
                         placeholder="Añade un lugar (sede, aula, dirección…)"
                         onBlur={(event) => onChangeLocation(event.target.value)}
-                        className="w-full bg-transparent py-2 text-sm text-(--color-text) placeholder:text-(--color-text-muted) focus:outline-none"
+                        className="w-full bg-transparent py-2 text-sm text-fg placeholder:text-fg-muted focus:outline-none"
                     />
                 </div>
             </Field>

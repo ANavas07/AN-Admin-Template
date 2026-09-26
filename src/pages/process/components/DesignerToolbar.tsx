@@ -2,7 +2,8 @@ import { useRef } from 'react'
 import type { ChangeEvent } from 'react'
 import ButtonComponent from '../../../components/ui/buttons/ButtonComponent'
 import { ArrowLeftIcon, FlowIcon, SparkIcon, TrashBinIcon } from '../../../icons/icons'
-import { processStatusLabels, processStatusStyles } from '../types'
+import Badge from '../../../components/ui/badge/Badge'
+import { processStatusLabels, processStatusTones } from '../types'
 import type { ProcessMeta } from '../types'
 
 type DesignerToolbarProps = {
@@ -26,7 +27,7 @@ type DesignerToolbarProps = {
 }
 
 const historyButtonClass =
-    'px-2.5 py-1.5 text-sm text-(--color-text) transition-colors hover:bg-(--color-bg-soft) disabled:cursor-not-allowed disabled:opacity-40'
+    'px-2.5 py-1.5 text-sm text-fg transition-colors hover:bg-canvas-subtle disabled:cursor-not-allowed disabled:opacity-40'
 
 /** Top bar of the process designer: process identity, history and diagram actions. */
 export default function DesignerToolbar({
@@ -58,13 +59,13 @@ export default function DesignerToolbar({
     }
 
     return (
-        <div className="border-b border-(--color-border) bg-(--color-surface)/80 backdrop-blur">
+        <div className="border-b border-line bg-surface">
             <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
                 <div className="flex min-w-0 items-center gap-3">
                     <button
                         type="button"
                         onClick={onBack}
-                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-(--color-border) text-(--color-text-muted) transition-colors hover:bg-(--color-bg-soft) hover:text-(--color-text)"
+                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line text-fg-muted transition-colors hover:bg-canvas-subtle hover:text-fg"
                         aria-label="Volver al repositorio de procesos"
                         title="Volver al repositorio"
                     >
@@ -80,16 +81,14 @@ export default function DesignerToolbar({
                             className="flex max-w-full items-center gap-2 text-left"
                             title="Editar información del proceso"
                         >
-                            <h1 className="truncate text-sm font-bold text-(--color-text) hover:text-brand">
+                            <h1 className="truncate text-sm font-semibold text-fg hover:text-brand">
                                 {meta.name}
                             </h1>
-                            <span
-                                className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${processStatusStyles[meta.status]}`}
-                            >
+                            <Badge tone={processStatusTones[meta.status]} size="sm" caps className="shrink-0">
                                 {processStatusLabels[meta.status]}
-                            </span>
+                            </Badge>
                         </button>
-                        <p className="truncate text-xs text-(--color-text-muted)">
+                        <p className="truncate text-xs text-fg-muted">
                             {meta.code ? `${meta.code} · ` : ''}v{meta.version} · {nodeCount} elementos ·{' '}
                             {edgeCount} conexiones
                             {isDirty ? ' · cambios sin guardar' : ''}
@@ -103,7 +102,7 @@ export default function DesignerToolbar({
                             Suelta sobre el elemento destino · Esc para cancelar
                         </span>
                     ) : null}
-                    <div className="flex items-center overflow-hidden rounded-xl border border-(--color-border)">
+                    <div className="flex items-center overflow-hidden rounded-xl border border-line">
                         <button
                             type="button"
                             onClick={onUndo}
@@ -114,7 +113,7 @@ export default function DesignerToolbar({
                         >
                             ↶
                         </button>
-                        <span className="h-5 w-px bg-(--color-border)" aria-hidden="true" />
+                        <span className="h-5 w-px bg-line" aria-hidden="true" />
                         <button
                             type="button"
                             onClick={onRedo}

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import type { CapturedValue, CellStyle, TemplateCell as Cell } from '../../types'
 import type { IconCatalog } from '../../hooks/useIconCatalog'
+import { PlusIcon, UploadIcon } from '../../../../icons/icons'
 
 // Dibuja UNA celda del template según su tipo (label/field/icon/image) y el modo.
 // El comportamiento depende del TIPO de celda, no de su posición ni su sección.
@@ -19,7 +20,9 @@ function styleToCss(style?: CellStyle): CSSProperties {
   if (!style) return {}
   return {
     background: style.bg,
-    color: style.color,
+    // A band with its own (document) background keeps dark ink in both themes;
+    // otherwise light theme text would disappear on it in dark mode
+    color: style.color ?? (style.bg ? 'var(--color-document-ink)' : undefined),
     fontWeight: style.bold ? 700 : undefined,
     fontStyle: style.italic ? 'italic' : undefined,
     textTransform: style.uppercase ? 'uppercase' : undefined,
@@ -51,7 +54,7 @@ export default function TemplateCell({
   onOpenPicker,
 }: TemplateCellProps) {
   const css = styleToCss(cell.style)
-  const base = 'h-full w-full px-2 py-1.5 text-xs text-(--color-text)'
+  const base = 'h-full w-full px-2 py-1.5 text-xs text-fg'
 
   // ── label ──────────────────────────────────────────────────────────────────
   if (cell.type === 'label') {
@@ -86,9 +89,9 @@ export default function TemplateCell({
     ) : (
       <span
         style={{ width: cell.size.width, height: cell.size.height }}
-        className="flex items-center justify-center rounded-md border border-dashed border-(--color-border) text-[18px] leading-none text-(--color-text-muted)"
+        className="flex items-center justify-center rounded-md border border-dashed border-line text-fg-subtle"
       >
-        {cell.type === 'image' ? '🖼' : '＋'}
+        {cell.type === 'image' ? <UploadIcon className="size-4.5" /> : <PlusIcon className="size-4.5" />}
       </span>
     )
 
@@ -102,7 +105,7 @@ export default function TemplateCell({
             type="button"
             onClick={() => onOpenPicker(cell)}
             title={label ? `${label} — clic para cambiar` : 'Clic para elegir'}
-            className="rounded-md p-0.5 transition-all hover:bg-(--color-bg-soft) hover:ring-2 hover:ring-brand/30 active:scale-[0.97]"
+            className="rounded-md p-0.5 transition-all hover:bg-canvas-subtle hover:ring-2 hover:ring-brand/30 active:scale-[0.97]"
           >
             {content}
           </button>
@@ -174,7 +177,7 @@ function FieldCellView({
       placeholder={cell.placeholder}
       rows={cell.multiline ? 2 : 1}
       style={css}
-      className={`${base} ${align} resize-none whitespace-pre-wrap break-words bg-transparent outline-none placeholder:text-(--color-text-muted) focus:ring-2 focus:ring-highlight/25`}
+      className={`${base} ${align} resize-none whitespace-pre-wrap break-words bg-transparent outline-none placeholder:text-fg-muted focus:ring-2 focus:ring-brand/25`}
     />
   )
 }

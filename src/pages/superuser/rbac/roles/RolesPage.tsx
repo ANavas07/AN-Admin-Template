@@ -4,7 +4,7 @@ import TableTS, { ActionCell, StatusBadge } from '../../../../components/ui/tabl
 import ButtonComponent from '../../../../components/ui/buttons/ButtonComponent'
 import PopUp from '../../../../components/common/pop-up/PopUp'
 import ModuleHeader from '../../../../components/common/page/ModuleHeader'
-import { ShieldIcon, ChartIcon } from '../../../../icons/icons'
+import { ShieldIcon, ChartIcon, LockIcon } from '../../../../icons/icons'
 import RoleFormModal from './RoleFormModal'
 import RolePermissionsPanel from './RolePermissionsPanel'
 import RoleHierarchyTree from './RoleHierarchyTree'
@@ -99,7 +99,7 @@ export default function RolesPage() {
       accessorKey: 'code',
       header: 'Código',
       cell: (info) => (
-        <span className="font-mono text-xs bg-(--color-bg-soft) px-2 py-0.5 rounded">
+        <span className="font-mono text-xs bg-canvas-subtle px-2 py-0.5 rounded">
           {info.getValue() as string}
         </span>
       ),
@@ -115,7 +115,7 @@ export default function RolesPage() {
       cell: ({ row }) =>
         row.original.parentRole
           ? <span className="text-sm">{row.original.parentRole.name}</span>
-          : <span className="text-(--color-text-muted)">—</span>,
+          : <span className="text-fg-muted">—</span>,
     },
     {
       accessorKey: 'isSystem',
@@ -123,7 +123,7 @@ export default function RolesPage() {
       cell: (info) =>
         info.getValue()
           ? <StatusBadge value="Sistema" />
-          : <span className="text-(--color-text-muted) text-xs">—</span>,
+          : <span className="text-fg-muted text-xs">—</span>,
     },
     {
       accessorKey: 'createdAt',
@@ -145,9 +145,9 @@ export default function RolesPage() {
             {role.isSystem && (
               <span
                 title="Rol protegido del sistema"
-                className="ml-1 text-xs text-(--color-text-muted)"
+                className="ml-1 inline-flex text-fg-subtle"
               >
-                🔒
+                <LockIcon className="size-3.5" />
               </span>
             )}
           </div>
@@ -236,9 +236,9 @@ export default function RolesPage() {
           </>
         }
       >
-        <p className="text-sm text-(--color-text-muted)">
+        <p className="text-sm text-fg-muted">
           Se eliminará el rol{' '}
-          <span className="font-semibold text-(--color-text)">{deleteTarget?.name}</span>
+          <span className="font-semibold text-fg">{deleteTarget?.name}</span>
           {' '}(código:{' '}
           <span className="font-mono text-xs">{deleteTarget?.code}</span>
           ). Los usuarios y grupos que lo tenían asignado perderán este rol.

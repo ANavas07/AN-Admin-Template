@@ -105,13 +105,13 @@ export default function GroupRolesPanel({
       size="md"
       footer={<ButtonComponent variant="outline" onClick={onClose}>Cerrar</ButtonComponent>}
     >
-      <div className="mb-4 rounded-lg border border-brand/20 bg-brand/5 px-3 py-2 text-xs text-brand dark:text-blue-300">
-        ℹ️ Los roles asignados aquí se heredan automáticamente a todos los miembros del grupo.
+      <div className="mb-4 rounded-lg border border-brand/20 bg-brand-soft px-3 py-2 text-xs text-brand-strong">
+        Los roles asignados aquí se heredan automáticamente a todos los miembros del grupo.
       </div>
 
       {/* Agregar rol */}
-      <div className="mb-5 rounded-xl border border-(--color-border) bg-(--color-bg-soft) p-4 space-y-3">
-        <p className="text-sm font-semibold text-(--color-text)">Asignar rol al grupo</p>
+      <div className="mb-5 rounded-xl border border-line bg-canvas-subtle p-4 space-y-3">
+        <p className="text-sm font-semibold text-fg">Asignar rol al grupo</p>
         <div className="flex gap-2">
           <div className="flex-1">
             <DataList
@@ -143,9 +143,9 @@ export default function GroupRolesPanel({
 
       {/* Roles actuales */}
       {loading ? (
-        <p className="text-sm text-(--color-text-muted) text-center py-4">Cargando roles...</p>
+        <p className="text-sm text-fg-muted text-center py-4">Cargando roles...</p>
       ) : groupRoles.length === 0 ? (
-        <p className="text-sm text-(--color-text-muted) text-center py-4">
+        <p className="text-sm text-fg-muted text-center py-4">
           No hay roles asignados a este grupo.
         </p>
       ) : (
@@ -153,11 +153,11 @@ export default function GroupRolesPanel({
           {groupRoles.map((gr) => (
             <div
               key={gr.roleId}
-              className="flex items-center justify-between gap-2 rounded-lg border border-(--color-border) px-3 py-2.5"
+              className="flex items-center justify-between gap-2 rounded-lg border border-line px-3 py-2.5"
             >
               <div className="min-w-0">
-                <p className="text-sm font-medium text-(--color-text) truncate">{gr.role.name}</p>
-                <p className="font-mono text-xs text-(--color-text-muted)">{gr.role.code}</p>
+                <p className="text-sm font-medium text-fg truncate">{gr.role.name}</p>
+                <p className="font-mono text-xs text-fg-muted">{gr.role.code}</p>
               </div>
               <ButtonComponent
                 size="icon"
@@ -167,7 +167,7 @@ export default function GroupRolesPanel({
                 aria-label={`Remover rol ${gr.role.name}`}
                 title="Remover rol"
               >
-                <TrashBinIcon className="h-4 w-4 text-rose-600 dark:text-rose-400" />
+                <TrashBinIcon className="size-4 text-danger" />
               </ButtonComponent>
             </div>
           ))}

@@ -34,25 +34,21 @@ export type ButtonComponentProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-    primary:
-        'border-transparent bg-brand text-white shadow-sm hover:bg-brand/90 focus-visible:ring-brand/30',
+    primary: 'border-transparent bg-brand-solid text-on-solid shadow-xs hover:bg-brand-solid/90 focus-visible:ring-brand/30',
     secondary:
-        'border-transparent bg-highlight text-white shadow-sm hover:bg-highlight/90 focus-visible:ring-highlight/30',
+        'border-line bg-canvas-subtle text-fg hover:border-line-strong hover:bg-canvas-subtle/70 focus-visible:ring-brand/25',
     outline:
-        'border-(--color-border) bg-(--color-surface) text-(--color-text) hover:border-brand hover:text-brand focus-visible:ring-brand/25',
-    ghost:
-        'border-transparent bg-transparent text-(--color-text) hover:bg-(--color-bg-soft) hover:text-brand focus-visible:ring-brand/25',
-    danger:
-        'border-transparent bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500/30 dark:bg-red-500 dark:hover:bg-red-600',
-    success:
-        'border-transparent bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 focus-visible:ring-emerald-500/30 dark:bg-emerald-500 dark:hover:bg-emerald-600',
+        'border-line bg-surface text-fg shadow-xs hover:border-line-strong hover:bg-canvas-subtle/60 focus-visible:ring-brand/25',
+    ghost: 'border-transparent bg-transparent text-fg-muted hover:bg-canvas-subtle hover:text-fg focus-visible:ring-brand/25',
+    danger: 'border-transparent bg-danger-solid text-on-solid shadow-xs hover:bg-danger-solid/90 focus-visible:ring-danger/30',
+    success: 'border-transparent bg-success-solid text-on-solid shadow-xs hover:bg-success-solid/90 focus-visible:ring-success/30',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
-    sm: 'h-9 px-3 text-xs',
-    md: 'h-11 px-4 text-sm',
-    lg: 'h-12 px-5 text-base',
-    icon: 'h-10 w-10 p-0 text-sm',
+    sm: 'h-8 px-3 text-xs',
+    md: 'h-9 px-3.5 text-sm',
+    lg: 'h-11 px-5 text-sm',
+    icon: 'h-9 w-9 p-0 text-sm',
 }
 
 const spinnerSizeClasses: Record<ButtonSize, string> = {
@@ -118,12 +114,12 @@ const ButtonComponent = forwardRef<HTMLButtonElement, ButtonComponentProps>(
                 {...linkProps}
                 aria-busy={isLoading}
                 className={cn(
-                    'inline-flex items-center justify-center gap-2 rounded-xl border font-semibold',
-                    'transition-all duration-200 ease-out',
-                    'focus-visible:outline-none focus-visible:ring-4',
-                    'disabled:cursor-not-allowed disabled:opacity-60',
-                    'active:scale-[0.98]',
-                    fullWidth ? 'w-full' : 'w-auto',
+                    'inline-flex items-center justify-center gap-2 rounded-md border font-medium',
+                    'transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-3',
+                    'disabled:cursor-not-allowed disabled:opacity-55',
+                    // Icon-only buttons are square: their width comes from sizeClasses.icon
+                    fullWidth ? 'w-full' : !isIconOnly && 'w-auto',
                     sizeClasses[size],
                     variantClasses[variant],
                     className

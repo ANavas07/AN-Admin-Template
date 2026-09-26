@@ -609,17 +609,17 @@ export default function ProcessDesigner() {
 
     if (loadState === 'loading') {
         return (
-            <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-(--color-bg)">
-                <p className="text-sm text-(--color-text-muted)">Cargando proceso…</p>
+            <div className="flex h-[calc(100vh-var(--layout-navbar-height))] items-center justify-center bg-canvas">
+                <p className="text-sm text-fg-muted">Cargando proceso…</p>
             </div>
         )
     }
 
     if (loadState === 'missing' || !record) {
         return (
-            <div className="flex h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 bg-(--color-bg)">
-                <FlowIcon className="size-10 text-(--color-text-muted)" />
-                <p className="text-sm font-semibold text-(--color-text)">El proceso no existe o fue eliminado.</p>
+            <div className="flex h-[calc(100vh-var(--layout-navbar-height))] flex-col items-center justify-center gap-4 bg-canvas">
+                <FlowIcon className="size-10 text-fg-muted" />
+                <p className="text-sm font-semibold text-fg">El proceso no existe o fue eliminado.</p>
                 <ButtonComponent variant="primary" size="sm" onClick={() => navigate('/process')}>
                     Volver al repositorio
                 </ButtonComponent>
@@ -628,7 +628,7 @@ export default function ProcessDesigner() {
     }
 
     return (
-        <div ref={rootRef} className="relative flex h-[calc(100vh-4rem)] flex-col bg-(--color-bg)">
+        <div ref={rootRef} className="relative flex h-[calc(100vh-var(--layout-navbar-height))] flex-col bg-canvas">
             <DesignerToolbar
                 meta={record.meta}
                 nodeCount={nodes.length}
@@ -667,7 +667,7 @@ export default function ProcessDesigner() {
                             height: CANVAS_HEIGHT,
                             transform: `translate(${viewport.tx}px, ${viewport.ty}px) scale(${viewport.scale})`,
                             transformOrigin: '0 0',
-                            backgroundImage: 'radial-gradient(circle, var(--color-border) 1px, transparent 1px)',
+                            backgroundImage: 'radial-gradient(circle, var(--color-line) 1px, transparent 1px)',
                             backgroundSize: '24px 24px',
                         }}
                     >
@@ -706,12 +706,12 @@ export default function ProcessDesigner() {
                         ))}
 
                         {nodes.length === 0 ? (
-                            <div className="pointer-events-none absolute left-105 top-48 w-80 rounded-3xl border border-dashed border-(--color-border) bg-(--color-surface)/80 p-8 text-center backdrop-blur">
-                                <FlowIcon className="mx-auto size-8 text-(--color-text-muted)" />
-                                <p className="mt-3 text-sm font-semibold text-(--color-text)">
+                            <div className="pointer-events-none absolute left-105 top-48 w-80 rounded-3xl border border-dashed border-line-strong bg-surface p-8 text-center">
+                                <FlowIcon className="mx-auto size-8 text-fg-muted" />
+                                <p className="mt-3 text-sm font-semibold text-fg">
                                     El lienzo está vacío
                                 </p>
-                                <p className="mt-1 text-xs text-(--color-text-muted)">
+                                <p className="mt-1 text-xs text-fg-muted">
                                     Agrega elementos desde la paleta BPMN, genera una propuesta con IA o importa un
                                     diagrama guardado.
                                 </p>
@@ -738,7 +738,7 @@ export default function ProcessDesigner() {
                 </div>
 
                 <aside
-                    className="hidden w-80 shrink-0 overflow-y-auto border-l border-(--color-border) bg-(--color-surface) lg:block"
+                    className="hidden w-80 shrink-0 overflow-y-auto border-l border-line bg-surface lg:block"
                     onPointerDown={(event) => event.stopPropagation()}
                 >
                     <PropertiesPanel

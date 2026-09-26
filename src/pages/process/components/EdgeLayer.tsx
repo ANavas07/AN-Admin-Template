@@ -37,7 +37,7 @@ export default function EdgeLayer({
             >
                 <defs>
                     <marker id="flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                        <path d="M 0 0 L 10 5 L 0 10 z" className="fill-(--color-text-muted)" />
+                        <path d="M 0 0 L 10 5 L 0 10 z" className="fill-fg-muted" />
                     </marker>
                     <marker id="flow-arrow-active" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                         <path d="M 0 0 L 10 5 L 0 10 z" className="fill-brand" />
@@ -67,7 +67,7 @@ export default function EdgeLayer({
                                 fill="none"
                                 strokeWidth={isSelected ? 2.5 : 1.8}
                                 strokeDasharray={isDashed ? '5 4' : undefined}
-                                className={isSelected ? 'stroke-brand' : 'stroke-(--color-text-muted)'}
+                                className={isSelected ? 'stroke-brand' : 'stroke-fg-muted'}
                                 markerEnd={isSelected ? 'url(#flow-arrow-active)' : 'url(#flow-arrow)'}
                                 style={{ pointerEvents: 'none' }}
                             />
@@ -92,7 +92,7 @@ export default function EdgeLayer({
                 .map(({ edge, midX, midY }) => (
                     <span
                         key={`label-${edge.id}`}
-                        className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-(--color-border) bg-(--color-surface) px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-(--color-text) shadow-sm"
+                        className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-line bg-surface px-2 py-0.5 text-3xs font-bold uppercase tracking-caps text-fg shadow-sm"
                         style={{ left: midX, top: midY, zIndex: 4 }}
                     >
                         {edge.label}
@@ -104,7 +104,7 @@ export default function EdgeLayer({
                     type="button"
                     onPointerDown={(event) => event.stopPropagation()}
                     onClick={() => onRemoveEdge(selectedRoute.edge.id)}
-                    className="absolute z-20 inline-flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-(--color-border) bg-(--color-surface) text-rose-600 shadow-md transition-transform hover:scale-110 dark:text-rose-300"
+                    className="absolute z-20 inline-flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-surface text-danger shadow-md transition-colors hover:bg-danger-soft"
                     style={{
                         left: selectedRoute.midX,
                         top: selectedRoute.midY - (selectedRoute.edge.label ? 22 : 0),

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import PopUp from '../../../../components/common/pop-up/PopUp'
 import ButtonComponent from '../../../../components/ui/buttons/ButtonComponent'
 import type { Role } from '../types'
+import { LockIcon } from '../../../../icons/icons'
 
 interface RoleHierarchyTreeProps {
   isOpen: boolean
@@ -40,7 +41,7 @@ function TreeNode({ node, depth }: TreeNodeProps) {
   return (
     <div>
       <div
-        className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-(--color-bg-soft) ${
+        className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-canvas-subtle ${
           depth === 0 ? 'font-semibold' : ''
         }`}
         style={{ paddingLeft: `${depth * 20 + 12}px` }}
@@ -50,7 +51,7 @@ function TreeNode({ node, depth }: TreeNodeProps) {
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
-            className="shrink-0 text-(--color-text-muted) transition-transform"
+            className="shrink-0 text-fg-muted transition-transform"
             aria-label={expanded ? 'Colapsar' : 'Expandir'}
           >
             <svg
@@ -65,25 +66,25 @@ function TreeNode({ node, depth }: TreeNodeProps) {
             </svg>
           </button>
         ) : (
-          <span className="w-3.5 shrink-0 text-(--color-text-muted)">·</span>
+          <span className="w-3.5 shrink-0 text-fg-muted">·</span>
         )}
 
         {/* Role info */}
         <div className="flex flex-1 items-center justify-between gap-2 min-w-0">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-sm text-(--color-text) truncate">{node.name}</span>
+            <span className="text-sm text-fg truncate">{node.name}</span>
             {node.isSystem && (
-              <span className="shrink-0 text-xs text-(--color-text-muted)" title="Rol de sistema">
-                🔒
+              <span className="shrink-0 text-fg-subtle" title="Rol de sistema">
+                <LockIcon className="size-3.5" />
               </span>
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="font-mono text-xs text-(--color-text-muted) hidden sm:block">
+            <span className="font-mono text-xs text-fg-muted hidden sm:block">
               {node.code}
             </span>
             {typeof node.permissionCount === 'number' && (
-              <span className="text-xs text-(--color-text-muted)">
+              <span className="text-xs text-fg-muted">
                 {node.permissionCount} perm.
               </span>
             )}
@@ -95,7 +96,7 @@ function TreeNode({ node, depth }: TreeNodeProps) {
       {expanded && hasChildren && (
         <div className="relative">
           <div
-            className="absolute left-0 top-0 bottom-0 w-px bg-(--color-border)"
+            className="absolute left-0 top-0 bottom-0 w-px bg-line"
             style={{ left: `${depth * 20 + 19}px` }}
             aria-hidden="true"
           />
@@ -124,7 +125,7 @@ export default function RoleHierarchyTree({ isOpen, roles, onClose }: RoleHierar
     >
       <div className="max-h-[60vh] overflow-y-auto -mx-2">
         {tree.length === 0 ? (
-          <p className="text-sm text-(--color-text-muted) text-center py-4">
+          <p className="text-sm text-fg-muted text-center py-4">
             No hay roles para mostrar.
           </p>
         ) : (

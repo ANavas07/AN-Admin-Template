@@ -28,7 +28,7 @@ export default function Minimap({ nodes, boxOf, viewport, viewportSize, onNaviga
     return (
         <div
             onPointerDown={handlePointerDown}
-            className="absolute bottom-4 right-4 z-30 hidden cursor-pointer overflow-hidden rounded-xl border border-(--color-border) bg-(--color-surface)/90 shadow-lg backdrop-blur md:block"
+            className="absolute bottom-4 right-4 z-30 hidden cursor-pointer overflow-hidden rounded-lg border border-line bg-surface shadow-md md:block"
             style={{ width: MINIMAP_WIDTH, height: MINIMAP_HEIGHT }}
             role="img"
             aria-label="Vista general del diagrama — clic para mover la vista"

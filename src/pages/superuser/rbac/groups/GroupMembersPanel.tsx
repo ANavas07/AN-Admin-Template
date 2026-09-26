@@ -116,8 +116,8 @@ export default function GroupMembersPanel({
       footer={<ButtonComponent variant="outline" onClick={onClose}>Cerrar</ButtonComponent>}
     >
       {/* Agregar miembro */}
-      <div className="mb-5 rounded-xl border border-(--color-border) bg-(--color-bg-soft) p-4 space-y-3">
-        <p className="text-sm font-semibold text-(--color-text)">Agregar miembro</p>
+      <div className="mb-5 rounded-xl border border-line bg-canvas-subtle p-4 space-y-3">
+        <p className="text-sm font-semibold text-fg">Agregar miembro</p>
 
         {/* Búsqueda de usuario */}
         <div className="flex gap-2">
@@ -186,34 +186,34 @@ export default function GroupMembersPanel({
 
       {/* Tabla de miembros */}
       {loading ? (
-        <p className="text-sm text-(--color-text-muted) text-center py-4">Cargando miembros...</p>
+        <p className="text-sm text-fg-muted text-center py-4">Cargando miembros...</p>
       ) : members.length === 0 ? (
-        <p className="text-sm text-(--color-text-muted) text-center py-4">
+        <p className="text-sm text-fg-muted text-center py-4">
           No hay miembros en este grupo.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-(--color-border)">
+        <div className="overflow-x-auto rounded-xl border border-line">
           <table className="min-w-full text-sm">
-            <thead className="bg-(--color-bg-soft) border-b border-(--color-border)">
+            <thead className="bg-canvas-subtle border-b border-line">
               <tr>
                 {['Username', 'Asignado', 'Vigencia', ''].map((h) => (
                   <th
                     key={h}
-                    className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-(--color-text-muted)"
+                    className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-caps text-fg-muted"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-(--color-border)">
+            <tbody className="divide-y divide-line">
               {members.map((m) => (
-                <tr key={m.userId} className="hover:bg-(--color-bg-soft)/50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-(--color-text)">{m.username}</td>
-                  <td className="px-4 py-3 text-(--color-text-muted)">
+                <tr key={m.userId} className="hover:bg-canvas-subtle/50 transition-colors">
+                  <td className="px-4 py-3 font-medium text-fg">{m.username}</td>
+                  <td className="px-4 py-3 text-fg-muted">
                     {new Date(m.assignedAt).toLocaleDateString('es-CO')}
                   </td>
-                  <td className="px-4 py-3 text-(--color-text-muted)">
+                  <td className="px-4 py-3 text-fg-muted">
                     {m.validUntil
                       ? new Date(m.validUntil).toLocaleDateString('es-CO')
                       : 'Indefinida'}
@@ -227,7 +227,7 @@ export default function GroupMembersPanel({
                       aria-label={`Remover a ${m.username}`}
                       title="Remover miembro"
                     >
-                      <TrashBinIcon className="h-4 w-4 text-rose-600 dark:text-rose-400" />
+                      <TrashBinIcon className="size-4 text-danger" />
                     </ButtonComponent>
                   </td>
                 </tr>

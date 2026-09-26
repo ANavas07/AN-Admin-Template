@@ -4,9 +4,10 @@ import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
 import InputComponent from '../../components/ui/inputs/InputComponent'
 import PopUp from '../../components/common/pop-up/PopUp'
 import ModuleHeader from '../../components/common/page/ModuleHeader'
-import { FlowIcon, PlusIcon, TrashBinIcon } from '../../icons/icons'
+import { FileDocIcon, FlowIcon, PlusIcon, TrashBinIcon, UserIcon } from '../../icons/icons'
 import { processService } from '../../services/process/process.service'
-import { processStatusFlow, processStatusLabels, processStatusStyles } from './types'
+import Badge from '../../components/ui/badge/Badge'
+import { processStatusFlow, processStatusLabels, processStatusTones } from './types'
 import type { ProcessStatus, ProcessSummary } from './types'
 import { formatDate } from './format'
 
@@ -78,7 +79,7 @@ export default function ProcessRepository() {
     }
 
     return (
-        <div className="min-h-[calc(100vh-4rem)] bg-(--color-bg)">
+        <div className="min-h-[calc(100vh-var(--layout-navbar-height))] bg-canvas">
             <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
                 <ModuleHeader
                     eyebrow="Gestión de procesos"
@@ -114,7 +115,7 @@ export default function ProcessRepository() {
                             className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                                 statusFilter === 'all'
                                     ? 'border-brand bg-brand-soft text-brand'
-                                    : 'border-(--color-border) bg-(--color-surface) text-(--color-text-muted) hover:text-(--color-text)'
+                                    : 'border-line bg-surface text-fg-muted hover:text-fg'
                             }`}
                         >
                             Todos
@@ -127,7 +128,7 @@ export default function ProcessRepository() {
                                 className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                                     statusFilter === status
                                         ? 'border-brand bg-brand-soft text-brand'
-                                        : 'border-(--color-border) bg-(--color-surface) text-(--color-text-muted) hover:text-(--color-text)'
+                                        : 'border-line bg-surface text-fg-muted hover:text-fg'
                                 }`}
                             >
                                 {processStatusLabels[status]}
@@ -137,7 +138,7 @@ export default function ProcessRepository() {
                             <select
                                 value={categoryFilter}
                                 onChange={(event) => setCategoryFilter(event.target.value)}
-                                className="rounded-full border border-(--color-border) bg-(--color-surface) px-3 py-1.5 text-xs font-semibold text-(--color-text-muted) focus:border-highlight focus:outline-none"
+                                className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-fg-muted focus:border-brand focus:outline-none"
                                 aria-label="Filtrar por categoría"
                             >
                                 <option value="all">Todas las categorías</option>
@@ -153,14 +154,14 @@ export default function ProcessRepository() {
 
                 {/* Process cards */}
                 {loading ? (
-                    <p className="py-16 text-center text-sm text-(--color-text-muted)">Cargando procesos…</p>
+                    <p className="py-16 text-center text-sm text-fg-muted">Cargando procesos…</p>
                 ) : filtered.length === 0 ? (
-                    <div className="rounded-3xl border border-dashed border-(--color-border) bg-(--color-surface)/60 py-16 text-center">
-                        <FlowIcon className="mx-auto size-10 text-(--color-text-muted)" />
-                        <p className="mt-4 text-sm font-semibold text-(--color-text)">
+                    <div className="rounded-3xl border border-dashed border-line bg-surface/60 py-16 text-center">
+                        <FlowIcon className="mx-auto size-10 text-fg-muted" />
+                        <p className="mt-4 text-sm font-semibold text-fg">
                             {processes.length === 0 ? 'Aún no hay procesos en el repositorio' : 'Ningún proceso coincide con la búsqueda'}
                         </p>
-                        <p className="mt-1 text-xs text-(--color-text-muted)">
+                        <p className="mt-1 text-xs text-fg-muted">
                             {processes.length === 0
                                 ? 'Crea tu primer proceso para empezar a construir el conocimiento de la organización.'
                                 : 'Ajusta la búsqueda o los filtros para encontrar lo que necesitas.'}
@@ -182,42 +183,51 @@ export default function ProcessRepository() {
                         {filtered.map((process) => (
                             <article
                                 key={process.id}
-                                className="flex flex-col rounded-3xl border border-(--color-border) bg-(--color-surface) p-5 shadow-sm transition-shadow hover:shadow-md"
+                                className="card-interactive flex flex-col p-5"
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0">
-                                        <h2 className="truncate text-base font-bold text-(--color-text)" title={process.name}>
+                                        <h2 className="truncate text-sm font-semibold text-fg" title={process.name}>
                                             {process.name}
                                         </h2>
-                                        <p className="mt-0.5 text-xs text-(--color-text-muted)">
+                                        <p className="mt-0.5 text-xs text-fg-muted">
                                             {process.code ? `${process.code} · ` : ''}
                                             {process.area || 'Sin área'} · v{process.version}
                                         </p>
                                     </div>
-                                    <span
-                                        className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${processStatusStyles[process.status]}`}
-                                    >
+                                    <Badge tone={processStatusTones[process.status]} size="sm" caps className="shrink-0">
                                         {processStatusLabels[process.status]}
-                                    </span>
+                                    </Badge>
                                 </div>
 
                                 {process.description ? (
-                                    <p className="mt-3 line-clamp-2 text-xs leading-5 text-(--color-text-muted)">
+                                    <p className="mt-3 line-clamp-2 text-xs leading-5 text-fg-muted">
                                         {process.description}
                                     </p>
                                 ) : null}
 
-                                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-(--color-text-muted)">
-                                    <span>🧩 {process.elementCount} elementos</span>
-                                    <span>📎 {process.documentCount} documentos</span>
-                                    {process.responsible ? <span>👤 {process.responsible}</span> : null}
+                                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-muted">
+                                    <span className="inline-flex items-center gap-1.5">
+                                        <FlowIcon className="size-3.5" />
+                                        {process.elementCount} elementos
+                                    </span>
+                                    <span className="inline-flex items-center gap-1.5">
+                                        <FileDocIcon className="size-3.5" />
+                                        {process.documentCount} documentos
+                                    </span>
+                                    {process.responsible ? (
+                                        <span className="inline-flex items-center gap-1.5">
+                                            <UserIcon className="size-3.5" />
+                                            {process.responsible}
+                                        </span>
+                                    ) : null}
                                 </div>
 
-                                <p className="mt-2 text-[11px] text-(--color-text-muted)">
+                                <p className="mt-2 text-2xs text-fg-muted">
                                     Actualizado: {formatDate(process.updatedAt)}
                                 </p>
 
-                                <div className="mt-4 flex items-center gap-2 border-t border-(--color-border) pt-4">
+                                <div className="mt-4 flex items-center gap-2 border-t border-line pt-4">
                                     <ButtonComponent
                                         variant="primary"
                                         size="sm"
@@ -231,7 +241,7 @@ export default function ProcessRepository() {
                                     <button
                                         type="button"
                                         onClick={() => setDeleteTarget(process)}
-                                        className="ml-auto rounded-lg p-2 text-rose-600 transition-colors hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-900/30"
+                                        className="ml-auto rounded-lg p-2 text-danger transition-colors hover:bg-danger-soft"
                                         aria-label={`Eliminar ${process.name}`}
                                         title="Eliminar proceso"
                                     >

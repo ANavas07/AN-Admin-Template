@@ -6,6 +6,7 @@ import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
 import ModuleHeader from '../../components/common/page/ModuleHeader'
 import type { FormConfig, FormValues } from '../../components/common/forms/FormRender'
 import { PlusIcon, UsersIcon, CheckIcon, ShieldIcon } from '../../icons/icons'
+import Avatar from '../../components/ui/avatar/Avatar'
 
 type UserStatus = 'active' | 'pending' | 'inactive'
 type UserRole = 'Administrator' | 'Organizer' | 'Analyst' | 'Viewer'
@@ -32,41 +33,19 @@ const initialUsers: AppUser[] = [
     { id: 'u-08', name: 'Sofia Torres', email: 'sofia@tournaments.com', role: 'Organizer', status: 'active', joinDate: '2025-06-27' },
 ]
 
-const avatarPalette = [
-    'bg-emerald-600',
-    'bg-sky-600',
-    'bg-violet-600',
-    'bg-amber-600',
-    'bg-rose-600',
-    'bg-teal-600',
-]
-
-function avatarColor(name: string) {
-    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-    return avatarPalette[hash % avatarPalette.length]
-}
-
-function initials(name: string) {
-    return name
-        .split(' ')
-        .slice(0, 2)
-        .map((part) => part.charAt(0).toUpperCase())
-        .join('')
-}
-
 function formatDate(isoDate: string) {
     return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(`${isoDate}T00:00:00`))
 }
 
 function StatTile({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
     return (
-        <div className="flex items-center gap-4 rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 shadow-sm">
+        <div className="flex items-center gap-4 card p-4">
             <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-soft text-brand">
                 {icon}
             </span>
             <div>
-                <p className="text-2xl font-bold leading-7 text-(--color-text)">{value}</p>
-                <p className="text-xs font-medium uppercase tracking-wide text-(--color-text-muted)">{label}</p>
+                <p className="text-2xl font-semibold leading-7 text-fg">{value}</p>
+                <p className="text-xs font-medium uppercase tracking-caps text-fg-muted">{label}</p>
             </div>
         </div>
     )
@@ -195,14 +174,10 @@ export default function UserManagement() {
                 header: 'User',
                 cell: ({ row }) => (
                     <div className="flex items-center gap-3">
-                        <span
-                            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${avatarColor(row.original.name)}`}
-                        >
-                            {initials(row.original.name)}
-                        </span>
+                        <Avatar name={row.original.name} />
                         <div className="min-w-0">
-                            <p className="font-semibold text-(--color-text)">{row.original.name}</p>
-                            <p className="text-xs text-(--color-text-muted)">{row.original.email}</p>
+                            <p className="font-semibold text-fg">{row.original.name}</p>
+                            <p className="text-xs text-fg-muted">{row.original.email}</p>
                         </div>
                     </div>
                 ),
@@ -211,7 +186,7 @@ export default function UserManagement() {
                 accessorKey: 'role',
                 header: 'Role',
                 cell: ({ getValue }) => (
-                    <span className="inline-flex items-center rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold text-(--color-text)">
+                    <span className="inline-flex items-center rounded-full border border-line bg-canvas-subtle px-3 py-1 text-xs font-semibold text-fg">
                         {getValue<string>()}
                     </span>
                 ),
@@ -225,7 +200,7 @@ export default function UserManagement() {
                 accessorKey: 'joinDate',
                 header: 'Joined',
                 cell: ({ getValue }) => (
-                    <span className="text-(--color-text-muted)">{formatDate(getValue<string>())}</span>
+                    <span className="text-fg-muted">{formatDate(getValue<string>())}</span>
                 ),
             },
             {
@@ -244,7 +219,7 @@ export default function UserManagement() {
     )
 
     return (
-        <div className="min-h-[calc(100vh-4rem)] bg-(--color-bg)">
+        <div className="min-h-[calc(100vh-var(--layout-navbar-height))] bg-canvas">
             <div className="mx-auto max-w-350 space-y-6 px-4 py-8 sm:px-6 lg:px-8">
                 <ModuleHeader
                     eyebrow="Users module"

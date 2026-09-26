@@ -33,7 +33,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-(--color-bg) text-(--color-text) transition-colors duration-300">
+    <div className="min-h-screen bg-canvas text-fg transition-colors duration-300">
       {shouldShowNavbar ? (
         <Navbar
           isDarkMode={isDarkMode}

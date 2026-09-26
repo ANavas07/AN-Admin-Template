@@ -23,8 +23,8 @@ export default function GanttStandalone() {
     const links = [{ id: 1, source: 2, target: 3, type: "e2s" }];
 
     return (
-        <main className="h-[calc(100vh-4rem)] flex-1 min-h-0 overflow-hidden bg-(--color-bg) p-0">
-            <section className="h-full overflow-hidden rounded-none border-0 bg-(--color-surface) shadow-none">
+        <main className="h-[calc(100vh-var(--layout-navbar-height))] flex-1 min-h-0 overflow-hidden bg-canvas p-0">
+            <section className="h-full overflow-hidden rounded-none border-0 bg-surface shadow-none">
                 <GanttDiagram
                     tasks={tasks}
                     links={links}

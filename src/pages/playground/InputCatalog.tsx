@@ -3,6 +3,8 @@ import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
 import DataList from '../../components/ui/inputs/DataList'
 import InputComponent from '../../components/ui/inputs/InputComponent'
 import Select from '../../components/ui/inputs/Select'
+import { CatalogHeader } from './components/CatalogLayout'
+import { ArrowRightIcon, CheckIcon, PlusIcon, SearchIcon, SettingsIcon, TrashBinIcon } from '../../icons/icons'
 
 type TournamentOption = {
     id: string
@@ -40,9 +42,9 @@ const options: TournamentOption[] = [
 
 function Block({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
     return (
-        <article className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 shadow-sm">
-            <h3 className="text-base font-semibold text-(--color-text)">{title}</h3>
-            <p className="mt-1 text-sm text-(--color-text-muted)">{description}</p>
+        <article className="card p-5">
+            <h3 className="text-base font-semibold text-fg">{title}</h3>
+            <p className="mt-1 text-sm text-fg-muted">{description}</p>
             <div className="mt-4">{children}</div>
         </article>
     )
@@ -65,43 +67,31 @@ export default function InputCatalogPlayground() {
 
     return (
         <main className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            <section className="relative overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) p-6 shadow-sm sm:p-10">
-                <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand-soft blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-20 left-10 h-56 w-56 rounded-full bg-highlight-soft blur-3xl" />
+            <CatalogHeader
+                title="Catalogo de Componentes"
+                description="Ejemplos por caso real: busqueda, formulario, estados y tamanos."
+            />
 
-                <div className="relative">
-                    <p className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
-                        Playground
-                    </p>
-                    <h1 className="mt-4 max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
-                        Catalogo de Componentes
-                    </h1>
-                    <p className="mt-3 max-w-2xl text-sm text-(--color-text-muted) sm:text-base">
-                        Ejemplos por caso real: busqueda, formulario, estados y tamanos.
-                    </p>
-                </div>
-            </section>
-
-            <h1 className='font-bold text-3xl sm:text-4xl mt-2' >Botones</h1>
+            <h2 className="mt-8 text-lg font-semibold text-fg">Botones</h2>
             <section className="mt-8 grid gap-4 lg:grid-cols-2">
                 <Block
                     title="Botones reutilizables"
                     description="Variantes principales con iconos a la izquierda o derecha."
                 >
                     <div className="flex flex-wrap gap-3">
-                        <ButtonComponent leftIcon="＋">
+                        <ButtonComponent leftIcon={<PlusIcon className="size-4" />}>
                             Crear torneo
                         </ButtonComponent>
-                        <ButtonComponent variant="secondary" rightIcon="→">
+                        <ButtonComponent variant="secondary" rightIcon={<ArrowRightIcon className="size-4" />}>
                             Ver reportes
                         </ButtonComponent>
-                        <ButtonComponent variant="outline" leftIcon="🔎">
+                        <ButtonComponent variant="outline" leftIcon={<SearchIcon className="size-4" />}>
                             Buscar
                         </ButtonComponent>
-                        <ButtonComponent variant="ghost" rightIcon="⚙️">
+                        <ButtonComponent variant="ghost" rightIcon={<SettingsIcon className="size-4" />}>
                             Configurar
                         </ButtonComponent>
-                        <ButtonComponent variant="danger" leftIcon="🗑️">
+                        <ButtonComponent variant="danger" leftIcon={<TrashBinIcon className="size-4" />}>
                             Eliminar
                         </ButtonComponent>
                     </div>
@@ -112,7 +102,7 @@ export default function InputCatalogPlayground() {
                     description="Soporta ancho completo, loading, disabled y boton solo icono."
                 >
                     <div className="space-y-3">
-                        <ButtonComponent size="sm" variant="outline" leftIcon="✓">
+                        <ButtonComponent size="sm" variant="outline" leftIcon={<CheckIcon className="size-3.5" />}>
                             Guardar cambios
                         </ButtonComponent>
                         <ButtonComponent
@@ -122,17 +112,17 @@ export default function InputCatalogPlayground() {
                         >
                             Procesar inscripcion
                         </ButtonComponent>
-                        <ButtonComponent disabled variant="secondary" rightIcon="→">
+                        <ButtonComponent disabled variant="secondary" rightIcon={<ArrowRightIcon className="size-4" />}>
                             Accion bloqueada
                         </ButtonComponent>
                         <ButtonComponent size="icon" variant="ghost" aria-label="Abrir filtros">
-                            ⚙️
+                            <SettingsIcon className="size-4.5" />
                         </ButtonComponent>
                     </div>
                 </Block>
             </section>
 
-            <h1 className='font-bold text-3xl sm:text-4xl mt-2' >Inputs</h1>
+            <h2 className="mt-8 text-lg font-semibold text-fg">Inputs</h2>
             <section className="mt-8 grid gap-4 lg:grid-cols-2">
 
                 <Block
@@ -233,9 +223,9 @@ export default function InputCatalogPlayground() {
                             onSelect={(event) => setTournamentValue(event.target.value)}
                         />
 
-                        <div className="rounded-lg border border-(--color-border) bg-(--color-bg-soft) px-3 py-2 text-xs text-(--color-text-muted)">
+                        <div className="rounded-lg border border-line bg-canvas-subtle px-3 py-2 text-xs text-fg-muted">
                             Valor seleccionado:{' '}
-                            <span className="font-semibold text-(--color-text)">
+                            <span className="font-semibold text-fg">
                                 {tournamentValue || 'ninguno'}
                             </span>
                         </div>

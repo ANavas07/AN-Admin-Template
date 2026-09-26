@@ -1,4 +1,5 @@
 // Visual + BPMN layer of the diagram. Semantic process-level types live in ./types.
+import { toneBorder, toneSolid } from '../../components/ui/tone'
 export type NodeKind =
     | 'task'
     | 'start'
@@ -108,17 +109,22 @@ export const MAX_SCALE = 2.5
 /** Legacy single-diagram storage key (pre-repository). Migrated by processService. */
 export const LEGACY_STORAGE_KEY = 'process-designer-diagram'
 
-export const nodeColorStyles: Record<
-    NodeColor,
-    { bar: string; border: string; swatch: string; soft: string }
-> = {
-    emerald: { bar: 'bg-emerald-500', border: 'border-emerald-500', swatch: 'bg-emerald-500', soft: 'bg-emerald-500/10' },
-    sky: { bar: 'bg-sky-500', border: 'border-sky-500', swatch: 'bg-sky-500', soft: 'bg-sky-500/10' },
-    amber: { bar: 'bg-amber-500', border: 'border-amber-500', swatch: 'bg-amber-500', soft: 'bg-amber-500/10' },
-    violet: { bar: 'bg-violet-500', border: 'border-violet-500', swatch: 'bg-violet-500', soft: 'bg-violet-500/10' },
-    rose: { bar: 'bg-rose-500', border: 'border-rose-500', swatch: 'bg-rose-500', soft: 'bg-rose-500/10' },
-    slate: { bar: 'bg-slate-500', border: 'border-slate-500', swatch: 'bg-slate-500', soft: 'bg-slate-500/10' },
+/** Node colors are categorical tones (see components/ui/tone.ts); the names are persisted in diagrams. */
+const nodeSoftFill: Record<NodeColor, string> = {
+    emerald: 'bg-accent-emerald/10',
+    sky: 'bg-accent-sky/10',
+    amber: 'bg-accent-amber/10',
+    violet: 'bg-accent-violet/10',
+    rose: 'bg-accent-rose/10',
+    slate: 'bg-accent-slate/10',
 }
+
+export const nodeColorStyles = Object.fromEntries(
+    (Object.keys(nodeSoftFill) as NodeColor[]).map((color) => [
+        color,
+        { bar: toneSolid[color], border: toneBorder[color], swatch: toneSolid[color], soft: nodeSoftFill[color] },
+    ])
+) as Record<NodeColor, { bar: string; border: string; swatch: string; soft: string }>
 
 export const colorOptions: { value: NodeColor; label: string }[] = [
     { value: 'emerald', label: 'Esmeralda' },

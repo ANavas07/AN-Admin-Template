@@ -17,7 +17,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const [isDarkMode, setIsDarkMode] = useState(getInitialTheme)
 
     useEffect(() => {
-        document.documentElement.classList.toggle('dark', isDarkMode)
+        const root = document.documentElement
+        // Both hooks are supported by theme.css: the class (Tailwind `dark:`) and the attribute
+        root.classList.toggle('dark', isDarkMode)
+        root.dataset.theme = isDarkMode ? 'dark' : 'light'
         window.localStorage.setItem('theme', isDarkMode ? 'dark' : 'light')
     }, [isDarkMode])
 

@@ -3,6 +3,8 @@ import type { ChangeEvent, DragEvent } from 'react'
 import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
 import ModuleHeader from '../../components/common/page/ModuleHeader'
 import { FileDocIcon, TrashBinIcon, UploadIcon, CheckIcon } from '../../icons/icons'
+import { toneTint } from '../../components/ui/tone'
+import type { Tone } from '../../components/ui/tone'
 
 type UploadStatus = 'uploading' | 'complete'
 
@@ -21,21 +23,19 @@ const initialFiles: UploadedFile[] = [
     { id: 'f-03', name: 'stadium-map.png', size: 2_830_000, uploadedAt: '2026-06-25T09:40:00', status: 'complete', progress: 100 },
 ]
 
-const extensionStyles: Record<string, string> = {
-    pdf: 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20 dark:bg-rose-500/15 dark:text-rose-300',
-    doc: 'bg-sky-50 text-sky-700 ring-1 ring-sky-600/20 dark:bg-sky-500/15 dark:text-sky-300',
-    docx: 'bg-sky-50 text-sky-700 ring-1 ring-sky-600/20 dark:bg-sky-500/15 dark:text-sky-300',
-    xls: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-300',
-    xlsx: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-300',
-    csv: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-300',
-    png: 'bg-violet-50 text-violet-700 ring-1 ring-violet-600/20 dark:bg-violet-500/15 dark:text-violet-300',
-    jpg: 'bg-violet-50 text-violet-700 ring-1 ring-violet-600/20 dark:bg-violet-500/15 dark:text-violet-300',
-    jpeg: 'bg-violet-50 text-violet-700 ring-1 ring-violet-600/20 dark:bg-violet-500/15 dark:text-violet-300',
-    svg: 'bg-violet-50 text-violet-700 ring-1 ring-violet-600/20 dark:bg-violet-500/15 dark:text-violet-300',
+/** File types are told apart with categorical tones. */
+const extensionTones: Record<string, Tone> = {
+    pdf: 'rose',
+    doc: 'sky',
+    docx: 'sky',
+    xls: 'emerald',
+    xlsx: 'emerald',
+    csv: 'emerald',
+    png: 'violet',
+    jpg: 'violet',
+    jpeg: 'violet',
+    svg: 'violet',
 }
-
-const fallbackExtensionStyle =
-    'bg-slate-100 text-slate-700 ring-1 ring-slate-500/20 dark:bg-slate-500/15 dark:text-slate-300'
 
 function getExtension(fileName: string) {
     const parts = fileName.split('.')
@@ -127,7 +127,7 @@ export default function FileUploadCenter() {
     const totalSize = files.reduce((sum, file) => sum + file.size, 0)
 
     return (
-        <div className="min-h-[calc(100vh-4rem)] bg-(--color-bg)">
+        <div className="min-h-[calc(100vh-var(--layout-navbar-height))] bg-canvas">
             <div className="mx-auto max-w-350 space-y-6 px-4 py-8 sm:px-6 lg:px-8">
                 <ModuleHeader
                     eyebrow="Files module"
@@ -146,23 +146,23 @@ export default function FileUploadCenter() {
                                 'flex min-h-80 flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed p-8 text-center transition-all duration-200',
                                 isDragActive
                                     ? 'scale-[1.01] border-brand bg-brand-soft shadow-lg'
-                                    : 'border-(--color-border) bg-(--color-surface) shadow-sm',
+                                    : 'border-line bg-surface shadow-sm',
                             ].join(' ')}
                         >
                             <span
                                 className={[
                                     'inline-flex h-16 w-16 items-center justify-center rounded-2xl transition-colors duration-200',
-                                    isDragActive ? 'bg-brand text-white' : 'bg-brand-soft text-brand',
+                                    isDragActive ? 'bg-brand-solid text-on-solid' : 'bg-brand-soft text-brand-strong',
                                 ].join(' ')}
                             >
                                 <UploadIcon className="size-8" />
                             </span>
 
                             <div>
-                                <p className="text-base font-semibold text-(--color-text)">
+                                <p className="text-base font-semibold text-fg">
                                     {isDragActive ? 'Drop files to upload' : 'Drag & drop files here'}
                                 </p>
-                                <p className="mt-1 text-sm text-(--color-text-muted)">
+                                <p className="mt-1 text-sm text-fg-muted">
                                     or pick them manually from your device
                                 </p>
                             </div>
@@ -183,7 +183,7 @@ export default function FileUploadCenter() {
                                 aria-label="Select files to upload"
                             />
 
-                            <p className="text-xs text-(--color-text-muted)">
+                            <p className="text-xs text-fg-muted">
                                 Any file type is accepted in this demo.
                             </p>
                         </div>
@@ -191,47 +191,47 @@ export default function FileUploadCenter() {
 
                     {/* File list */}
                     <section aria-label="Uploaded files">
-                        <div className="overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) shadow-sm">
-                            <div className="flex items-center justify-between border-b border-(--color-border) px-5 py-4">
-                                <h2 className="text-sm font-semibold text-(--color-text)">
+                        <div className="overflow-hidden card">
+                            <div className="flex items-center justify-between border-b border-line px-5 py-4">
+                                <h2 className="text-sm font-semibold text-fg">
                                     Uploaded files
                                 </h2>
-                                <span className="rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold text-(--color-text-muted)">
+                                <span className="rounded-full border border-line bg-canvas-subtle px-3 py-1 text-xs font-semibold text-fg-muted">
                                     {files.length} {files.length === 1 ? 'file' : 'files'} · {formatBytes(totalSize)}
                                 </span>
                             </div>
 
                             {files.length === 0 ? (
                                 <div className="flex flex-col items-center gap-2 px-6 py-14 text-center">
-                                    <FileDocIcon className="size-8 text-(--color-text-muted)" />
-                                    <p className="text-sm font-medium text-(--color-text)">No files yet</p>
-                                    <p className="text-xs text-(--color-text-muted)">
+                                    <FileDocIcon className="size-8 text-fg-muted" />
+                                    <p className="text-sm font-medium text-fg">No files yet</p>
+                                    <p className="text-xs text-fg-muted">
                                         Drop a file on the left to see it listed here.
                                     </p>
                                 </div>
                             ) : (
-                                <ul className="divide-y divide-(--color-border)">
+                                <ul className="divide-y divide-line">
                                     {files.map((file) => {
                                         const extension = getExtension(file.name)
                                         return (
-                                            <li key={file.id} className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-(--color-bg-soft)/50">
+                                            <li key={file.id} className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-canvas-subtle/50">
                                                 <span
                                                     className={[
-                                                        'inline-flex h-10 w-12 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold uppercase',
-                                                        extensionStyles[extension] ?? fallbackExtensionStyle,
+                                                        'inline-flex h-10 w-12 shrink-0 items-center justify-center rounded-lg text-3xs font-bold uppercase',
+                                                        toneTint[extensionTones[extension] ?? 'neutral'],
                                                     ].join(' ')}
                                                 >
                                                     {extension}
                                                 </span>
 
                                                 <div className="min-w-0 flex-1">
-                                                    <p className="truncate text-sm font-semibold text-(--color-text)">
+                                                    <p className="truncate text-sm font-semibold text-fg">
                                                         {file.name}
                                                     </p>
                                                     {file.status === 'uploading' ? (
                                                         <div className="mt-1.5 flex items-center gap-2">
                                                             <div
-                                                                className="h-1.5 flex-1 overflow-hidden rounded-full bg-(--color-bg-soft)"
+                                                                className="h-1.5 flex-1 overflow-hidden rounded-full bg-canvas-subtle"
                                                                 role="progressbar"
                                                                 aria-valuenow={file.progress}
                                                                 aria-valuemin={0}
@@ -239,20 +239,20 @@ export default function FileUploadCenter() {
                                                                 aria-label={`Uploading ${file.name}`}
                                                             >
                                                                 <div
-                                                                    className="h-full rounded-full bg-brand transition-all duration-150"
+                                                                    className="h-full rounded-full bg-brand-solid transition-all duration-150"
                                                                     style={{ width: `${file.progress}%` }}
                                                                 />
                                                             </div>
-                                                            <span className="w-9 text-right text-xs tabular-nums text-(--color-text-muted)">
+                                                            <span className="w-9 text-right text-xs tabular-nums text-fg-muted">
                                                                 {file.progress}%
                                                             </span>
                                                         </div>
                                                     ) : (
-                                                        <p className="mt-0.5 flex items-center gap-2 text-xs text-(--color-text-muted)">
+                                                        <p className="mt-0.5 flex items-center gap-2 text-xs text-fg-muted">
                                                             <span>{formatBytes(file.size)}</span>
                                                             <span aria-hidden="true">·</span>
                                                             <span>{formatDate(file.uploadedAt)}</span>
-                                                            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                                                            <span className="inline-flex items-center gap-1 text-success">
                                                                 <CheckIcon className="size-3.5" />
                                                                 Uploaded
                                                             </span>
@@ -267,7 +267,7 @@ export default function FileUploadCenter() {
                                                     aria-label={`Remove ${file.name} from the list`}
                                                     title="Remove from list"
                                                 >
-                                                    <TrashBinIcon className="size-5 text-rose-600 dark:text-rose-300" />
+                                                    <TrashBinIcon className="size-4.5 text-danger" />
                                                 </ButtonComponent>
                                             </li>
                                         )

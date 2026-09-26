@@ -19,6 +19,20 @@ import { ReactComponent as UsersIcon } from './Users.svg?react';
 import { ReactComponent as FlowIcon } from './Flow.svg?react';
 import { ReactComponent as NoteIcon } from './Note.svg?react';
 import { ReactComponent as FileDocIcon } from './FileDoc.svg?react';
+import { ReactComponent as SunIcon } from './Sun.svg?react';
+import { ReactComponent as MoonIcon } from './Moon.svg?react';
+import { ReactComponent as BellIcon } from './Bell.svg?react';
+import { ReactComponent as UserIcon } from './User.svg?react';
+import { ReactComponent as LogOutIcon } from './LogOut.svg?react';
+import { ReactComponent as MenuIcon } from './Menu.svg?react';
+import { ReactComponent as CloseIcon } from './Close.svg?react';
+import { ReactComponent as ListChecksIcon } from './ListChecks.svg?react';
+import { ReactComponent as GridIcon } from './Grid.svg?react';
+import { ReactComponent as FolderIcon } from './Folder.svg?react';
+import { ReactComponent as LockIcon } from './Lock.svg?react';
+import { ReactComponent as ClipboardIcon } from './Clipboard.svg?react';
+import { ReactComponent as LayersIcon } from './Layers.svg?react';
+import { ReactComponent as TimelineIcon } from './Timeline.svg?react';
 
 
 
@@ -43,5 +57,19 @@ export {
     UsersIcon,
     FlowIcon,
     NoteIcon,
-    FileDocIcon
+    FileDocIcon,
+    SunIcon,
+    MoonIcon,
+    BellIcon,
+    UserIcon,
+    LogOutIcon,
+    MenuIcon,
+    CloseIcon,
+    ListChecksIcon,
+    GridIcon,
+    FolderIcon,
+    LockIcon,
+    ClipboardIcon,
+    LayersIcon,
+    TimelineIcon,
 }

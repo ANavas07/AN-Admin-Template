@@ -22,9 +22,9 @@ export function SubtaskList({ subtasks, onToggle, onAdd }: Props) {
     return (
         <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-(--color-text)">Subtareas</h3>
+                <h3 className="text-sm font-semibold text-fg">Subtareas</h3>
                 {subtasks.length > 0 ? (
-                    <span className="text-xs font-medium text-(--color-text-muted)">
+                    <span className="text-xs font-medium text-fg-muted">
                         {done}/{subtasks.length}
                     </span>
                 ) : null}
@@ -40,7 +40,7 @@ export function SubtaskList({ subtasks, onToggle, onAdd }: Props) {
                             size="sm"
                         />
                         <span
-                            className={`text-sm ${subtask.completed ? 'text-(--color-text-muted) line-through' : 'text-(--color-text)'}`}
+                            className={`text-sm ${subtask.completed ? 'text-fg-muted line-through' : 'text-fg'}`}
                         >
                             {subtask.title}
                         </span>
@@ -49,7 +49,7 @@ export function SubtaskList({ subtasks, onToggle, onAdd }: Props) {
             </ul>
 
             <div className="mt-1 flex items-center gap-2">
-                <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-(--color-border)" aria-hidden="true" />
+                <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-line" aria-hidden="true" />
                 <input
                     value={draft}
                     onChange={(event) => setDraft(event.target.value)}
@@ -57,7 +57,7 @@ export function SubtaskList({ subtasks, onToggle, onAdd }: Props) {
                         if (event.key === 'Enter') submit()
                     }}
                     placeholder="Añadir subtarea…"
-                    className="w-full bg-transparent text-sm text-(--color-text) placeholder:text-(--color-text-muted) focus:outline-none"
+                    className="w-full bg-transparent text-sm text-fg placeholder:text-fg-muted focus:outline-none"
                 />
             </div>
         </div>

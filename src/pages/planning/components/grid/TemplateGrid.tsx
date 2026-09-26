@@ -62,8 +62,8 @@ export default function TemplateGrid({
     gridTemplateColumns,
     gridTemplateRows,
     gap: '1px',
-    background: 'var(--color-border)',
-    border: '1px solid var(--color-border)',
+    background: 'var(--color-line)',
+    border: '1px solid var(--color-line)',
   }
 
   function commitValue(cell: Cell, value: CapturedValue) {

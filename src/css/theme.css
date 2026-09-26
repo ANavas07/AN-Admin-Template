@@ -1,0 +1,228 @@
+/* ==========================================================================
+   Design tokens — single source of truth for the visual language.
+
+   Every color, shadow, radius, font, motion curve and layering value used by
+   the application is declared here. Components never hardcode values: they
+   consume these tokens through Tailwind utilities (`bg-surface`, `text-fg`,
+   `border-line`, `text-danger`, `shadow-md`, `rounded-lg`…) or, in plain CSS,
+   through `var(--token)`.
+
+   Structure
+     1. Tailwind theme   Tokens that generate utilities. Values are the light theme.
+     2. Dark theme       Overrides of the same tokens under `.dark` / [data-theme="dark"].
+     3. Aliases          Legacy and descriptive names kept for backward compatibility.
+
+   Tailwind's default palette and shadow scale are reset (`initial`) so only
+   the tokens below exist: `bg-red-500` simply does not generate any CSS, which
+   keeps hardcoded colors out of the codebase by construction.
+   ========================================================================== */
+
+@theme {
+	--color-*: initial;
+	--shadow-*: initial;
+
+	/* ---- Neutrals ------------------------------------------------------- */
+	/* App background and the subtle fill used for hovers, wells and headers */
+	--color-canvas: #f4f6f9;
+	--color-canvas-subtle: #eaeef3;
+	/* Cards, panels, menus, inputs */
+	--color-surface: #ffffff;
+	/* Recessed areas inside a surface: table headers, toolbars, code */
+	--color-surface-muted: #f8f9fb;
+	--color-line: #dde3ea;
+	--color-line-strong: #c3ccd8;
+	--color-fg: #101828;
+	--color-fg-muted: #4a5870;
+	--color-fg-subtle: #6a778b;
+	/* Text / icons placed on solid colored fills (brand, danger, success) */
+	--color-on-solid: #ffffff;
+	/* Modal and drawer scrim */
+	--color-overlay: rgb(15 23 42 / 0.45);
+	/* Inverted surface for toasts and tooltips */
+	--color-toast: #1b2536;
+	--color-toast-fg: #f3f6fa;
+	/* Ink for content drawn on fixed "paper" colors (exported document bands) */
+	--color-document-ink: #16213a;
+
+	/* ---- Brand ---------------------------------------------------------- */
+	/* Deep corporate blue. Same triad as the status colors:
+	   `brand` for text, icons, borders and focus; `brand-solid` for filled
+	   backgrounds carrying text-on-solid; `brand-strong` for text on brand-soft. */
+	--color-brand: #1d4ed8;
+	--color-brand-solid: #1d4ed8;
+	--color-brand-strong: #1e3a8a;
+	--color-brand-soft: color-mix(in oklab, var(--color-brand) var(--tint-strength), transparent);
+	/* Sober slate for secondary emphasis */
+	--color-secondary: #475569;
+	--color-secondary-soft: color-mix(in oklab, var(--color-secondary) var(--tint-strength), transparent);
+
+	/* ---- Status --------------------------------------------------------- */
+	/* `X` is for text, icons and borders; `X-soft` is the tinted background;
+	   `X-solid` is the filled background for buttons (pair with text-on-solid). */
+	--color-success: #16774a;
+	--color-success-soft: color-mix(in oklab, var(--color-success) var(--tint-strength), transparent);
+	--color-success-solid: #16774a;
+	--color-warning: #8f5b00;
+	--color-warning-soft: color-mix(in oklab, var(--color-warning) var(--tint-strength), transparent);
+	--color-warning-solid: #936000;
+	--color-danger: #b8322a;
+	--color-danger-soft: color-mix(in oklab, var(--color-danger) var(--tint-strength), transparent);
+	--color-danger-solid: #b8322a;
+	--color-info: #1f5fae;
+	--color-info-soft: color-mix(in oklab, var(--color-info) var(--tint-strength), transparent);
+	--color-info-solid: #1f5fae;
+
+	/* ---- Categorical accents -------------------------------------------- */
+	/* Muted hues to tell data apart (process nodes, tags, avatars, file types).
+	   Names match the values persisted in data, e.g. a FlowNode color 'emerald'. */
+	--color-accent-emerald: #1d7a55;
+	--color-accent-sky: #1f68a8;
+	--color-accent-indigo: #4450b8;
+	--color-accent-violet: #6547b3;
+	--color-accent-rose: #b0384f;
+	--color-accent-amber: #8f5f00;
+	--color-accent-orange: #a84d16;
+	--color-accent-teal: #13727a;
+	--color-accent-slate: #56657a;
+
+	/* Opaque tints of the accents (mixed with the surface) so overlapping marks
+	   such as avatar stacks never show through each other */
+	--color-accent-emerald-soft: color-mix(in oklab, var(--color-accent-emerald) var(--tint-strength), var(--color-surface));
+	--color-accent-sky-soft: color-mix(in oklab, var(--color-accent-sky) var(--tint-strength), var(--color-surface));
+	--color-accent-indigo-soft: color-mix(in oklab, var(--color-accent-indigo) var(--tint-strength), var(--color-surface));
+	--color-accent-violet-soft: color-mix(in oklab, var(--color-accent-violet) var(--tint-strength), var(--color-surface));
+	--color-accent-rose-soft: color-mix(in oklab, var(--color-accent-rose) var(--tint-strength), var(--color-surface));
+	--color-accent-amber-soft: color-mix(in oklab, var(--color-accent-amber) var(--tint-strength), var(--color-surface));
+	--color-accent-orange-soft: color-mix(in oklab, var(--color-accent-orange) var(--tint-strength), var(--color-surface));
+	--color-accent-teal-soft: color-mix(in oklab, var(--color-accent-teal) var(--tint-strength), var(--color-surface));
+	--color-accent-slate-soft: color-mix(in oklab, var(--color-accent-slate) var(--tint-strength), var(--color-surface));
+
+	/* ---- Typography ----------------------------------------------------- */
+	--font-sans: "Inter Variable", "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
+		"Helvetica Neue", Arial, sans-serif;
+	--font-mono: "JetBrains Mono", "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+	/* Compact sizes for dense enterprise UI (meta text, chips, canvas labels) */
+	--text-3xs: 0.625rem;
+	--text-3xs--line-height: 0.875rem;
+	--text-2xs: 0.6875rem;
+	--text-2xs--line-height: 1rem;
+	/* Letter spacing for uppercase eyebrows and table headers */
+	--tracking-caps: 0.08em;
+
+	/* ---- Radius --------------------------------------------------------- */
+	/* Restrained corners: controls 6px, cards 8–10px, dialogs 12px */
+	--radius-xs: 0.125rem;
+	--radius-sm: 0.25rem;
+	--radius-md: 0.375rem;
+	--radius-lg: 0.5rem;
+	--radius-xl: 0.5rem;
+	--radius-2xl: 0.625rem;
+	--radius-3xl: 0.75rem;
+
+	/* ---- Elevation ------------------------------------------------------ */
+	/* Shadow colors are tokens themselves, so the dark theme can deepen them */
+	--shadow-xs: 0 1px 2px 0 var(--color-shadow);
+	--shadow-sm: 0 1px 2px 0 var(--color-shadow), 0 1px 3px 0 var(--color-shadow);
+	--shadow: var(--shadow-sm);
+	--shadow-md: 0 2px 4px -1px var(--color-shadow), 0 4px 8px -2px var(--color-shadow);
+	--shadow-lg: 0 4px 6px -2px var(--color-shadow), 0 12px 16px -4px var(--color-shadow-strong);
+	--shadow-xl: 0 8px 8px -4px var(--color-shadow), 0 20px 24px -4px var(--color-shadow-strong);
+	--shadow-2xl: 0 24px 48px -12px var(--color-shadow-strong);
+
+	/* ---- Motion --------------------------------------------------------- */
+	--ease-standard: cubic-bezier(0.2, 0, 0, 1);
+	--ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+	--default-transition-duration: 150ms;
+	--default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Values referenced by the theme above that do not generate utilities */
+:root {
+	color-scheme: light;
+	--tint-strength: 10%;
+	--color-shadow: rgb(16 24 40 / 0.06);
+	--color-shadow-strong: rgb(16 24 40 / 0.1);
+
+	/* Motion durations for hand-written CSS and inline styles */
+	--duration-fast: 120ms;
+	--duration-base: 180ms;
+	--duration-slow: 260ms;
+
+	/* Layering: use as `z-(--z-modal)` */
+	--z-sticky: 20;
+	--z-dropdown: 30;
+	--z-overlay: 40;
+	--z-modal: 50;
+	--z-popover: 60;
+	--z-toast: 1000;
+
+	/* Layout */
+	--layout-navbar-height: 4rem;
+	--layout-content-max-width: 90rem;
+}
+
+/* ==========================================================================
+   Dark theme. Toggled by ThemeProvider on <html> with the `dark` class and
+   `data-theme="dark"`; both selectors are supported.
+   ========================================================================== */
+.dark,
+[data-theme="dark"] {
+	color-scheme: dark;
+	--tint-strength: 16%;
+	--color-shadow: rgb(0 0 0 / 0.3);
+	--color-shadow-strong: rgb(0 0 0 / 0.45);
+
+	--color-canvas: #0b1120;
+	--color-canvas-subtle: #162033;
+	--color-surface: #111a2b;
+	--color-surface-muted: #0e1626;
+	--color-line: #243149;
+	--color-line-strong: #34445f;
+	--color-fg: #e7ecf4;
+	--color-fg-muted: #a3afc2;
+	--color-fg-subtle: #7f8ca2;
+	--color-on-solid: #ffffff;
+	--color-overlay: rgb(2 6 16 / 0.7);
+	--color-toast: #e7ecf4;
+	--color-toast-fg: #101828;
+
+	--color-brand: #5f91f2;
+	--color-brand-solid: #2d66d6;
+	--color-brand-strong: #8fb4ff;
+	--color-secondary: #94a3b8;
+
+	--color-success: #5cc594;
+	--color-success-solid: #1f7d52;
+	--color-warning: #e2b35a;
+	--color-warning-solid: #946000;
+	--color-danger: #f08a80;
+	--color-danger-solid: #c1392f;
+	--color-info: #7fb0ee;
+	--color-info-solid: #2a67b5;
+
+	--color-accent-emerald: #6cc69f;
+	--color-accent-sky: #7bb4e6;
+	--color-accent-indigo: #9da6f0;
+	--color-accent-violet: #b19ded;
+	--color-accent-rose: #ee8fa2;
+	--color-accent-amber: #dfb55f;
+	--color-accent-orange: #eea06d;
+	--color-accent-teal: #6cc4c9;
+	--color-accent-slate: #a2afc2;
+}
+
+/* ==========================================================================
+   Aliases. Kept so existing code and third-party snippets that read the
+   previous variable names keep working. Prefer the canonical tokens above.
+   ========================================================================== */
+:root {
+	--color-bg: var(--color-canvas);
+	--color-bg-soft: var(--color-canvas-subtle);
+	--color-text: var(--color-fg);
+	--color-text-muted: var(--color-fg-muted);
+	--color-border: var(--color-line);
+	--color-primary: var(--color-brand);
+	--color-highlight: var(--color-info);
+	--color-highlight-soft: var(--color-info-soft);
+	--color-background: var(--color-canvas);
+}

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import type { ReactNode } from 'react'
 import PopUp from '../../components/common/pop-up/PopUp'
 import type { FormConfig, FormValues } from '../../components/common/forms/FormRender'
 import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
@@ -11,26 +10,9 @@ import {
     CheckIcon,
     SparkIcon,
 } from '../../icons/icons'
+import { CatalogHeader, CatalogSection } from './components/CatalogLayout'
 
 // ─── Catalog helpers ──────────────────────────────────────────────────────────
-
-type CatalogSectionProps = {
-    title: string
-    description: string
-    children: ReactNode
-}
-
-function CatalogSection({ title, description, children }: CatalogSectionProps) {
-    return (
-        <article className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 shadow-sm">
-            <div className="mb-4">
-                <h2 className="text-base font-semibold text-(--color-text)">{title}</h2>
-                <p className="mt-1 text-sm text-(--color-text-muted)">{description}</p>
-            </div>
-            {children}
-        </article>
-    )
-}
 
 // ─── Form configs ─────────────────────────────────────────────────────────────
 
@@ -187,23 +169,10 @@ export default function PopUpCatalog() {
     return (
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             {/* Hero */}
-            <section className="relative overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) p-6 shadow-sm sm:p-10">
-                <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand-soft blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-20 left-10 h-56 w-56 rounded-full bg-highlight-soft blur-3xl" />
-
-                <div className="relative max-w-3xl">
-                    <p className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
-                        UI Catalog
-                    </p>
-                    <h1 className="mt-4 text-3xl font-bold tracking-tight text-(--color-text) sm:text-4xl">
-                        Catalogo de Pop-Ups
-                    </h1>
-                    <p className="mt-3 text-sm text-(--color-text-muted) sm:text-base">
-                        Guia visual del componente PopUp: modo formulario automatico,
-                        confirmaciones, alertas y contenido personalizado.
-                    </p>
-                </div>
-            </section>
+            <CatalogHeader
+                title="Catalogo de Pop-Ups"
+                description="Guia visual del componente PopUp: modo formulario automatico, confirmaciones, alertas y contenido personalizado."
+            />
 
             <section className="mt-8 grid gap-5 xl:grid-cols-2">
 
@@ -279,11 +248,11 @@ export default function PopUpCatalog() {
                     description="Los valores del ultimo onSubmit aparecen aqui para verificar que funciona."
                 >
                     {submittedValues ? (
-                        <pre className="overflow-x-auto rounded-xl bg-(--color-bg-soft) p-4 text-xs text-(--color-text)">
+                        <pre className="overflow-x-auto rounded-xl bg-canvas-subtle p-4 text-xs text-fg">
                             {JSON.stringify(submittedValues, null, 2)}
                         </pre>
                     ) : (
-                        <p className="rounded-xl bg-(--color-bg-soft) p-4 text-sm text-(--color-text-muted)">
+                        <p className="rounded-xl bg-canvas-subtle p-4 text-sm text-fg-muted">
                             Aun no se ha enviado ningun formulario.
                         </p>
                     )}
@@ -345,9 +314,9 @@ export default function PopUpCatalog() {
                     </>
                 }
             >
-                <p className="text-sm text-(--color-text-muted)">
+                <p className="text-sm text-fg-muted">
                     Se eliminara el torneo{' '}
-                    <span className="font-semibold text-(--color-text)">Copa Ciudad 2026</span>{' '}
+                    <span className="font-semibold text-fg">Copa Ciudad 2026</span>{' '}
                     junto con todos sus partidos, equipos y estadisticas registradas.
                 </p>
             </PopUp>
@@ -365,7 +334,7 @@ export default function PopUpCatalog() {
                     </ButtonComponent>
                 }
             >
-                <ul className="grid gap-2 text-sm text-(--color-text)">
+                <ul className="grid gap-2 text-sm text-fg">
                     {[
                         'Crear y eliminar torneos',
                         'Gestionar equipos y jugadores',

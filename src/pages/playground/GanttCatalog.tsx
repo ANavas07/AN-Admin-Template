@@ -32,7 +32,7 @@ export default function GanttCatalog() {
 
     return (
         <main className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            <section className="h-[55vh] min-h-130 overflow-hidden rounded-2xl border border-(--color-border) bg-(--color-surface)">
+            <section className="h-[55vh] min-h-130 overflow-hidden rounded-2xl border border-line bg-surface">
                 <GanttDiagram
                     tasks={tasks}
                     links={links}

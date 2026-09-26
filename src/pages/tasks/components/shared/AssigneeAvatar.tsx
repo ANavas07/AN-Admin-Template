@@ -1,29 +1,23 @@
+import { getInitials } from '../../../../utils/initials'
 import { accentAvatar } from '../../constants'
 import type { Assignee } from '../../types'
 
 type Size = 'sm' | 'md'
 
 const sizeClasses: Record<Size, string> = {
-    sm: 'h-6 w-6 text-[10px]',
+    sm: 'h-6 w-6 text-3xs',
     md: 'h-8 w-8 text-xs',
 }
 
-function initials(name: string) {
-    return name
-        .split(' ')
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase() ?? '')
-        .join('')
-}
 
 export function AssigneeAvatar({ assignee, size = 'sm' }: { assignee: Assignee; size?: Size }) {
     return (
         <span
             title={assignee.name}
             aria-label={assignee.name}
-            className={`inline-flex shrink-0 items-center justify-center rounded-full font-semibold ring-2 ring-(--color-surface) ${sizeClasses[size]} ${accentAvatar[assignee.color]}`}
+            className={`inline-flex shrink-0 items-center justify-center rounded-full font-semibold ring-2 ring-surface ${sizeClasses[size]} ${accentAvatar[assignee.color]}`}
         >
-            {initials(assignee.name)}
+            {getInitials(assignee.name)}
         </span>
     )
 }
@@ -41,7 +35,7 @@ export function AssigneeStack({ assignees, size = 'sm', max = 3 }: { assignees: 
             ))}
             {rest > 0 ? (
                 <span
-                    className={`inline-flex items-center justify-center rounded-full bg-(--color-bg-soft) font-semibold text-(--color-text-muted) ring-2 ring-(--color-surface) ${sizeClasses[size]}`}
+                    className={`inline-flex items-center justify-center rounded-full bg-canvas-subtle font-semibold text-fg-muted ring-2 ring-surface ${sizeClasses[size]}`}
                 >
                     +{rest}
                 </span>
