@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import ModuleHeader from '../../../components/common/page/ModuleHeader'
 import PageContainer from '../../../components/common/page/PageContainer'
 import ConfirmDialog from '../../../components/common/pop-up/ConfirmDialog'
@@ -41,7 +42,9 @@ export default function ApiKeysPage() {
     const [environment, setEnvironment] = useState<KeyEnvironment | 'all'>('all')
     const [status, setStatus] = useState<ApiKeyStatus | 'all'>('all')
     const [selectedId, setSelectedId] = useState<string | null>(null)
-    const [form, setForm] = useState<FormState>(null)
+    const [searchParams] = useSearchParams()
+    // ?new opens the generate form (quick action from the command palette)
+    const [form, setForm] = useState<FormState>(() => (searchParams.has('new') ? { mode: 'generate' } : null))
     // The issued secret lives only in this state and is dropped when the modal closes
     const [issued, setIssued] = useState<{ value: IssuedKey; isRotation: boolean } | null>(null)
     const [pending, setPending] = useState<PendingAction>(null)

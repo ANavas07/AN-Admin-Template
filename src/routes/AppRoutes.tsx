@@ -12,6 +12,7 @@ import AdminPanel from '../pages/workspace/dashboard/DashboardPage'
 import NotFoundPage from '../pages/system/NotFoundPage'
 import ForbiddenPage from '../pages/system/ForbiddenPage'
 import ServerErrorPage from '../pages/system/ServerErrorPage'
+import MaintenancePage from '../pages/system/MaintenancePage'
 
 // El resto de modulos se carga bajo demanda, agrupado como en la navegacion
 // (src/navigation/modules.ts) y en src/pages/<seccion>/<modulo>.
@@ -58,6 +59,7 @@ const SecurityPage = lazy(() => import('../pages/account/security/SecurityPage')
 const KnowledgeBasePage = lazy(() => import('../pages/help/knowledge-base/KnowledgeBasePage'))
 const KnowledgeBaseBrowser = lazy(() => import('../pages/help/knowledge-base/components/KnowledgeBaseBrowser'))
 const ArticlePage = lazy(() => import('../pages/help/knowledge-base/ArticlePage'))
+const DocsPage = lazy(() => import('../pages/help/docs/DocsPage'))
 const Playground = lazy(() => import('../pages/help/playground/Playground'))
 const InputCatalog = lazy(() => import('../pages/help/playground/InputCatalog'))
 const ButtonCatalog = lazy(() => import('../pages/help/playground/ButtonCatalog'))
@@ -65,9 +67,6 @@ const TableCatalog = lazy(() => import('../pages/help/playground/TableCatalog'))
 const GanttCatalog = lazy(() => import('../pages/help/playground/GanttCatalog'))
 const FormsCatalog = lazy(() => import('../pages/help/playground/FormsCatalog'))
 const PopUpCatalog = lazy(() => import('../pages/help/playground/PopUpCatalog'))
-
-// Sistema
-const MaintenancePage = lazy(() => import('../pages/system/MaintenancePage'))
 
 type LoginCredentials = {
   email: string
@@ -177,6 +176,7 @@ export function AppRoutes({
 
             <Route path="/help/knowledge-base" element={<KnowledgeBasePage />} />
             <Route path="/help/knowledge-base/:slug" element={<ArticlePage />} />
+            <Route path="/help/docs" element={<DocsPage />} />
 
             <Route path="/account" element={<AccountLayout />}>
               <Route index element={<Navigate to="/account/profile" replace />} />

@@ -11,6 +11,8 @@ import { getCatalogCategories, getModuleById, hasModuleAccess } from '../../../n
 import type { ModuleDefinition } from '../../../navigation/modules'
 import { getQuickActions } from '../../../navigation/quickActions'
 
+const HOME_QUICK_ACTIONS = 5
+
 const DAY_MS = 24 * 60 * 60 * 1000
 
 export type ModuleUsage = { module: ModuleDefinition; count: number }
@@ -46,7 +48,8 @@ export function useWorkspaceInsights() {
             .slice(0, 3)
             .map((entry) => entry.module)
 
-        const quickActions = [...getQuickActions(role)].sort((a, b) => usageOf(b.moduleId) - usageOf(a.moduleId))
+        // The home shows the five most relevant; the palette lists them all
+        const quickActions = [...getQuickActions(role)].sort((a, b) => usageOf(b.moduleId) - usageOf(a.moduleId)).slice(0, HOME_QUICK_ACTIONS)
 
         return {
             accessibleModules: accessible,

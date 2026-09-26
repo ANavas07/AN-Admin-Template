@@ -3,10 +3,12 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 Admin panel **template** built with React 19, TypeScript, Vite and Tailwind CSS 4.
-It ships with a role-filtered module dashboard, an RBAC console, a task workspace
-(board / list / timeline / calendar), a planning grid, a BPMN-style process
-designer and a UI component catalog — all running on mock data, so you can clone
-it and plug in your own backend.
+It ships with a personal workspace home, a mail center, an AI assistant, a
+support center with knowledge base, API key management, an RBAC console, a task
+workspace (board / list / timeline / calendar), a planning grid, a BPMN-style
+process designer, account settings, error and maintenance pages and a UI
+component catalog — all running on mock data, so you can clone it and plug in
+your own backend.
 
 🇪🇸 [Versión en español](README.es.md)
 
@@ -69,37 +71,93 @@ backed by environment variables declared in [`.env.example`](.env.example).
 | `VITE_APP_ORGANIZATION` | `Mi Organizacion` | Organization shown in the dashboard sidebar |
 | `VITE_APP_LOCATION` | `Sede principal` | Location shown in the dashboard sidebar |
 | `VITE_API_BASE_URL` | `http://localhost:3000/api` | Base URL for `src/services/http.ts` |
+| `VITE_SUPPORT_EMAIL` / `_PHONE` / `_HOURS` | sample values | Support channels (support center, 403 and error pages) |
+| `VITE_MAINTENANCE_MODE` | `false` | `true` replaces the whole app with the maintenance page |
+| `VITE_MAINTENANCE_MESSAGE` / `_UNTIL` | empty | Optional message and estimated end (ISO 8601) |
+| `VITE_STATUS_PAGE_URL` | empty | Optional link to your status page |
 
 > Everything prefixed with `VITE_` is inlined into the browser bundle. Never put
 > secrets there.
 
 ## Project structure
 
+Pages are grouped exactly like the navigation: `src/pages/<section>/<module>/`.
+Every module follows the same split: the page composes presentational
+components, a hook (`hooks/useX.ts`) owns state and actions, and a service in
+`src/services/<domain>/` owns business rules and persistence.
+
 ```
 src/
-├── app/App.tsx              Shell: navbar, theme, mock session
-├── routes/AppRoutes.tsx     Route table (lazy-loaded modules)
+├── app/                     App shell, error boundary
+├── routes/                  Route table (lazy) + role-based route guard
+├── navigation/              Module registry, queries, quick actions
 ├── config/app.config.ts     Single configuration entry point
+├── context/                 Theme, account and workspace providers
+├── services/                Per-domain services (mail, support, api-keys, assistant,
+│                            knowledge-base, account, workspace, process, rbac…)
 ├── components/
-│   ├── admin-panel/         Home workspace + navigation registry
-│   ├── common/              Navbar, sidebar, command palette, forms, modals, toasts
-│   └── ui/                  Buttons, inputs, table, charts, badge, alert, avatar, tones
+│   ├── common/              Shell, sidebar, navbar, command palette, layouts,
+│   │                        drawer, confirm dialog, markdown, attachments
+│   └── ui/                  Buttons, inputs, switch, segmented control, table,
+│                            charts, badge, alert, avatar, empty state, tones
 ├── pages/
-│   ├── tasks/               Board, list, timeline, calendar (dnd-kit)
-│   ├── planning/            Template grid with per-cell icons/images
-│   ├── process/             Process repository + BPMN-style designer
-│   ├── superuser/rbac/      Roles, permissions, groups, audit log
-│   ├── users/               User management
-│   ├── files/               Upload center
-│   └── playground/          UI component catalog
-├── services/                HTTP client + per-domain API services
-├── utils/                   Small shared helpers (e.g. `cn` for class names)
-├── context/ThemeContext.tsx Light/dark theme
+│   ├── workspace/           Home, modules, favorites, recent activity
+│   ├── operations/          Tasks, planning, processes, documents, gantt
+│   ├── communication/       Mail center, AI assistant, support center
+│   ├── administration/      API keys, users, roles (RBAC), audit log
+│   ├── help/                Knowledge base, documentation, UI catalog
+│   ├── account/             Profile, preferences, security
+│   ├── system/              404, 403, 500 and maintenance pages
+│   └── auth/                Login
+├── utils/                   Small shared helpers (cn, format, attachments, text)
 └── css/
     ├── theme.css            Design tokens (light + dark), the single source of truth
     ├── components.css       Reusable classes: card, eyebrow, page-title…
     └── styles.css           Tailwind entry, base layer, third-party bridges
 ```
+
+## Modules
+
+| Section | Module | Route | Highlights |
+| --- | --- | --- | --- |
+| Workspace | Home, Modules, Favorites, Recent activity | `/dashboard`, `/workspace/*` | Favorites per user, visit history, usage charts |
+| Communication | Mail | `/mail/:folder` | Inbox, starred, sent, drafts, archive, trash; threads; compose, reply, reply all, forward; search, filters, labels, attachments |
+| Communication | AI assistant | `/assistant` | Multiple conversations, search, pin, rename; streaming Markdown with highlighted code; copy, regenerate, stop; attachments |
+| Communication | Support center | `/support/*` | Tickets with status tracking, priority, category, assignment, internal notes, attachments; knowledge base; contact page with response targets |
+| Administration | API keys | `/admin/api-keys` | Generate or register, rotate, revoke, activate/deactivate, scopes, expiration, usage, audit trail |
+| Administration | Users, Roles, Audit | `/users`, `/superuser/rbac/*` | RBAC console |
+| Help | Knowledge base, Documentation | `/help/*`, `/playground` | Accent-insensitive search, article feedback, template guide, UI catalog |
+| Account | Profile, Preferences, Security | `/account/*` | Theme (light/dark/system), notifications, password, 2FA, sessions, security log |
+
+### API key security
+
+- The full key is shown **once**, masked until revealed, and the dialog only
+  closes after the user confirms it was stored.
+- Storage keeps a SHA-256 hash, the prefix and the last four characters —
+  lists and details only ever show `sk_live_••••••••••••a1B2`.
+- Rotation issues a new secret for the same key and invalidates the old one
+  immediately; revocation is permanent.
+- Every action (create, register, edit, (de)activate, rotate, revoke, copy) is
+  written to the key's audit trail and to the actor's security log.
+
+### Status pages and permissions
+
+`requiredRoles` in the navigation registry drives access everywhere: the module
+disappears from the sidebar, palette and home, and `ModuleAccessGuard` answers
+**403** if its URL is opened directly (with a "contact support" action that
+prefills a ticket). Unknown routes show **404** with search and suggestions.
+Render errors are caught by `AppErrorBoundary`, which shows **500** with a
+copyable reference (`ERR-YYYYMMDD-XXXXXX`) that can be attached to a ticket.
+`VITE_MAINTENANCE_MODE=true` shows the **maintenance** page instead of the app
+(preview it at `/maintenance`).
+
+### AI engine
+
+The assistant depends on the `AssistantEngine` contract in
+[`assistantEngine.ts`](src/services/assistant/assistantEngine.ts). The template
+ships a local simulation; to use a real model, implement the contract against
+**your backend**, which holds the model credentials. Never call a model provider
+with a key from the browser.
 
 ## How the home dashboard works
 
@@ -110,17 +168,18 @@ Favorites and quick actions are ordered by how often the user opens each module.
 
 ### One navigation registry
 
-[`src/components/admin-panel/data/modules.ts`](src/components/admin-panel/data/modules.ts)
+[`src/navigation/modules.ts`](src/navigation/modules.ts)
 is the single source of navigation. The sidebar, the command palette, the home,
 the RBAC sub-navigation and the activity tracking all read it through
-[`navigation.ts`](src/components/admin-panel/data/navigation.ts). Every entry
+[`navigation.ts`](src/navigation/navigation.ts). Every entry
 maps to a real route, is filtered by the active role (`requiredRoles`), and may
 declare nested pages (`children`) and search `keywords`.
 
 To add a module:
 
-1. Create the page under `src/pages/<module>/`.
-2. Register the route in `src/routes/AppRoutes.tsx` using `lazy()`.
+1. Create the page under `src/pages/<section>/<module>/`.
+2. Register the route in `src/routes/AppRoutes.tsx` using `lazy()`, inside
+   `ModuleAccessGuard`.
 3. Add an entry to `MODULE_CATEGORIES` with its `url`, `requiredRoles`, an
    `icon` key from `ModuleIcon.tsx` and, optionally, `children` and `keywords`.
 
@@ -149,7 +208,7 @@ the charts are not empty. It is flagged as demo data and the home offers a
   routes and actions, lists favorites and recent history. Arrows to move, Enter
   to open, `Ctrl/⌘ + D` to toggle a favorite, Esc to close. It follows the ARIA
   combobox pattern. Quick actions are defined once in
-  [`quickActions.ts`](src/components/admin-panel/data/quickActions.ts) and shared
+  [`quickActions.ts`](src/navigation/quickActions.ts) and shared
   with the home.
 
 ### Charts
@@ -215,15 +274,15 @@ The previous variable names (`--color-bg`, `--color-text`, `--color-border`,
 Places to touch when starting a new project:
 
 - `src/config/app.config.ts` — name, organization, API base URL.
-- `src/components/admin-panel/data/modules.ts` — your module catalog.
+- `src/navigation/modules.ts` — your module catalog.
 - `src/app/App.tsx` — replace `DEMO_USER` and `handleLogin` with real auth.
 - `src/services/` — replace the mock services with your endpoints.
 - `src/css/theme.css` — design tokens (see [Design system](#design-system)).
 - `index.html` — page title and favicon.
 
-Mock datasets are isolated in `data/` folders (`src/pages/tasks/data/`,
-`src/pages/planning/data/`) and in the `*Catalog.tsx` playground pages. Some of
-them still carry sample naming from an earlier tournament-management project;
+Mock datasets are isolated in `data/` folders (`src/pages/operations/tasks/data/`,
+`src/pages/operations/planning/data/`), in the `seed` functions of the services
+and in the `*Catalog.tsx` playground pages. Some of them still carry sample naming from an earlier tournament-management project;
 they are demo fixtures only and are safe to delete.
 
 ## Authentication note
