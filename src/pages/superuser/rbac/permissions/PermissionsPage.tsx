@@ -107,7 +107,7 @@ export default function PermissionsPage() {
       accessorKey: 'code',
       header: 'Código',
       cell: (info) => (
-        <span className="font-mono text-xs bg-(--color-bg-soft) px-2 py-0.5 rounded">
+        <span className="font-mono text-xs bg-canvas-subtle px-2 py-0.5 rounded">
           {info.getValue() as string}
         </span>
       ),
@@ -121,7 +121,7 @@ export default function PermissionsPage() {
       accessorKey: 'action',
       header: 'Acción',
       cell: (info) => (
-        <span className="inline-flex items-center rounded-full bg-(--color-bg-soft) px-2 py-0.5 text-xs font-medium text-(--color-text-muted) ring-1 ring-(--color-border)">
+        <span className="inline-flex items-center rounded-full bg-canvas-subtle px-2 py-0.5 text-xs font-medium text-fg-muted ring-1 ring-line">
           {info.getValue() as string}
         </span>
       ),
@@ -132,8 +132,8 @@ export default function PermissionsPage() {
       cell: (info) => {
         const val = info.getValue() as string | null
         return val
-          ? <span className="text-sm text-(--color-text-muted)">{val}</span>
-          : <span className="text-(--color-text-muted)">—</span>
+          ? <span className="text-sm text-fg-muted">{val}</span>
+          : <span className="text-fg-muted">—</span>
       },
     },
     {
@@ -166,7 +166,7 @@ export default function PermissionsPage() {
         <select
           value={resourceFilter}
           onChange={(e) => setResourceFilter(e.target.value)}
-          className="min-h-9 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 py-1.5 text-sm text-(--color-text) focus:border-brand focus:outline-none"
+          className="min-h-9 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-fg focus:border-brand focus:outline-none"
           aria-label="Filtrar por recurso"
         >
           <option value="">Todos los recursos</option>
@@ -178,7 +178,7 @@ export default function PermissionsPage() {
         <select
           value={actionFilter}
           onChange={(e) => setActionFilter(e.target.value)}
-          className="min-h-9 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 py-1.5 text-sm text-(--color-text) focus:border-brand focus:outline-none"
+          className="min-h-9 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-fg focus:border-brand focus:outline-none"
           aria-label="Filtrar por acción"
         >
           <option value="">Todas las acciones</option>
@@ -241,9 +241,9 @@ export default function PermissionsPage() {
           </>
         }
       >
-        <p className="text-sm text-(--color-text-muted)">
+        <p className="text-sm text-fg-muted">
           Se eliminará el permiso{' '}
-          <span className="font-mono text-xs font-semibold text-(--color-text)">
+          <span className="font-mono text-xs font-semibold text-fg">
             {deleteTarget?.code}
           </span>
           . Los roles que lo tenían asignado perderán este permiso.

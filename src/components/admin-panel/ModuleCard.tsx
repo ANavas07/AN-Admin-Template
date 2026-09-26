@@ -1,3 +1,6 @@
+import { ArrowRightIcon } from '../../icons/icons'
+import ModuleIcon from './ModuleIcon'
+
 type ModuleCardProps = {
     icon: string
     title: string
@@ -6,33 +9,24 @@ type ModuleCardProps = {
     isAvailable?: boolean
 }
 
-export default function ModuleCard({
-    icon,
-    title,
-    description,
-    onClick,
-    isAvailable = true,
-}: ModuleCardProps) {
+export default function ModuleCard({ icon, title, description, onClick, isAvailable = true }: ModuleCardProps) {
     return (
         <button
             type="button"
             onClick={onClick}
             disabled={!isAvailable}
-            className="group rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 text-left transition-all hover:border-highlight hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            className="card-interactive group flex items-start gap-3.5 p-4 text-left focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-brand/25 disabled:cursor-not-allowed disabled:opacity-50"
         >
-            <div className="flex items-start gap-3">
-                <span className="text-3xl leading-none group-hover:scale-110 transition-transform">
-                    {icon}
+            <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand-strong">
+                <ModuleIcon name={icon} />
+            </span>
+            <span className="min-w-0 flex-1">
+                <span className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-semibold text-fg">{title}</span>
+                    <ArrowRightIcon className="size-4 shrink-0 text-fg-subtle opacity-0 transition-opacity group-hover:opacity-100" />
                 </span>
-                <div className="flex-1">
-                    <h3 className="font-semibold text-(--color-text) group-hover:text-highlight transition-colors">
-                        {title}
-                    </h3>
-                    <p className="mt-1 text-xs text-(--color-text-muted) leading-relaxed">
-                        {description}
-                    </p>
-                </div>
-            </div>
+                <span className="mt-1 block text-xs leading-relaxed text-fg-muted">{description}</span>
+            </span>
         </button>
     )
 }

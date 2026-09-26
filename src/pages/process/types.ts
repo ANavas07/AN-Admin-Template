@@ -1,5 +1,7 @@
 // Process-level (semantic) types: a process is more than its diagram — it carries
 // metadata, documentation, state and versioning, independent from the visual layer.
+import { toneSoft } from '../../components/ui/tone'
+import type { StatusTone } from '../../components/ui/tone'
 import type { AttachmentRef, DiagramSnapshot } from './flowTypes'
 
 export type ProcessStatus = 'draft' | 'review' | 'approved' | 'published' | 'obsolete'
@@ -12,13 +14,18 @@ export const processStatusLabels: Record<ProcessStatus, string> = {
     obsolete: 'Obsoleto',
 }
 
-export const processStatusStyles: Record<ProcessStatus, string> = {
-    draft: 'bg-slate-500/10 text-slate-600 border-slate-500/30 dark:text-slate-300',
-    review: 'bg-amber-500/10 text-amber-700 border-amber-500/30 dark:text-amber-300',
-    approved: 'bg-sky-500/10 text-sky-700 border-sky-500/30 dark:text-sky-300',
-    published: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/30 dark:text-emerald-300',
-    obsolete: 'bg-rose-500/10 text-rose-700 border-rose-500/30 dark:text-rose-300',
+export const processStatusTones: Record<ProcessStatus, StatusTone> = {
+    draft: 'neutral',
+    review: 'warning',
+    approved: 'info',
+    published: 'success',
+    obsolete: 'danger',
 }
+
+/** @deprecated Kept for compatibility; render `<Badge tone={processStatusTones[status]}>` instead. */
+export const processStatusStyles = Object.fromEntries(
+    Object.entries(processStatusTones).map(([status, tone]) => [status, toneSoft[tone]])
+) as Record<ProcessStatus, string>
 
 /** Natural lifecycle order, used to offer the next states in the UI. */
 export const processStatusFlow: ProcessStatus[] = ['draft', 'review', 'approved', 'published', 'obsolete']

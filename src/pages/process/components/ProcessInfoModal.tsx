@@ -4,6 +4,7 @@ import ButtonComponent from '../../../components/ui/buttons/ButtonComponent'
 import InputComponent from '../../../components/ui/inputs/InputComponent'
 import { processStatusFlow, processStatusLabels } from '../types'
 import type { ProcessMeta, ProcessStatus } from '../types'
+import { fieldSelectClass, fieldTextareaClass } from '../../../components/ui/inputs/fieldStyles'
 
 type ProcessInfoModalProps = {
     isOpen: boolean
@@ -12,8 +13,7 @@ type ProcessInfoModalProps = {
     onSave: (patch: Partial<Omit<ProcessMeta, 'id' | 'createdAt'>>) => void
 }
 
-const textareaClass =
-    'w-full rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-2.5 text-sm text-(--color-text) placeholder:text-(--color-text-muted) transition-all duration-200 focus:border-highlight focus:outline-none focus:ring-2 focus:ring-highlight/25'
+const textareaClass = fieldTextareaClass
 
 /**
  * General process information, independent from the diagram: identification,
@@ -109,14 +109,14 @@ export default function ProcessInfoModal({ isOpen, onClose, meta, onSave }: Proc
                     placeholder="p. ej. Coordinación Académica"
                 />
                 <div>
-                    <label htmlFor="process-status" className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                    <label htmlFor="process-status" className="mb-1.5 block text-sm font-medium text-fg">
                         Estado
                     </label>
                     <select
                         id="process-status"
                         value={form.status}
                         onChange={(event) => patch('status', event.target.value as ProcessStatus)}
-                        className="w-full rounded-xl border border-(--color-border) bg-(--color-surface) px-3.5 py-2.5 text-sm text-(--color-text) focus:border-highlight focus:outline-none focus:ring-2 focus:ring-highlight/25"
+                        className={fieldSelectClass}
                     >
                         {processStatusFlow.map((status) => (
                             <option key={status} value={status}>
@@ -126,7 +126,7 @@ export default function ProcessInfoModal({ isOpen, onClose, meta, onSave }: Proc
                     </select>
                 </div>
                 <div className="sm:col-span-2">
-                    <label htmlFor="process-description" className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                    <label htmlFor="process-description" className="mb-1.5 block text-sm font-medium text-fg">
                         Descripción
                     </label>
                     <textarea
@@ -139,7 +139,7 @@ export default function ProcessInfoModal({ isOpen, onClose, meta, onSave }: Proc
                     />
                 </div>
                 <div className="sm:col-span-2">
-                    <label htmlFor="process-objective" className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                    <label htmlFor="process-objective" className="mb-1.5 block text-sm font-medium text-fg">
                         Objetivo
                     </label>
                     <textarea
@@ -152,7 +152,7 @@ export default function ProcessInfoModal({ isOpen, onClose, meta, onSave }: Proc
                     />
                 </div>
                 <div className="sm:col-span-2">
-                    <label htmlFor="process-scope" className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                    <label htmlFor="process-scope" className="mb-1.5 block text-sm font-medium text-fg">
                         Alcance
                     </label>
                     <textarea

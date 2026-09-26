@@ -89,18 +89,18 @@ function DashboardIcon() {
 
 export default function Playground() {
     return (
-        <div className="min-h-[calc(100vh-4rem)] bg-(--color-bg)">
+        <div className="min-h-[calc(100vh-var(--layout-navbar-height))] bg-canvas">
             <div className="mx-auto grid max-w-400 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[300px_1fr] lg:px-8">
                 <aside className="lg:sticky lg:top-22 lg:h-[calc(100vh-6.5rem)]">
-                    <div className="overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) shadow-sm">
-                        <div className="border-b border-(--color-border) p-5">
-                            <span className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
+                    <div className="overflow-hidden card">
+                        <div className="border-b border-line p-5">
+                            <span className="eyebrow">
                                 Playground
                             </span>
-                            <h1 className="mt-4 text-xl font-bold text-(--color-text)">
+                            <h1 className="mt-4 text-xl font-semibold text-fg">
                                 Catalogo de componentes
                             </h1>
-                            <p className="mt-2 text-sm text-(--color-text-muted)">
+                            <p className="mt-2 text-sm text-fg-muted">
                                 Navega entre los componentes reutilizables del panel.
                             </p>
                         </div>
@@ -116,10 +116,10 @@ export default function Playground() {
                                         cn(
                                             'group flex items-start gap-3 rounded-2xl border p-3 transition-all duration-200',
                                             item.path === '/gantt'
-                                                ? 'border-transparent text-(--color-text) hover:border-(--color-border) hover:bg-(--color-bg-soft)'
+                                                ? 'border-transparent text-fg hover:border-line hover:bg-canvas-subtle'
                                                 : isActive
                                                     ? 'border-brand/40 bg-brand-soft text-brand shadow-sm'
-                                                    : 'border-transparent text-(--color-text) hover:border-(--color-border) hover:bg-(--color-bg-soft)'
+                                                    : 'border-transparent text-fg hover:border-line hover:bg-canvas-subtle'
                                         )
                                     }
                                 >
@@ -128,11 +128,11 @@ export default function Playground() {
                                         <span className="block text-sm font-semibold">
                                             {item.label}
                                         </span>
-                                        <span className="mt-0.5 block text-xs leading-5 text-(--color-text-muted)">
+                                        <span className="mt-0.5 block text-xs leading-5 text-fg-muted">
                                             {item.description}
                                         </span>
                                         {item.path === '/gantt' ? (
-                                            <span className="mt-1 inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-(--color-text-muted)">
+                                            <span className="mt-1 inline-flex rounded-full border border-line bg-canvas-subtle px-2 py-0.5 text-3xs font-semibold uppercase tracking-caps text-fg-muted">
                                                 Nueva ventana
                                             </span>
                                         ) : null}
@@ -141,10 +141,10 @@ export default function Playground() {
                             ))}
                         </nav>
 
-                        <div className="border-t border-(--color-border) p-3">
+                        <div className="border-t border-line p-3">
                             <NavLink
                                 to="/dashboard"
-                                className="flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold text-(--color-text-muted) transition-colors hover:bg-(--color-bg-soft) hover:text-brand"
+                                className="flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold text-fg-muted transition-colors hover:bg-canvas-subtle hover:text-brand"
                             >
                                 <DashboardIcon />
                                 Volver al dashboard

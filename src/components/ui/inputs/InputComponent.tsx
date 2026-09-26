@@ -1,6 +1,9 @@
 import { forwardRef, useId } from 'react'
 import type { ChangeEvent, InputHTMLAttributes, ReactNode } from 'react'
+import { SearchIcon } from '../../../icons/icons'
 import { cn } from '../../../utils/cn'
+import { FieldLabel, FieldMessage } from './field'
+import { fieldControlClass } from './fieldStyles'
 
 type InputSize = 'sm' | 'md' | 'lg'
 type InputVariant = 'default' | 'search' | 'rounded'
@@ -64,18 +67,16 @@ const InputComponent = forwardRef<HTMLInputElement, InputComponentProps>(
         const describedBy = helpText ? `${inputId}-description` : undefined
 
         const sizeClasses: Record<InputSize, string> = {
-            sm: 'h-9 px-3 text-xs',
-            md: 'h-11 px-4 text-sm',
-            lg: 'h-12 px-4 text-base',
+            sm: 'h-8 px-2.5 text-xs',
+            md: 'h-9 px-3 text-sm',
+            lg: 'h-11 px-3.5 text-sm',
         }
 
+        // Only the corner shape changes between variants; colors come from fieldControlClass
         const variantClasses: Record<InputVariant, string> = {
-            default:
-                'rounded-xl border border-(--color-border) bg-(--color-surface) text-(--color-text)',
-            search:
-                'rounded-2xl border-2 border-(--color-border) bg-(--color-surface) text-(--color-text)',
-            rounded:
-                'rounded-full border border-(--color-border) bg-(--color-surface) text-(--color-text)',
+            default: '',
+            search: '',
+            rounded: 'rounded-full',
         }
 
         const positionClasses: Record<InputPosition, string> = {
@@ -96,16 +97,15 @@ const InputComponent = forwardRef<HTMLInputElement, InputComponentProps>(
                 )}
             >
                 {label ? (
-                    <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                    <FieldLabel htmlFor={inputId} required={requiredMark}>
                         {label}
-                        {requiredMark ? <span className="ml-1 text-red-500">*</span> : null}
-                    </label>
+                    </FieldLabel>
                 ) : null}
 
                 <div className="relative">
                     {hasLeftIcon ? (
-                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-(--color-text-muted)">
-                            {leftIcon ?? '🔍'}
+                        <span className="pointer-events-none absolute left-3 top-1/2 flex -translate-y-1/2 text-fg-subtle">
+                            {leftIcon ?? <SearchIcon className="size-4" />}
                         </span>
                     ) : null}
 
@@ -119,39 +119,24 @@ const InputComponent = forwardRef<HTMLInputElement, InputComponentProps>(
                         aria-invalid={Boolean(error)}
                         aria-describedby={describedBy}
                         className={cn(
-                            'w-full placeholder:text-(--color-text-muted) transition-all duration-200',
-                            'focus:outline-none focus:ring-2 focus:ring-highlight/25',
-                            'disabled:cursor-not-allowed disabled:opacity-60',
+                            fieldControlClass(Boolean(error)),
                             sizeClasses[size],
                             variantClasses[variant],
-                            hasLeftIcon ? 'pl-10' : '',
-                            hasRightIcon ? 'pr-10' : '',
-                            error
-                                ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                                : 'focus:border-highlight',
+                            hasLeftIcon ? 'pl-9' : '',
+                            hasRightIcon ? 'pr-9' : '',
                             className
                         )}
                         {...rest}
                     />
 
                     {hasRightIcon ? (
-                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base text-(--color-text-muted)">
-                            {rightIcon ?? '🔍'}
+                        <span className="pointer-events-none absolute right-3 top-1/2 flex -translate-y-1/2 text-fg-subtle">
+                            {rightIcon ?? <SearchIcon className="size-4" />}
                         </span>
                     ) : null}
                 </div>
 
-                {helpText ? (
-                    <p
-                        id={`${inputId}-description`}
-                        className={cn(
-                            'mt-1 text-xs',
-                            error ? 'text-red-600 dark:text-red-400' : 'text-(--color-text-muted)'
-                        )}
-                    >
-                        {helpText}
-                    </p>
-                ) : null}
+                <FieldMessage id={`${inputId}-description`} error={error} hint={hint} />
             </div>
         )
     }

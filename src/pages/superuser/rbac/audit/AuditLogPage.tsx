@@ -6,27 +6,26 @@ import InputComponent from '../../../../components/ui/inputs/InputComponent'
 import PopUp from '../../../../components/common/pop-up/PopUp'
 import ModuleHeader from '../../../../components/common/page/ModuleHeader'
 import { auditService, AUDIT_EVENT_TYPES } from '../../../../services/rbac/audit.service'
+import Badge from '../../../../components/ui/badge/Badge'
+import { toneSoft } from '../../../../components/ui/tone'
+import type { Tone } from '../../../../components/ui/tone'
 import type { AuditLog } from '../types'
 
-const EVENT_BADGE: Record<string, { label: string; className: string }> = {
-  ROLE_ASSIGNED: { label: 'Rol asignado', className: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-950 dark:text-emerald-300' },
-  ROLE_REVOKED: { label: 'Rol revocado', className: 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-950 dark:text-rose-300' },
-  PII_ACCESSED: { label: 'PII accedido', className: 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-950 dark:text-amber-300' },
-  BATCH_PII_EXPORT: { label: 'Exportación PII', className: 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-950 dark:text-amber-300' },
-  USER_CREATED: { label: 'Usuario creado', className: 'bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-950 dark:text-sky-300' },
-  PERMISSION_CHANGED: { label: 'Permiso cambiado', className: 'bg-orange-50 text-orange-700 ring-orange-600/20 dark:bg-orange-950 dark:text-orange-300' },
-  GROUP_MEMBER_ADDED: { label: 'Miembro agregado', className: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-950 dark:text-emerald-300' },
-  GROUP_MEMBER_REMOVED: { label: 'Miembro removido', className: 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-950 dark:text-rose-300' },
-  LOGIN_FAILED: { label: 'Login fallido', className: 'bg-red-100 text-red-800 ring-red-700/20 dark:bg-red-950 dark:text-red-300' },
+const EVENT_BADGE: Record<string, { label: string; tone: Tone }> = {
+  ROLE_ASSIGNED: { label: 'Rol asignado', tone: 'success' },
+  ROLE_REVOKED: { label: 'Rol revocado', tone: 'danger' },
+  PII_ACCESSED: { label: 'PII accedido', tone: 'warning' },
+  BATCH_PII_EXPORT: { label: 'Exportación PII', tone: 'warning' },
+  USER_CREATED: { label: 'Usuario creado', tone: 'info' },
+  PERMISSION_CHANGED: { label: 'Permiso cambiado', tone: 'orange' },
+  GROUP_MEMBER_ADDED: { label: 'Miembro agregado', tone: 'success' },
+  GROUP_MEMBER_REMOVED: { label: 'Miembro removido', tone: 'danger' },
+  LOGIN_FAILED: { label: 'Login fallido', tone: 'danger' },
 }
 
 function EventBadge({ eventType }: { eventType: string }) {
-  const badge = EVENT_BADGE[eventType] ?? { label: eventType, className: 'bg-(--color-bg-soft) text-(--color-text-muted) ring-(--color-border)' }
-  return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${badge.className}`}>
-      {badge.label}
-    </span>
-  )
+  const badge = EVENT_BADGE[eventType] ?? { label: eventType, tone: 'neutral' }
+  return <Badge tone={badge.tone}>{badge.label}</Badge>
 }
 
 const PAGE_SIZE = 20
@@ -131,14 +130,14 @@ export default function AuditLogPage() {
       header: 'Actor',
       cell: ({ row }) =>
         row.original.actor?.username ?? (
-          <span className="text-(--color-text-muted) text-xs italic">Sistema</span>
+          <span className="text-fg-muted text-xs italic">Sistema</span>
         ),
     },
     {
       accessorKey: 'entityType',
       header: 'Entidad',
       cell: (info) => (
-        <span className="font-mono text-xs text-(--color-text-muted)">{info.getValue() as string}</span>
+        <span className="font-mono text-xs text-fg-muted">{info.getValue() as string}</span>
       ),
     },
     {
@@ -165,7 +164,7 @@ export default function AuditLogPage() {
       />
 
       {/* Filtros */}
-      <div className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 shadow-sm space-y-4">
+      <div className="card p-4 space-y-4">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <InputComponent
             label="Actor"
@@ -191,7 +190,7 @@ export default function AuditLogPage() {
 
         {/* Multiselect de tipos de evento */}
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-(--color-text-muted)">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-caps text-fg-muted">
             Tipos de evento
           </p>
           <div className="flex flex-wrap gap-2">
@@ -203,8 +202,8 @@ export default function AuditLogPage() {
                   key={et}
                   type="button"
                   onClick={() => toggleEventType(et)}
-                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 transition-opacity ${
-                    badge?.className ?? 'bg-(--color-bg-soft) text-(--color-text) ring-(--color-border)'
+                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset transition-opacity ${
+                    toneSoft[badge?.tone ?? 'neutral']
                   } ${active ? 'opacity-100 ring-2' : 'opacity-50 hover:opacity-75'}`}
                   aria-pressed={active}
                 >
@@ -234,7 +233,7 @@ export default function AuditLogPage() {
       {/* Paginación manual (server-side) */}
       {!loading && total > 0 && (
         <div className="flex items-center justify-between gap-3">
-          <span className="text-sm text-(--color-text-muted)">
+          <span className="text-sm text-fg-muted">
             Página {page} de {totalPages} · {total} eventos
           </span>
           <div className="flex items-center gap-2">
@@ -288,14 +287,14 @@ export default function AuditLogPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-(--color-text-muted)">Fecha</p>
-              <p className="mt-1 text-(--color-text)">
+              <p className="text-xs font-semibold uppercase tracking-caps text-fg-muted">Fecha</p>
+              <p className="mt-1 text-fg">
                 {detailLog && new Date(detailLog.createdAt).toLocaleString('es-CO')}
               </p>
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-(--color-text-muted)">Actor</p>
-              <p className="mt-1 text-(--color-text)">
+              <p className="text-xs font-semibold uppercase tracking-caps text-fg-muted">Actor</p>
+              <p className="mt-1 text-fg">
                 {detailLog?.actor?.username ?? 'Sistema'}
               </p>
             </div>
@@ -303,10 +302,10 @@ export default function AuditLogPage() {
 
           {detailLog?.oldValue !== undefined && (
             <div>
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-(--color-text-muted)">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-caps text-fg-muted">
                 Valor anterior
               </p>
-              <pre className="overflow-x-auto rounded-xl bg-(--color-bg-soft) p-3 text-xs text-(--color-text)">
+              <pre className="overflow-x-auto rounded-xl bg-canvas-subtle p-3 text-xs text-fg">
                 {JSON.stringify(detailLog.oldValue, null, 2)}
               </pre>
             </div>
@@ -314,10 +313,10 @@ export default function AuditLogPage() {
 
           {detailLog?.newValue !== undefined && (
             <div>
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-(--color-text-muted)">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-caps text-fg-muted">
                 Valor nuevo
               </p>
-              <pre className="overflow-x-auto rounded-xl bg-(--color-bg-soft) p-3 text-xs text-(--color-text)">
+              <pre className="overflow-x-auto rounded-xl bg-canvas-subtle p-3 text-xs text-fg">
                 {JSON.stringify(detailLog.newValue, null, 2)}
               </pre>
             </div>

@@ -66,9 +66,9 @@ export function ListView({ api, onOpenTask, onAddTask, matches = () => true }: P
 
             <DragOverlay>
                 {dnd.activeTask ? (
-                    <div className="flex items-center gap-2 rounded-lg border border-brand/30 bg-(--color-surface) px-3 py-2 shadow-xl">
+                    <div className="flex items-center gap-2 rounded-lg border border-brand/30 bg-surface px-3 py-2 shadow-xl">
                         <PriorityBadge priority={dnd.activeTask.priority} />
-                        <span className="truncate text-sm font-medium text-(--color-text)">
+                        <span className="truncate text-sm font-medium text-fg">
                             {dnd.activeTask.title}
                         </span>
                     </div>

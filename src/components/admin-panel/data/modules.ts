@@ -10,6 +10,9 @@
  *   2. Registra la ruta en src/routes/AppRoutes.tsx (usa lazy())
  *   3. Agrega la entrada aqui con su `url` y sus `requiredRoles`
  *
+ * `icon` es una clave del registro de ModuleIcon.tsx (p. ej. 'tasks', 'files').
+ * Por compatibilidad tambien acepta cualquier texto, como un emoji.
+ *
  * `requiredRoles` filtra la tarjeta segun el rol activo. Si se omite, el modulo
  * es visible para todos los roles.
  */
@@ -34,13 +37,13 @@ export type ModuleCategory = {
 export const MODULE_CATEGORIES: ModuleCategory[] = [
     {
         name: 'OPERACION',
-        icon: '📋',
+        icon: 'operation',
         modules: [
             {
                 id: 'tasks',
                 title: 'Gestion de tareas',
                 description: 'Tablero, lista, cronograma y calendario de tareas',
-                icon: '🗂️',
+                icon: 'tasks',
                 url: '/tasks',
                 requiredRoles: ['admin', 'organizer', 'analyst'],
             },
@@ -48,7 +51,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 id: 'planning',
                 title: 'Planificacion',
                 description: 'Grilla de plantillas con iconos e imagenes por celda',
-                icon: '📝',
+                icon: 'planning',
                 url: '/planning',
                 requiredRoles: ['admin', 'organizer', 'analyst'],
             },
@@ -56,7 +59,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 id: 'process',
                 title: 'Procesos',
                 description: 'Repositorio y disenador de diagramas de proceso',
-                icon: '🔀',
+                icon: 'process',
                 url: '/process',
                 requiredRoles: ['admin', 'organizer'],
             },
@@ -64,7 +67,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 id: 'files',
                 title: 'Documentos',
                 description: 'Centro de carga y seguimiento de archivos',
-                icon: '📁',
+                icon: 'files',
                 url: '/files',
                 requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
             },
@@ -72,13 +75,13 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
     },
     {
         name: 'ADMINISTRACION',
-        icon: '🛡️',
+        icon: 'administration',
         modules: [
             {
                 id: 'users',
                 title: 'Gestion de usuarios',
                 description: 'Alta, edicion y estado de los usuarios del sistema',
-                icon: '👥',
+                icon: 'users',
                 url: '/users',
                 requiredRoles: ['admin'],
             },
@@ -86,7 +89,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 id: 'rbac',
                 title: 'Roles y permisos',
                 description: 'Roles, permisos, grupos y asignaciones (RBAC)',
-                icon: '🔐',
+                icon: 'rbac',
                 url: '/superuser/rbac',
                 requiredRoles: ['admin'],
             },
@@ -94,7 +97,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 id: 'audit',
                 title: 'Auditoria',
                 description: 'Bitacora de cambios sobre roles y permisos',
-                icon: '🧾',
+                icon: 'audit',
                 url: '/superuser/rbac/audit',
                 requiredRoles: ['admin', 'analyst'],
             },
@@ -102,13 +105,13 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
     },
     {
         name: 'HERRAMIENTAS',
-        icon: '🧩',
+        icon: 'tools',
         modules: [
             {
                 id: 'gantt',
                 title: 'Gantt',
                 description: 'Vista Gantt independiente para cronogramas',
-                icon: '📊',
+                icon: 'gantt',
                 url: '/gantt',
                 requiredRoles: ['admin', 'organizer', 'analyst'],
             },
@@ -116,7 +119,7 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
                 id: 'playground',
                 title: 'Catalogo de UI',
                 description: 'Inputs, botones, tablas, formularios y modales',
-                icon: '🎨',
+                icon: 'playground',
                 url: '/playground',
                 requiredRoles: ['admin', 'organizer', 'analyst', 'viewer'],
             },

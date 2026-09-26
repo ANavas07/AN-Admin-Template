@@ -15,12 +15,11 @@ import {
 import type { AttachmentRef, BpmnType, EdgeKind, ElementData, FlowEdge, FlowNode } from '../flowTypes'
 import { formatBytes, formatDate } from '../format'
 import BpmnGlyph from './BpmnGlyph'
+import { fieldInputClass, fieldSelectClass, fieldTextareaClass } from '../../../components/ui/inputs/fieldStyles'
 
-const textareaClass =
-    'w-full rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-2.5 text-sm text-(--color-text) placeholder:text-(--color-text-muted) transition-all duration-200 focus:border-highlight focus:outline-none focus:ring-2 focus:ring-highlight/25'
+const textareaClass = fieldTextareaClass
 
-const selectClass =
-    'w-full rounded-xl border border-(--color-border) bg-(--color-surface) px-3.5 py-2.5 text-sm text-(--color-text) transition-all duration-200 focus:border-highlight focus:outline-none focus:ring-2 focus:ring-highlight/25'
+const selectClass = fieldSelectClass
 
 /** Files up to this size keep their content inline (localStorage); larger ones keep metadata only. */
 const INLINE_ATTACHMENT_LIMIT = 300_000
@@ -43,7 +42,7 @@ function ListInput({ label, value, placeholder, onCommit }: ListInputProps) {
     const [raw, setRaw] = useState(value.join(', '))
     return (
         <div>
-            <label className="mb-1.5 block text-sm font-medium text-(--color-text)">{label}</label>
+            <label className="mb-1.5 block text-sm font-medium text-fg">{label}</label>
             <input
                 value={raw}
                 onChange={(event) => {
@@ -56,9 +55,9 @@ function ListInput({ label, value, placeholder, onCommit }: ListInputProps) {
                     )
                 }}
                 placeholder={placeholder}
-                className="w-full rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-2.5 text-sm text-(--color-text) placeholder:text-(--color-text-muted) transition-all duration-200 focus:border-highlight focus:outline-none focus:ring-2 focus:ring-highlight/25"
+                className={fieldInputClass}
             />
-            <p className="mt-1 text-[11px] text-(--color-text-muted)">Separa los valores con comas.</p>
+            <p className="mt-1 text-2xs text-fg-muted">Separa los valores con comas.</p>
         </div>
     )
 }
@@ -165,14 +164,14 @@ export default function PropertiesPanel({
                     <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-soft text-brand">
                         <BpmnGlyph kind={selectedNode.kind} bpmnType={selectedNode.bpmnType} className="size-5" />
                     </span>
-                    <span className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
+                    <span className="eyebrow">
                         {typeLabel}
                     </span>
                 </div>
 
                 {bpmnOptions.length > 1 ? (
                     <div>
-                        <label htmlFor="node-bpmn-type" className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                        <label htmlFor="node-bpmn-type" className="mb-1.5 block text-sm font-medium text-fg">
                             Tipo BPMN
                         </label>
                         <select
@@ -201,7 +200,7 @@ export default function PropertiesPanel({
 
                 {!isContainer(selectedNode.kind) ? (
                     <div>
-                        <label htmlFor="node-description" className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                        <label htmlFor="node-description" className="mb-1.5 block text-sm font-medium text-fg">
                             {selectedNode.kind === 'note' ? 'Contenido' : 'Descripción'}
                         </label>
                         <textarea
@@ -220,8 +219,8 @@ export default function PropertiesPanel({
                 ) : null}
 
                 {hasSemanticData(selectedNode.kind) ? (
-                    <div key={selectedNode.id} className="space-y-4 rounded-2xl border border-(--color-border) bg-(--color-bg-soft)/60 p-4">
-                        <p className="text-xs font-bold uppercase tracking-[0.14em] text-(--color-text-muted)">
+                    <div key={selectedNode.id} className="space-y-4 rounded-2xl border border-line bg-canvas-subtle/60 p-4">
+                        <p className="text-xs font-bold uppercase tracking-caps text-fg-muted">
                             Documentación
                         </p>
                         <InputComponent
@@ -262,25 +261,25 @@ export default function PropertiesPanel({
                         />
 
                         <div>
-                            <p className="mb-1.5 text-sm font-medium text-(--color-text)">Documentos</p>
+                            <p className="mb-1.5 text-sm font-medium text-fg">Documentos</p>
                             {selectedNode.data.documents.length > 0 ? (
                                 <ul className="space-y-1.5">
                                     {selectedNode.data.documents.map((doc) => (
                                         <li
                                             key={doc.id}
-                                            className="flex items-center gap-2 rounded-xl border border-(--color-border) bg-(--color-surface) px-3 py-2"
+                                            className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2"
                                         >
-                                            <FileDocIcon className="size-4 shrink-0 text-(--color-text-muted)" />
+                                            <FileDocIcon className="size-4 shrink-0 text-fg-muted" />
                                             <button
                                                 type="button"
                                                 onClick={() => downloadAttachment(doc)}
                                                 className="min-w-0 flex-1 text-left"
                                                 title={doc.dataUrl ? 'Descargar documento' : 'Solo referencia'}
                                             >
-                                                <span className="block truncate text-xs font-semibold text-(--color-text)">
+                                                <span className="block truncate text-xs font-semibold text-fg">
                                                     {doc.name}
                                                 </span>
-                                                <span className="block text-[10px] text-(--color-text-muted)">
+                                                <span className="block text-3xs text-fg-muted">
                                                     {formatBytes(doc.size)} · {formatDate(doc.addedAt)}
                                                     {!doc.dataUrl ? ' · referencia' : ''}
                                                 </span>
@@ -288,7 +287,7 @@ export default function PropertiesPanel({
                                             <button
                                                 type="button"
                                                 onClick={() => removeAttachment(doc)}
-                                                className="shrink-0 rounded-lg p-1 text-rose-600 transition-colors hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-900/30"
+                                                className="shrink-0 rounded-lg p-1 text-danger transition-colors hover:bg-danger-soft"
                                                 aria-label={`Eliminar ${doc.name}`}
                                             >
                                                 <TrashBinIcon className="size-3.5" />
@@ -297,7 +296,7 @@ export default function PropertiesPanel({
                                     ))}
                                 </ul>
                             ) : (
-                                <p className="text-xs text-(--color-text-muted)">Sin documentos asociados.</p>
+                                <p className="text-xs text-fg-muted">Sin documentos asociados.</p>
                             )}
                             <ButtonComponent
                                 variant="outline"
@@ -322,8 +321,8 @@ export default function PropertiesPanel({
 
                 {selectedNode.kind === 'task' || selectedNode.kind === 'data' || selectedNode.kind === 'decision' ? (
                     <div>
-                        <label htmlFor="node-note" className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-(--color-text)">
-                            <NoteIcon className="size-4 text-amber-600 dark:text-amber-400" />
+                        <label htmlFor="node-note" className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-fg">
+                            <NoteIcon className="size-4 text-warning" />
                             Nota adjunta
                         </label>
                         <textarea
@@ -332,14 +331,14 @@ export default function PropertiesPanel({
                             onChange={(event) => onUpdateNode(selectedNode.id, { note: event.target.value })}
                             rows={3}
                             placeholder="Agrega una anotación para este elemento"
-                            className="w-full rounded-xl border border-amber-600/30 bg-amber-50/50 px-4 py-2.5 text-sm text-(--color-text) placeholder:text-(--color-text-muted) transition-all duration-200 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 dark:bg-amber-500/5"
+                            className="w-full rounded-md border border-warning/30 bg-warning-soft px-3 py-2 text-sm text-fg placeholder:text-fg-subtle transition-[border-color,box-shadow] focus:border-warning focus:outline-none focus:ring-3 focus:ring-warning/20"
                         />
                     </div>
                 ) : null}
 
                 {selectedNode.kind !== 'start' && selectedNode.kind !== 'end' && selectedNode.kind !== 'note' ? (
                     <div>
-                        <p className="mb-2 text-sm font-medium text-(--color-text)">Color de acento</p>
+                        <p className="mb-2 text-sm font-medium text-fg">Color de acento</p>
                         <div className="flex flex-wrap gap-2">
                             {colorOptions.map((option) => (
                                 <button
@@ -347,10 +346,10 @@ export default function PropertiesPanel({
                                     type="button"
                                     onClick={() => onUpdateNode(selectedNode.id, { color: option.value })}
                                     className={[
-                                        'h-8 w-8 rounded-full transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-surface)',
+                                        'h-8 w-8 rounded-full transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
                                         nodeColorStyles[option.value].swatch,
                                         selectedNode.color === option.value
-                                            ? 'ring-2 ring-(--color-text) ring-offset-2 ring-offset-(--color-surface)'
+                                            ? 'ring-2 ring-fg ring-offset-2 ring-offset-surface'
                                             : '',
                                     ].join(' ')}
                                     aria-label={`Usar color ${option.label}`}
@@ -362,7 +361,7 @@ export default function PropertiesPanel({
                     </div>
                 ) : null}
 
-                <div className="space-y-2 border-t border-(--color-border) pt-4">
+                <div className="space-y-2 border-t border-line pt-4">
                     <ButtonComponent variant="outline" size="sm" fullWidth onClick={() => onDuplicateNode(selectedNode.id)}>
                         Duplicar elemento
                     </ButtonComponent>
@@ -383,10 +382,10 @@ export default function PropertiesPanel({
     if (selectedEdge) {
         return (
             <div className="space-y-5 p-5">
-                <span className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
+                <span className="eyebrow">
                     Conexión
                 </span>
-                <p className="text-sm text-(--color-text)">
+                <p className="text-sm text-fg">
                     <span className="font-semibold">
                         {nodes.find((node) => node.id === selectedEdge.from)?.title ?? 'Elemento desconocido'}
                     </span>
@@ -396,7 +395,7 @@ export default function PropertiesPanel({
                     </span>
                 </p>
                 <div>
-                    <label htmlFor="edge-kind" className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                    <label htmlFor="edge-kind" className="mb-1.5 block text-sm font-medium text-fg">
                         Tipo de conector
                     </label>
                     <select
@@ -441,32 +440,32 @@ export default function PropertiesPanel({
 
     return (
         <div className="space-y-4 p-5">
-            <span className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
+            <span className="eyebrow">
                 Cómo funciona
             </span>
-            <ul className="space-y-3 text-sm text-(--color-text-muted)">
+            <ul className="space-y-3 text-sm text-fg-muted">
                 <li className="flex gap-2.5">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-solid" />
                     Agrega eventos, tareas, compuertas y más desde la paleta izquierda. Pasa el cursor sobre un elemento para ver qué hace.
                 </li>
                 <li className="flex gap-2.5">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-solid" />
                     Arrastra desde el puerto derecho de un elemento y suelta sobre otro para conectarlos.
                 </li>
                 <li className="flex gap-2.5">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-solid" />
                     Selecciona un elemento para documentarlo: responsable, sistemas, tiempos y archivos adjuntos.
                 </li>
                 <li className="flex gap-2.5">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-solid" />
                     Usa Ctrl+Z / Ctrl+Y para deshacer y rehacer, la rueda para hacer zoom y el minimapa para desplazarte.
                 </li>
                 <li className="flex gap-2.5">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-solid" />
                     Valida el diagrama con el botón «Validar» para detectar elementos sueltos o sin documentar.
                 </li>
                 <li className="flex gap-2.5">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-solid" />
                     Guardar almacena el proceso en el repositorio; Exportar / Importar lo mueve como archivo JSON.
                 </li>
             </ul>

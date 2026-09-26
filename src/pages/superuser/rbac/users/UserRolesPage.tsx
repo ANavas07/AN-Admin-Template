@@ -4,12 +4,14 @@ import TableTS, { ActionCell } from '../../../../components/ui/table/TableTs'
 import ButtonComponent from '../../../../components/ui/buttons/ButtonComponent'
 import InputComponent from '../../../../components/ui/inputs/InputComponent'
 import ModuleHeader from '../../../../components/common/page/ModuleHeader'
-import { SearchIcon, EyeIcon } from '../../../../icons/icons'
+import Badge from '../../../../components/ui/badge/Badge'
+import { SearchIcon, EyeIcon, UsersIcon } from '../../../../icons/icons'
 import UserRoleAssignModal from './UserRoleAssignModal'
 import UserEffectivePermissionsPanel from './UserEffectivePermissionsPanel'
 import { usersRolesService } from '../../../../services/rbac/users-roles.service'
 import { sileo } from 'sileo'
 import type { RbacUser, UserRoleAssignment, UserGroupRole } from '../types'
+import Avatar from '../../../../components/ui/avatar/Avatar'
 
 export default function UserRolesPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -90,7 +92,7 @@ export default function UserRolesPage() {
       id: 'roleCode',
       header: 'Código',
       cell: ({ row }) => (
-        <span className="font-mono text-xs bg-(--color-bg-soft) px-2 py-0.5 rounded">
+        <span className="font-mono text-xs bg-canvas-subtle px-2 py-0.5 rounded">
           {row.original.role.code}
         </span>
       ),
@@ -102,7 +104,7 @@ export default function UserRolesPage() {
         const val = info.getValue() as string | null
         return val
           ? new Date(val).toLocaleDateString('es-CO')
-          : <span className="text-(--color-text-muted)">Indefinida</span>
+          : <span className="text-fg-muted">Indefinida</span>
       },
     },
     {
@@ -131,7 +133,7 @@ export default function UserRolesPage() {
       id: 'roleCode',
       header: 'Código',
       cell: ({ row }) => (
-        <span className="font-mono text-xs bg-(--color-bg-soft) px-2 py-0.5 rounded">
+        <span className="font-mono text-xs bg-canvas-subtle px-2 py-0.5 rounded">
           {row.original.role.code}
         </span>
       ),
@@ -140,9 +142,10 @@ export default function UserRolesPage() {
       accessorKey: 'groupName',
       header: 'Grupo de origen',
       cell: (info) => (
-        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-950 dark:text-emerald-300 dark:ring-emerald-800/50">
-          👥 {info.getValue() as string}
-        </span>
+        <Badge tone="success">
+          <UsersIcon className="size-3.5" />
+          {info.getValue() as string}
+        </Badge>
       ),
     },
   ], [])
@@ -156,8 +159,8 @@ export default function UserRolesPage() {
       />
 
       {/* Buscador de usuario */}
-      <div className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 shadow-sm">
-        <p className="mb-3 text-sm font-semibold text-(--color-text)">Seleccionar usuario</p>
+      <div className="card p-5">
+        <p className="mb-3 text-sm font-semibold text-fg">Seleccionar usuario</p>
         <div className="flex gap-2">
           <div className="flex-1">
             <InputComponent
@@ -183,23 +186,23 @@ export default function UserRolesPage() {
 
         {/* Resultados de búsqueda */}
         {searchResults.length > 0 && (
-          <div className="mt-3 rounded-xl border border-(--color-border) overflow-hidden">
+          <div className="mt-3 rounded-xl border border-line overflow-hidden">
             {searchResults.map((user) => (
               <button
                 key={user.id}
                 type="button"
                 onClick={() => selectUser(user)}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm hover:bg-(--color-bg-soft) transition-colors border-b border-(--color-border) last:border-b-0"
+                className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm hover:bg-canvas-subtle transition-colors border-b border-line last:border-b-0"
               >
-                <span className="text-base">👤</span>
-                <span className="font-medium text-(--color-text)">{user.username}</span>
+                <Avatar name={user.username} size="sm" />
+                <span className="font-medium text-fg">{user.username}</span>
               </button>
             ))}
           </div>
         )}
 
         {searchResults.length === 0 && isSearching === false && searchQuery.length >= 2 && !selectedUser && (
-          <p className="mt-2 text-sm text-(--color-text-muted)">Sin resultados para "{searchQuery}".</p>
+          <p className="mt-2 text-sm text-fg-muted">Sin resultados para "{searchQuery}".</p>
         )}
       </div>
 
@@ -208,10 +211,10 @@ export default function UserRolesPage() {
         <>
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-(--color-text)">
+              <h2 className="text-lg font-semibold text-fg">
                 {selectedUser.username}
               </h2>
-              <p className="text-sm text-(--color-text-muted)">ID: {selectedUser.id}</p>
+              <p className="text-sm text-fg-muted">ID: {selectedUser.id}</p>
             </div>
             <div className="flex gap-2">
               <ButtonComponent
@@ -229,7 +232,7 @@ export default function UserRolesPage() {
 
           {/* Roles directos */}
           <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-(--color-text)">Roles directos</h3>
+            <h3 className="text-sm font-semibold text-fg">Roles directos</h3>
             <TableTS
               data={directRoles}
               columns={directColumns}
@@ -243,8 +246,8 @@ export default function UserRolesPage() {
           {/* Roles por grupo */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-(--color-text)">Roles por grupo</h3>
-              <span className="text-xs text-(--color-text-muted)">(solo lectura — administra desde Grupos)</span>
+              <h3 className="text-sm font-semibold text-fg">Roles por grupo</h3>
+              <span className="text-xs text-fg-muted">(solo lectura — administra desde Grupos)</span>
             </div>
             <TableTS
               data={groupRoles}

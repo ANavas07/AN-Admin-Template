@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import TableTS, { ActionCell, StatusBadge } from '../../components/ui/table/TableTs'
+import { CatalogHeader, CatalogSection } from './components/CatalogLayout'
 
 type Tournament = {
 	id: string
@@ -26,22 +27,6 @@ type Event = {
 	description: string
 	date: string
 	category: string
-}
-
-function CatalogSection({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
-	return (
-		<article className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 shadow-sm">
-			<div className="mb-6">
-				<h2 className="text-base font-semibold text-(--color-text)">
-					{title}
-				</h2>
-				<p className="mt-1 text-sm text-(--color-text-muted)">
-					{description}
-				</p>
-			</div>
-			{children}
-		</article>
-	)
 }
 
 export default function TableCatalog() {
@@ -247,22 +232,10 @@ export default function TableCatalog() {
 
 	return (
 		<main className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
-			<section className="relative overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) p-6 shadow-sm sm:p-10">
-				<div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand-soft blur-3xl" />
-				<div className="pointer-events-none absolute -bottom-20 left-10 h-56 w-56 rounded-full bg-highlight-soft blur-3xl" />
-
-				<div className="relative">
-					<p className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
-						Playground
-					</p>
-					<h1 className="mt-4 max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
-						Catalogo de Tablas
-					</h1>
-					<p className="mt-3 max-w-2xl text-sm text-(--color-text-muted) sm:text-base">
-						Ejemplos de tablas con diferentes configuraciones: ordenamiento, búsqueda, paginación, estados y acciones.
-					</p>
-				</div>
-			</section>
+			<CatalogHeader
+			    title="Catalogo de Tablas"
+			    description="Ejemplos de tablas con diferentes configuraciones: ordenamiento, búsqueda, paginación, estados y acciones."
+			/>
 
 			<section className="mt-8 space-y-6">
 				<CatalogSection
@@ -307,27 +280,27 @@ export default function TableCatalog() {
 						renderExpandedRowModel={(event) => (
 							<div className="space-y-2">
 								<div>
-									<p className="text-xs font-semibold text-(--color-text-muted) uppercase">
+									<p className="text-xs font-semibold text-fg-muted uppercase">
 										Descripción
 									</p>
-									<p className="mt-1 text-sm text-(--color-text)">
+									<p className="mt-1 text-sm text-fg">
 										{event.description}
 									</p>
 								</div>
 								<div className="grid grid-cols-2 gap-4">
 									<div>
-										<p className="text-xs font-semibold text-(--color-text-muted) uppercase">
+										<p className="text-xs font-semibold text-fg-muted uppercase">
 											Categoría
 										</p>
-										<p className="mt-1 text-sm text-(--color-text)">
+										<p className="mt-1 text-sm text-fg">
 											{event.category}
 										</p>
 									</div>
 									<div>
-										<p className="text-xs font-semibold text-(--color-text-muted) uppercase">
+										<p className="text-xs font-semibold text-fg-muted uppercase">
 											ID Evento
 										</p>
-										<p className="mt-1 text-sm text-(--color-text)">
+										<p className="mt-1 text-sm text-fg">
 											{event.id}
 										</p>
 									</div>

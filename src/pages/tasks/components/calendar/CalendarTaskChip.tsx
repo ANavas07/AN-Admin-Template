@@ -26,12 +26,12 @@ export function CalendarTaskChip({ task, onOpen, overlay = false }: Props) {
                 event.stopPropagation()
                 onOpen(task.id)
             }}
-            className={`flex cursor-grab items-center gap-1 rounded-md border border-(--color-border) bg-(--color-surface) px-1.5 py-1 text-[11px] leading-tight active:cursor-grabbing ${
+            className={`flex cursor-grab items-center gap-1 rounded-md border border-line bg-surface px-1.5 py-1 text-2xs leading-tight active:cursor-grabbing ${
                 overlay ? 'rotate-2 shadow-lg ring-1 ring-brand/20' : 'hover:border-brand/50'
             } ${isDragging ? 'opacity-40' : ''}`}
         >
             <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${priorityDot[task.priority]}`} aria-hidden="true" />
-            <span className={`truncate font-medium text-(--color-text) ${task.completed ? 'line-through text-(--color-text-muted)' : ''}`}>
+            <span className={`truncate font-medium text-fg ${task.completed ? 'line-through text-fg-muted' : ''}`}>
                 {task.title}
             </span>
         </div>

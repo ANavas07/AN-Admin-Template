@@ -76,8 +76,8 @@ export function BoardView({ api, onOpenTask, onAddTask, onAddSection, matches = 
                         />
                     </div>
                 ) : dnd.activeColumnId ? (
-                    <div className="w-72 rounded-2xl border border-brand/30 bg-(--color-bg-soft) opacity-90 shadow-xl">
-                        <div className="px-3 py-2.5 text-sm font-semibold text-(--color-text)">
+                    <div className="w-72 rounded-2xl border border-brand/30 bg-canvas-subtle opacity-90 shadow-xl">
+                        <div className="px-3 py-2.5 text-sm font-semibold text-fg">
                             {sectionById.get(dnd.activeColumnId)?.name}
                         </div>
                     </div>

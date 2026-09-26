@@ -85,7 +85,7 @@ export function TimelineView({ project }: Props) {
     }, [project])
 
     return (
-        <section className="h-[62vh] min-h-130 overflow-hidden rounded-2xl border border-(--color-border) bg-(--color-surface)">
+        <section className="h-[62vh] min-h-130 overflow-hidden rounded-2xl border border-line bg-surface">
             <GanttDiagram
                 tasks={tasks}
                 links={links}

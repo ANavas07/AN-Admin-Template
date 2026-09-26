@@ -88,12 +88,12 @@ export default function MembersModal({
         >
             <div className="flex flex-col gap-4">
                 {/* Mode tabs */}
-                <div className="inline-flex w-full rounded-xl border border-(--color-border) bg-(--color-bg-soft)/50 p-1">
+                <div className="inline-flex w-full rounded-xl border border-line bg-canvas-subtle/50 p-1">
                     <button
                         type="button"
                         onClick={() => setMode('invite')}
                         className={`flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                            mode === 'invite' ? 'bg-(--color-surface) text-(--color-text) shadow-sm' : 'text-(--color-text-muted)'
+                            mode === 'invite' ? 'bg-surface text-fg shadow-sm' : 'text-fg-muted'
                         }`}
                     >
                         Invitar por correo
@@ -103,7 +103,7 @@ export default function MembersModal({
                         disabled={!canAdd}
                         onClick={() => setMode('add')}
                         className={`flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-40 ${
-                            mode === 'add' ? 'bg-(--color-surface) text-(--color-text) shadow-sm' : 'text-(--color-text-muted)'
+                            mode === 'add' ? 'bg-surface text-fg shadow-sm' : 'text-fg-muted'
                         }`}
                     >
                         Agregar existentes
@@ -130,7 +130,7 @@ export default function MembersModal({
                             </ButtonComponent>
                         </div>
                         {sent.length > 0 ? (
-                            <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-300">
+                            <div className="rounded-lg border border-success/25 bg-success-soft px-3 py-2 text-xs text-success">
                                 Invitación enviada a {sent.join(', ')} para {targetLabel}.
                             </div>
                         ) : null}
@@ -138,7 +138,7 @@ export default function MembersModal({
                 ) : (
                     <div className="flex flex-col gap-1.5">
                         {candidates.length === 0 ? (
-                            <p className="py-4 text-center text-sm text-(--color-text-muted)">
+                            <p className="py-4 text-center text-sm text-fg-muted">
                                 Todas las personas ya pertenecen a {targetLabel}.
                             </p>
                         ) : (
@@ -160,10 +160,10 @@ export default function MembersModal({
 function MemberRow({ member, onAdd }: { member: Assignee; onAdd: () => void }) {
     const [added, setAdded] = useState(false)
     return (
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-(--color-border) px-3 py-2">
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-line px-3 py-2">
             <span className="flex items-center gap-2.5">
                 <AssigneeAvatar assignee={member} size="md" />
-                <span className="text-sm font-medium text-(--color-text)">{member.name}</span>
+                <span className="text-sm font-medium text-fg">{member.name}</span>
             </span>
             <ButtonComponent
                 size="sm"

@@ -1,5 +1,5 @@
 import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent, ReactNode, Ref } from 'react'
-import { NoteIcon } from '../../icons/icons'
+import { FileDocIcon, NoteIcon, UserIcon } from '../../icons/icons'
 import { cn } from '../../utils/cn'
 import BpmnGlyph from './components/BpmnGlyph'
 import {
@@ -63,7 +63,7 @@ export default function FlowNodeView({
                 data-flow-port="input"
                 onPointerDown={onCompleteConnection}
                 className={cn(
-                    'absolute -left-2.5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 rounded-full border-2 bg-(--color-surface) transition-transform',
+                    'absolute -left-2.5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 rounded-full border-2 bg-surface transition-transform',
                     colorStyle.border,
                     isConnectCandidate ? 'scale-125 animate-pulse cursor-pointer' : 'cursor-crosshair'
                 )}
@@ -78,7 +78,7 @@ export default function FlowNodeView({
                 onPointerMove={onPortPointerMove}
                 onPointerUp={onPortPointerUp}
                 className={cn(
-                    'absolute -right-2.5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 cursor-crosshair touch-none rounded-full border-2 bg-(--color-surface) transition-transform hover:scale-125',
+                    'absolute -right-2.5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 cursor-crosshair touch-none rounded-full border-2 bg-surface transition-transform hover:scale-125',
                     colorStyle.border,
                     isConnectSource ? 'scale-125 ring-2 ring-brand/40' : ''
                 )}
@@ -99,21 +99,21 @@ export default function FlowNodeView({
             // Timer / message start & intermediate events show their marker inside the circle
             const hasMarker = node.bpmnType !== null && node.bpmnType !== 'startEvent' && node.bpmnType !== 'endEvent'
             const accentText = isStart
-                ? 'text-emerald-600 dark:text-emerald-400'
+                ? 'text-success'
                 : isIntermediate
-                    ? 'text-sky-600 dark:text-sky-400'
-                    : 'text-rose-600 dark:text-rose-400'
+                    ? 'text-info'
+                    : 'text-danger'
             body = (
                 <>
                     <div
                         className={cn(
-                            'flex h-16 w-16 flex-col items-center justify-center rounded-full bg-(--color-surface) shadow-sm',
+                            'flex h-16 w-16 flex-col items-center justify-center rounded-full bg-surface shadow-sm',
                             isStart
-                                ? 'border-2 border-emerald-500'
+                                ? 'border-2 border-success'
                                 : isIntermediate
-                                    ? 'border-2 border-sky-500 ring-2 ring-inset ring-sky-500/60 ring-offset-2 ring-offset-(--color-surface)'
-                                    : 'border-[5px] border-rose-500',
-                            isSelected ? 'ring-2 ring-brand/40 ring-offset-2 ring-offset-(--color-bg)' : ''
+                                    ? 'border-2 border-info ring-2 ring-inset ring-info/60 ring-offset-2 ring-offset-surface'
+                                    : 'border-[5px] border-danger',
+                            isSelected ? 'ring-2 ring-brand/40 ring-offset-2 ring-offset-canvas' : ''
                         )}
                         title={node.bpmnType ? bpmnTypeLabels[node.bpmnType] : undefined}
                     >
@@ -122,7 +122,7 @@ export default function FlowNodeView({
                         ) : null}
                         <span
                             className={cn(
-                                'px-1 text-center text-[10px] font-bold uppercase tracking-wide',
+                                'px-1 text-center text-3xs font-bold uppercase tracking-caps',
                                 hasMarker ? 'line-clamp-1' : '',
                                 accentText
                             )}
@@ -131,7 +131,7 @@ export default function FlowNodeView({
                         </span>
                     </div>
                     {node.description ? (
-                        <p className="absolute left-1/2 top-full mt-1 w-32 -translate-x-1/2 text-center text-[10px] leading-3 text-(--color-text-muted)">
+                        <p className="absolute left-1/2 top-full mt-1 w-32 -translate-x-1/2 text-center text-3xs leading-3 text-fg-muted">
                             {node.description}
                         </p>
                     ) : null}
@@ -145,19 +145,19 @@ export default function FlowNodeView({
                 <div className="relative h-32 w-32" title={node.bpmnType ? bpmnTypeLabels[node.bpmnType] : undefined}>
                     <div
                         className={cn(
-                            'absolute inset-4 rotate-45 rounded-xl border-2 bg-(--color-surface) shadow-sm',
+                            'absolute inset-4 rotate-45 rounded-xl border-2 bg-surface shadow-sm',
                             colorStyle.border,
                             isSelected ? 'ring-2 ring-brand/40' : ''
                         )}
                     />
                     {/* Gateway type marker (X / O / + / event) */}
                     {node.bpmnType && node.bpmnType !== 'exclusiveGateway' ? (
-                        <span className="absolute left-1/2 top-1.5 -translate-x-1/2 rounded-full bg-(--color-surface) p-0.5 text-(--color-text-muted)">
+                        <span className="absolute left-1/2 top-1.5 -translate-x-1/2 rounded-full bg-surface p-0.5 text-fg-muted">
                             <BpmnGlyph kind="decision" bpmnType={node.bpmnType} className="size-4" />
                         </span>
                     ) : null}
                     <div className="absolute inset-0 flex items-center justify-center p-6">
-                        <span className="line-clamp-3 text-center text-xs font-bold leading-4 text-(--color-text)">
+                        <span className="line-clamp-3 text-center text-xs font-semibold leading-4 text-fg">
                             {node.title}
                         </span>
                     </div>
@@ -170,16 +170,16 @@ export default function FlowNodeView({
             body = (
                 <div
                     className={cn(
-                        'rounded-lg border-2 border-dashed border-amber-500/70 bg-amber-50 px-3.5 py-3 shadow-sm dark:bg-amber-500/10',
+                        'rounded-lg border-2 border-dashed border-warning/60 bg-warning-soft px-3.5 py-3 shadow-sm',
                         isSelected ? 'ring-2 ring-brand/40' : ''
                     )}
                 >
-                    <p className="flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-300">
+                    <p className="flex items-center gap-1.5 text-xs font-semibold text-warning">
                         <NoteIcon className="size-3.5 shrink-0" />
                         <span className="truncate">{node.title}</span>
                     </p>
                     {node.description ? (
-                        <p className="mt-1.5 line-clamp-5 text-[11px] leading-4 text-amber-900/80 dark:text-amber-200/80">
+                        <p className="mt-1.5 line-clamp-5 text-2xs leading-4 text-fg-muted">
                             {node.description}
                         </p>
                     ) : null}
@@ -192,21 +192,21 @@ export default function FlowNodeView({
             body = (
                 <div
                     className={cn(
-                        'relative rounded-xl border bg-(--color-surface) shadow-sm',
-                        isSelected ? 'border-brand ring-2 ring-brand/30' : 'border-(--color-border)'
+                        'relative rounded-xl border bg-surface shadow-sm',
+                        isSelected ? 'border-brand ring-2 ring-brand/30' : 'border-line'
                     )}
                     style={{ clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%)' }}
                 >
                     {/* Folded corner */}
                     <span
-                        className="absolute right-0 top-0 h-4 w-4 rounded-bl-lg border-b border-l border-(--color-border) bg-(--color-bg-soft)"
+                        className="absolute right-0 top-0 h-4 w-4 rounded-bl-lg border-b border-l border-line bg-canvas-subtle"
                         aria-hidden="true"
                     />
                     <div className={`h-1.5 ${colorStyle.bar}`} style={{ width: 'calc(100% - 16px)' }} />
                     <div className="px-3.5 py-2.5">
-                        <p className="truncate text-xs font-bold text-(--color-text)">{node.title}</p>
+                        <p className="truncate text-xs font-semibold text-fg">{node.title}</p>
                         {node.description ? (
-                            <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-(--color-text-muted)">
+                            <p className="mt-0.5 line-clamp-2 text-2xs leading-4 text-fg-muted">
                                 {node.description}
                             </p>
                         ) : null}
@@ -226,7 +226,7 @@ export default function FlowNodeView({
                         isSelected ? 'ring-2 ring-brand/40' : ''
                     )}
                 >
-                    <span className="absolute left-3 top-2 max-w-[80%] truncate rounded-full bg-(--color-surface) px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-(--color-text-muted) shadow-sm">
+                    <span className="absolute left-3 top-2 max-w-[80%] truncate rounded-full bg-surface px-2.5 py-0.5 text-3xs font-bold uppercase tracking-caps text-fg-muted shadow-sm">
                         {node.title}
                     </span>
                 </div>
@@ -238,13 +238,13 @@ export default function FlowNodeView({
             body = (
                 <div
                     className={cn(
-                        'flex h-full w-full overflow-hidden rounded-xl border bg-(--color-surface)/40',
-                        isSelected ? 'border-brand ring-2 ring-brand/30' : 'border-(--color-border)'
+                        'flex h-full w-full overflow-hidden rounded-xl border bg-surface/40',
+                        isSelected ? 'border-brand ring-2 ring-brand/30' : 'border-line'
                     )}
                 >
-                    <div className={cn('flex w-7 shrink-0 items-center justify-center border-r border-(--color-border)', colorStyle.soft)}>
+                    <div className={cn('flex w-7 shrink-0 items-center justify-center border-r border-line', colorStyle.soft)}>
                         <span
-                            className="rotate-180 truncate text-[10px] font-bold uppercase tracking-[0.2em] text-(--color-text-muted)"
+                            className="rotate-180 truncate text-3xs font-bold uppercase tracking-caps text-fg-muted"
                             style={{ writingMode: 'vertical-rl', maxHeight: '90%' }}
                         >
                             {node.title}
@@ -260,8 +260,8 @@ export default function FlowNodeView({
             body = (
                 <div
                     className={cn(
-                        'rounded-2xl border bg-(--color-surface) shadow-sm transition-shadow',
-                        isSelected ? 'border-brand shadow-lg ring-2 ring-brand/30' : 'border-(--color-border) hover:shadow-md'
+                        'rounded-2xl border bg-surface shadow-sm transition-shadow',
+                        isSelected ? 'border-brand shadow-lg ring-2 ring-brand/30' : 'border-line hover:shadow-md'
                     )}
                 >
                     <div className={`h-1.5 rounded-t-2xl ${colorStyle.bar}`} />
@@ -270,35 +270,37 @@ export default function FlowNodeView({
                             {/* BPMN task-type badge (user / service / manual / script / rule / subprocess) */}
                             {node.bpmnType && node.bpmnType !== 'task' ? (
                                 <span
-                                    className="shrink-0 text-(--color-text-muted)"
+                                    className="shrink-0 text-fg-muted"
                                     title={bpmnTypeLabels[node.bpmnType]}
                                 >
                                     <BpmnGlyph kind="task" bpmnType={node.bpmnType} className="size-3.5" />
                                 </span>
                             ) : null}
-                            <p className="truncate text-sm font-bold text-(--color-text)">{node.title}</p>
+                            <p className="truncate text-sm font-semibold text-fg">{node.title}</p>
                         </div>
                         {node.description ? (
-                            <p className="mt-1 line-clamp-2 text-xs leading-5 text-(--color-text-muted)">
+                            <p className="mt-1 line-clamp-2 text-xs leading-5 text-fg-muted">
                                 {node.description}
                             </p>
                         ) : null}
                         {node.note ? (
-                            <p className="mt-2 flex items-start gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] leading-4 text-amber-800 ring-1 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-300">
+                            <p className="mt-2 flex items-start gap-1.5 rounded-md bg-warning-soft px-2.5 py-1.5 text-2xs leading-4 text-warning ring-1 ring-warning/20">
                                 <NoteIcon className="mt-0.5 size-3.5 shrink-0" />
                                 <span className="line-clamp-3">{node.note}</span>
                             </p>
                         ) : null}
                         {node.data.responsible || node.data.documents.length > 0 ? (
-                            <p className="mt-1.5 flex items-center gap-2 text-[10px] text-(--color-text-muted)">
+                            <p className="mt-1.5 flex items-center gap-2 text-3xs text-fg-muted">
                                 {node.data.responsible ? (
-                                    <span className="truncate" title={`Responsable: ${node.data.responsible}`}>
-                                        👤 {node.data.responsible}
+                                    <span className="flex min-w-0 items-center gap-1" title={`Responsable: ${node.data.responsible}`}>
+                                        <UserIcon className="size-3 shrink-0" />
+                                        <span className="truncate">{node.data.responsible}</span>
                                     </span>
                                 ) : null}
                                 {node.data.documents.length > 0 ? (
-                                    <span className="shrink-0" title={`${node.data.documents.length} documento(s)`}>
-                                        📎 {node.data.documents.length}
+                                    <span className="flex shrink-0 items-center gap-1" title={`${node.data.documents.length} documento(s)`}>
+                                        <FileDocIcon className="size-3" />
+                                        {node.data.documents.length}
                                     </span>
                                 ) : null}
                             </p>
@@ -338,7 +340,7 @@ export default function FlowNodeView({
                     onPointerMove={onResizeMove}
                     onPointerUp={onResizeEnd}
                     className={cn(
-                        'absolute -bottom-1.5 -right-1.5 z-10 h-4 w-4 cursor-se-resize touch-none rounded-sm border-2 bg-(--color-surface)',
+                        'absolute -bottom-1.5 -right-1.5 z-10 h-4 w-4 cursor-se-resize touch-none rounded-sm border-2 bg-surface',
                         colorStyle.border
                     )}
                     aria-label={`Resize ${node.title}`}

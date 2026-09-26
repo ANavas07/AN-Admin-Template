@@ -65,15 +65,15 @@ export default function IconPicker({
     <div className="flex flex-col gap-4">
       {/* Pestañas */}
       {allowUpload && (
-        <div className="flex gap-1 rounded-xl bg-(--color-bg-soft) p-1">
+        <div className="flex gap-1 rounded-xl bg-canvas-subtle p-1">
           <button
             type="button"
             onClick={() => setTab('catalog')}
             className={cn(
               'flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
               tab === 'catalog'
-                ? 'bg-(--color-surface) text-(--color-text) shadow-sm'
-                : 'text-(--color-text-muted) hover:text-(--color-text)',
+                ? 'bg-surface text-fg shadow-sm'
+                : 'text-fg-muted hover:text-fg',
             )}
           >
             Catálogo
@@ -84,8 +84,8 @@ export default function IconPicker({
             className={cn(
               'flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
               tab === 'upload'
-                ? 'bg-(--color-surface) text-(--color-text) shadow-sm'
-                : 'text-(--color-text-muted) hover:text-(--color-text)',
+                ? 'bg-surface text-fg shadow-sm'
+                : 'text-fg-muted hover:text-fg',
             )}
           >
             Subir imagen
@@ -106,11 +106,11 @@ export default function IconPicker({
           />
 
           {catalog.loading ? (
-            <p className="py-8 text-center text-sm text-(--color-text-muted)">Cargando catálogo…</p>
+            <p className="py-8 text-center text-sm text-fg-muted">Cargando catálogo…</p>
           ) : catalog.error ? (
-            <p className="py-8 text-center text-sm text-red-600 dark:text-red-400">{catalog.error}</p>
+            <p className="py-8 text-center text-sm text-danger">{catalog.error}</p>
           ) : results.length === 0 ? (
-            <p className="py-8 text-center text-sm text-(--color-text-muted)">
+            <p className="py-8 text-center text-sm text-fg-muted">
               Sin resultados para “{query}”.
             </p>
           ) : (
@@ -123,10 +123,10 @@ export default function IconPicker({
                   onClick={() => onSelectIcon(icon.id)}
                   className={cn(
                     'flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all',
-                    'hover:border-brand hover:bg-(--color-bg-soft) active:scale-[0.97]',
+                    'hover:border-brand hover:bg-canvas-subtle active:scale-[0.97]',
                     selectedIconId === icon.id
                       ? 'border-brand bg-brand-soft'
-                      : 'border-(--color-border) bg-(--color-surface)',
+                      : 'border-line bg-surface',
                   )}
                 >
                   <img
@@ -135,7 +135,7 @@ export default function IconPicker({
                     className="h-7 w-7"
                     loading="lazy"
                   />
-                  <span className="w-full truncate text-center text-[10px] leading-tight text-(--color-text-muted)">
+                  <span className="w-full truncate text-center text-3xs leading-tight text-fg-muted">
                     {icon.label}
                   </span>
                 </button>
@@ -153,15 +153,15 @@ export default function IconPicker({
             onChange={(e) => handleFile(e.target.files?.[0])}
           />
           <div
-            className="flex w-full flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-(--color-border) bg-(--color-bg-soft) px-6 py-10 text-center"
+            className="flex w-full flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-line bg-canvas-subtle px-6 py-10 text-center"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault()
               handleFile(e.dataTransfer.files?.[0])
             }}
           >
-            <p className="text-sm text-(--color-text)">Arrastra una imagen o selecciónala.</p>
-            <p className="text-xs text-(--color-text-muted)">
+            <p className="text-sm text-fg">Arrastra una imagen o selecciónala.</p>
+            <p className="text-xs text-fg-muted">
               PNG, JPG, SVG o WebP · máx. {(UPLOAD.maxBytes / (1024 * 1024)).toFixed(0)} MB
             </p>
             <ButtonComponent
@@ -179,7 +179,7 @@ export default function IconPicker({
       )}
 
       {onClear && (
-        <div className="flex justify-end border-t border-(--color-border) pt-3">
+        <div className="flex justify-end border-t border-line pt-3">
           <ButtonComponent variant="ghost" size="sm" onClick={onClear}>
             Quitar recurso
           </ButtonComponent>

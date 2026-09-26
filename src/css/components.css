@@ -1,0 +1,33 @@
+/* ==========================================================================
+   Reusable component classes. They compose theme tokens so recurring
+   patterns are written once; each one is a normal Tailwind utility and can
+   be combined with others (`card p-5`, `eyebrow text-brand`).
+   ========================================================================== */
+
+/* Standard container for content blocks, stats, lists and forms */
+@utility card {
+	@apply rounded-2xl border border-line bg-surface shadow-xs;
+}
+
+/* Card that reacts to hover (clickable tiles, module launchers) */
+@utility card-interactive {
+	@apply rounded-2xl border border-line bg-surface shadow-xs transition-[border-color,box-shadow];
+	&:hover {
+		@apply border-line-strong shadow-md;
+	}
+}
+
+/* Small uppercase label above a title or a group of fields */
+@utility eyebrow {
+	@apply text-xs font-semibold uppercase tracking-caps text-fg-muted;
+}
+
+/* Page-level heading used by every module header */
+@utility page-title {
+	@apply text-2xl font-semibold tracking-tight text-fg;
+}
+
+/* Recessed toolbar / header strip inside a card (tables, panels) */
+@utility surface-header {
+	@apply border-b border-line bg-surface-muted;
+}

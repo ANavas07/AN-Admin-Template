@@ -2,6 +2,8 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, KeyboardEventHandler, ReactNode } from 'react'
 import { ChevronIcon, ClearIcon, SearchIcon } from '../../../icons/icons'
 import { cn } from '../../../utils/cn'
+import { FieldLabel, FieldMessage } from './field'
+import { fieldControlClass, fieldSizeClasses } from './fieldStyles'
 
 type OptionValue = string | number | boolean
 
@@ -214,14 +216,13 @@ const DataList = <T,>({
     return (
         <div className={cn('w-full', containerClassName)}>
             {label ? (
-                <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                <FieldLabel htmlFor={inputId} required={requiredMark}>
                     {label}
-                    {requiredMark ? <span className="ml-1 text-red-500">*</span> : null}
-                </label>
+                </FieldLabel>
             ) : null}
 
             <div ref={wrapperRef} className={cn('relative', className)}>
-                <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-(--color-text-muted)">
+                <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-fg-muted">
                     {leftIcon ?? <SearchIcon />}
                 </span>
 
@@ -249,21 +250,17 @@ const DataList = <T,>({
                     aria-invalid={Boolean(error)}
                     aria-describedby={describedBy}
                     className={cn(
-                        'h-11 w-full rounded-xl border bg-(--color-surface) py-2.5 pl-10 pr-20 text-sm text-(--color-text)',
-                        'placeholder:text-(--color-text-muted) transition-all duration-200',
-                        'focus:outline-none focus:ring-2 focus:ring-highlight/25',
-                        'disabled:cursor-not-allowed disabled:opacity-60',
-                        error
-                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                            : 'border-(--color-border) focus:border-highlight'
+                        fieldControlClass(Boolean(error)),
+                        fieldSizeClasses.md,
+                        'pl-9 pr-18'
                     )}
                 />
 
-                <div className="absolute inset-y-0 right-2 flex items-center gap-1 text-(--color-text-muted)">
+                <div className="absolute inset-y-0 right-2 flex items-center gap-1 text-fg-muted">
                     {clearable && inputValue && !disabled ? (
                         <button
                             type="button"
-                            className="inline-flex size-8 items-center justify-center rounded-lg hover:bg-(--color-bg-soft) hover:text-(--color-text)"
+                            className="inline-flex size-8 items-center justify-center rounded-lg hover:bg-canvas-subtle hover:text-fg"
                             aria-label="Limpiar seleccion"
                             onClick={clearSelection}
                         >
@@ -273,7 +270,7 @@ const DataList = <T,>({
 
                     <button
                         type="button"
-                        className="inline-flex size-8 items-center justify-center rounded-lg hover:bg-(--color-bg-soft) hover:text-(--color-text) disabled:pointer-events-none disabled:opacity-50"
+                        className="inline-flex size-8 items-center justify-center rounded-lg hover:bg-canvas-subtle hover:text-fg disabled:pointer-events-none disabled:opacity-50"
                         aria-label={open ? 'Cerrar opciones' : 'Abrir opciones'}
                         disabled={disabled}
                         onClick={() => {
@@ -289,10 +286,10 @@ const DataList = <T,>({
                     <div
                         id={listId}
                         role="listbox"
-                        className="absolute left-0 top-full z-40 mt-2 max-h-64 w-full overflow-hidden rounded-xl border border-(--color-border) bg-(--color-surface) shadow-lg"
+                        className="absolute left-0 top-full z-40 mt-2 max-h-64 w-full overflow-hidden rounded-xl border border-line bg-surface shadow-lg"
                     >
                         {isLoading ? (
-                            <div className="px-3 py-3 text-sm text-(--color-text-muted)">
+                            <div className="px-3 py-3 text-sm text-fg-muted">
                                 Cargando opciones...
                             </div>
                         ) : filteredOptions.length > 0 ? (
@@ -312,26 +309,26 @@ const DataList = <T,>({
                                             aria-selected={selected}
                                             className={cn(
                                                 'cursor-pointer px-3 py-2.5 transition-colors',
-                                                active && 'bg-(--color-bg-soft)',
-                                                selected && 'text-highlight'
+                                                active && 'bg-canvas-subtle',
+                                                selected && 'text-brand'
                                             )}
                                             onMouseEnter={() => setActiveIndex(index)}
                                             onMouseDown={(event) => event.preventDefault()}
                                             onClick={() => commitSelection(option)}
                                         >
                                             <div className="flex items-center justify-between gap-3">
-                                                <span className="truncate text-sm font-medium text-(--color-text)">
+                                                <span className="truncate text-sm font-medium text-fg">
                                                     {text}
                                                 </span>
                                                 {selected ? (
-                                                    <span className="text-xs font-semibold text-highlight">
+                                                    <span className="text-xs font-medium text-brand">
                                                         Seleccionado
                                                     </span>
                                                 ) : null}
                                             </div>
 
                                             {optionP && extra ? (
-                                                <p className="mt-0.5 truncate text-xs text-(--color-text-muted)">
+                                                <p className="mt-0.5 truncate text-xs text-fg-muted">
                                                     {extra}
                                                 </p>
                                             ) : null}
@@ -340,7 +337,7 @@ const DataList = <T,>({
                                 })}
                             </ul>
                         ) : (
-                            <div className="px-3 py-3 text-sm text-(--color-text-muted)">
+                            <div className="px-3 py-3 text-sm text-fg-muted">
                                 {emptyText}
                             </div>
                         )}
@@ -348,17 +345,7 @@ const DataList = <T,>({
                 ) : null}
             </div>
 
-            {helpText ? (
-                <p
-                    id={`${inputId}-description`}
-                    className={cn(
-                        'mt-1 text-xs',
-                        error ? 'text-red-600 dark:text-red-400' : 'text-(--color-text-muted)'
-                    )}
-                >
-                    {helpText}
-                </p>
-            ) : null}
+            <FieldMessage id={`${inputId}-description`} error={error} hint={hint} />
         </div>
     )
 }

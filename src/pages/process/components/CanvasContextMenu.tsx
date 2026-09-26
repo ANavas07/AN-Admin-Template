@@ -19,7 +19,7 @@ export default function CanvasContextMenu({ menu, onDuplicate, onRemove }: Canva
     return (
         <div
             onPointerDown={(event) => event.stopPropagation()}
-            className="absolute z-50 w-44 overflow-hidden rounded-xl border border-(--color-border) bg-(--color-surface) py-1 shadow-xl"
+            className="absolute z-50 w-44 overflow-hidden rounded-xl border border-line bg-surface py-1 shadow-xl"
             style={{ left: menu.x, top: menu.y }}
             role="menu"
         >
@@ -28,7 +28,7 @@ export default function CanvasContextMenu({ menu, onDuplicate, onRemove }: Canva
                     type="button"
                     role="menuitem"
                     onClick={() => onDuplicate(menu.targetId)}
-                    className="w-full px-4 py-2 text-left text-sm text-(--color-text) transition-colors hover:bg-(--color-bg-soft)"
+                    className="w-full px-4 py-2 text-left text-sm text-fg transition-colors hover:bg-canvas-subtle"
                 >
                     Duplicar
                 </button>
@@ -37,7 +37,7 @@ export default function CanvasContextMenu({ menu, onDuplicate, onRemove }: Canva
                 type="button"
                 role="menuitem"
                 onClick={() => onRemove(menu)}
-                className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-rose-600 transition-colors hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-900/30"
+                className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-danger transition-colors hover:bg-danger-soft"
             >
                 <TrashBinIcon className="size-4" />
                 Eliminar

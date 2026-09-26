@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import InputComponent from '../ui/inputs/InputComponent'
 import SidebarPanel from './SidebarPanel'
 import ModuleCard from './ModuleCard'
+import ModuleIcon from './ModuleIcon'
+import { ChevronIcon } from '../../icons/icons'
 import type { ModuleCategory } from './data/modules'
 
 export type { ModuleCategory }
@@ -60,18 +62,16 @@ export default function MainPanel({
     const activeCategory = expandedCategory || firstCategoryName
 
     return (
-        <div className="min-h-screen bg-(--color-bg) py-6">
-            <div className="mx-auto  px-4 sm:px-6 lg:px-8">
+        <div className="min-h-[calc(100vh-var(--layout-navbar-height))] bg-canvas py-6">
+            <div className="mx-auto max-w-(--layout-content-max-width) px-4 sm:px-6 lg:px-8">
                 {/* Breadcrumb */}
-                <div className="mb-6 flex items-center gap-2 text-sm">
-                    <span className="text-(--color-text-muted)">Inicio</span>
-                    <span className="text-(--color-text-muted)">/</span>
-                    <span className="font-medium text-(--color-text)">Panel Admin</span>
-                </div>
+                <nav className="mb-6 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+                    <span className="text-fg-muted">Inicio</span>
+                    <span className="text-fg-subtle" aria-hidden="true">/</span>
+                    <span className="font-medium text-fg">Panel Admin</span>
+                </nav>
 
-                {/* Layout de 2 columnas */}
-                <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
-                    {/* Sidebar */}
+                <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
                     <aside>
                         <SidebarPanel
                             userName={userName}
@@ -79,105 +79,85 @@ export default function MainPanel({
                             organization={organization}
                             identifier={identifier}
                             location={location}
-                            onUploadPhoto={() =>
-                                console.log('Subir foto clicked')
-                            }
-                            onIdentification={() =>
-                                console.log('Identificación clicked')
-                            }
+                            onUploadPhoto={() => console.log('Subir foto clicked')}
+                            onIdentification={() => console.log('Identificación clicked')}
                         />
                     </aside>
 
-                    {/* Contenido Principal */}
-                    <main className="space-y-6">
-                        {/* Encabezado */}
-                        <div>
-                            <div className="inline-flex items-center gap-2 rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-wider text-(--color-text-muted)">
-                                <span>📚</span>
-                                Módulos Disponibles
+                    <main className="min-w-0 space-y-6">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                            <div>
+                                <p className="eyebrow">Espacio de trabajo</p>
+                                <h1 className="page-title mt-1.5">Módulos disponibles</h1>
+                                <p className="mt-1.5 text-sm text-fg-muted">
+                                    {filteredCategories.length} grupos ·{' '}
+                                    {filteredCategories.reduce((total, c) => total + c.modules.length, 0)} módulos con
+                                    acceso para tu rol
+                                </p>
                             </div>
-                            <h1 className="mt-3 text-3xl font-bold text-(--color-text)">
-                                Módulos Disponibles
-                            </h1>
-                            <p className="mt-2 text-sm text-(--color-text-muted)">
-                                Grupos:{' '}
-                                <span className="font-semibold">
-                                    {filteredCategories
-                                        .map((c) => c.name)
-                                        .join(', ')}
-                                </span>
-                            </p>
+                            <div className="w-full sm:max-w-sm">
+                                <InputComponent
+                                    aria-label="Buscar módulos por nombre o descripción"
+                                    placeholder="Buscar módulos…"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    showSearchIcon
+                                    iconPosition="left"
+                                />
+                            </div>
                         </div>
 
-                        {/* Búsqueda */}
-                        <div className="relative">
-                            <InputComponent
-                                label="Buscar módulos por nombre o descripción..."
-                                placeholder="Ej. calendario, reportes, soporte"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                variant="search"
-                                showSearchIcon
-                                hint="Busca por nombre o descripcion."
-                            />
-                        </div>
-
-                        {/* Categorías de módulos */}
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {filteredCategories.length > 0 ? (
-                                filteredCategories.map((category) => (
-                                    <div key={category.name}>
-                                        {/* Encabezado de categoría */}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setExpandedCategory(
-                                                    activeCategory === category.name ? null : category.name
-                                                )
-                                            }
-                                            className="group mb-4 flex w-full items-center gap-2 text-lg font-bold text-(--color-text) transition-colors hover:text-highlight"
-                                        >
-                                            <span className="text-2xl">{category.icon}</span>
-                                            {category.name.toUpperCase()}
-                                            <span
-                                                className={`ml-auto text-lg transition-transform ${activeCategory === category.name
-                                                    ? 'rotate-180'
-                                                    : ''
-                                                    }`}
+                                filteredCategories.map((category) => {
+                                    const isOpen = activeCategory === category.name
+                                    return (
+                                        <section key={category.name} className="card">
+                                            <button
+                                                type="button"
+                                                onClick={() => setExpandedCategory(isOpen ? null : category.name)}
+                                                aria-expanded={isOpen}
+                                                className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-left transition-colors hover:bg-canvas-subtle/60"
                                             >
-                                                ▼
-                                            </span>
-                                        </button>
+                                                <span className="inline-flex size-8 items-center justify-center rounded-md bg-canvas-subtle text-fg-muted">
+                                                    <ModuleIcon name={category.icon} className="size-4" />
+                                                </span>
+                                                <span className="text-sm font-semibold text-fg">
+                                                    {formatCategoryName(category.name)}
+                                                </span>
+                                                <span className="rounded-full bg-canvas-subtle px-2 py-0.5 text-2xs font-medium text-fg-muted">
+                                                    {category.modules.length}
+                                                </span>
+                                                <ChevronIcon
+                                                    className={`ml-auto size-4 text-fg-subtle transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                                                />
+                                            </button>
 
-                                        {/* Grid de módulos */}
-                                        {activeCategory === category.name && (
-                                            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                                                {category.modules.map((module) => (
-                                                    <ModuleCard
-                                                        key={module.id}
-                                                        icon={module.icon}
-                                                        title={module.title}
-                                                        description={module.description}
-                                                        isAvailable={Boolean(module.url)}
-                                                        onClick={
-                                                            module.url
-                                                                ? () => onModuleClick?.(module.url as string)
-                                                                : undefined
-                                                        }
-                                                    />
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))
+                                            {isOpen && (
+                                                <div className="grid grid-cols-1 gap-3 border-t border-line p-4 sm:grid-cols-2 xl:grid-cols-3">
+                                                    {category.modules.map((module) => (
+                                                        <ModuleCard
+                                                            key={module.id}
+                                                            icon={module.icon}
+                                                            title={module.title}
+                                                            description={module.description}
+                                                            isAvailable={Boolean(module.url)}
+                                                            onClick={
+                                                                module.url
+                                                                    ? () => onModuleClick?.(module.url as string)
+                                                                    : undefined
+                                                            }
+                                                        />
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </section>
+                                    )
+                                })
                             ) : (
-                                <div className="rounded-2xl border-2 border-dashed border-(--color-border) bg-(--color-bg-soft) p-12 text-center">
-                                    <p className="text-lg font-semibold text-(--color-text)">
-                                        No hay módulos disponibles
-                                    </p>
-                                    <p className="mt-2 text-sm text-(--color-text-muted)">
-                                        Intenta ajustar tu búsqueda
-                                    </p>
+                                <div className="rounded-2xl border border-dashed border-line-strong p-12 text-center">
+                                    <p className="text-sm font-semibold text-fg">No hay módulos disponibles</p>
+                                    <p className="mt-1 text-sm text-fg-muted">Intenta ajustar tu búsqueda</p>
                                 </div>
                             )}
                         </div>
@@ -186,4 +166,9 @@ export default function MainPanel({
             </div>
         </div>
     )
+}
+
+/** "OPERACION" → "Operacion": category ids are stored uppercase. */
+function formatCategoryName(name: string) {
+    return name.charAt(0) + name.slice(1).toLowerCase()
 }

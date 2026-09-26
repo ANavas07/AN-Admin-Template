@@ -51,7 +51,7 @@ type AppRoutesProps = {
 function RouteFallback() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <span className="text-sm text-(--color-text-muted)">Cargando modulo...</span>
+      <span className="text-sm text-fg-muted">Cargando modulo...</span>
     </div>
   )
 }

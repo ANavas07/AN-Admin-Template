@@ -101,7 +101,7 @@ export function TaskDetailPanel({ taskId, api, onClose }: Props) {
         <div className="fixed inset-0 z-50">
             {/* Backdrop */}
             <div
-                className={`absolute inset-0 bg-black/40 transition-opacity duration-200 ${visible ? 'opacity-100' : 'opacity-0'}`}
+                className={`absolute inset-0 bg-overlay transition-opacity ${visible ? 'opacity-100' : 'opacity-0'}`}
                 onClick={requestClose}
                 aria-hidden="true"
             />
@@ -111,14 +111,14 @@ export function TaskDetailPanel({ taskId, api, onClose }: Props) {
                 role="dialog"
                 aria-modal="true"
                 aria-label={`Detalle de la tarea ${task.title}`}
-                className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-(--color-border) bg-(--color-surface) shadow-2xl transition-transform duration-200 ease-out ${
+                className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-line bg-surface shadow-2xl transition-transform duration-200 ease-out ${
                     visible ? 'translate-x-0' : 'translate-x-full'
                 }`}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between gap-3 border-b border-(--color-border) px-4 py-3">
-                    <div className="flex items-center gap-2 text-xs text-(--color-text-muted)">
-                        <span className="rounded-full border border-(--color-border) px-2 py-0.5 font-medium">
+                <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+                    <div className="flex items-center gap-2 text-xs text-fg-muted">
+                        <span className="rounded-full border border-line px-2 py-0.5 font-medium">
                             {section?.name ?? '—'}
                         </span>
                     </div>
@@ -154,7 +154,7 @@ export function TaskDetailPanel({ taskId, api, onClose }: Props) {
                                         commitTitle()
                                     }
                                 }}
-                                className="w-full resize-none rounded-lg border border-highlight bg-(--color-surface) px-2 py-1 text-lg font-semibold text-(--color-text) focus:outline-none focus:ring-2 focus:ring-highlight/25"
+                                className="w-full resize-none rounded-lg border border-brand bg-surface px-2 py-1 text-lg font-semibold text-fg focus:outline-none focus:ring-2 focus:ring-brand/25"
                             />
                         ) : (
                             <h2
@@ -162,7 +162,7 @@ export function TaskDetailPanel({ taskId, api, onClose }: Props) {
                                     setTitleDraft(task.title)
                                     setEditingTitle(true)
                                 }}
-                                className={`cursor-text text-lg font-semibold leading-snug text-(--color-text) ${task.completed ? 'text-(--color-text-muted) line-through' : ''}`}
+                                className={`cursor-text text-lg font-semibold leading-snug text-fg ${task.completed ? 'text-fg-muted line-through' : ''}`}
                             >
                                 {task.title}
                             </h2>
@@ -183,42 +183,42 @@ export function TaskDetailPanel({ taskId, api, onClose }: Props) {
 
                     {/* Description */}
                     <div className="mt-4">
-                        <h3 className="mb-1.5 text-sm font-semibold text-(--color-text)">Descripción</h3>
+                        <h3 className="mb-1.5 text-sm font-semibold text-fg">Descripción</h3>
                         <textarea
                             defaultValue={task.description}
                             key={task.id}
                             rows={3}
                             placeholder="Añade más detalle…"
                             onBlur={(event) => api.updateTask(task.id, { description: event.target.value })}
-                            className="w-full resize-none rounded-lg border border-(--color-border) bg-(--color-surface) px-3 py-2 text-sm text-(--color-text) placeholder:text-(--color-text-muted) focus:border-highlight focus:outline-none focus:ring-2 focus:ring-highlight/25"
+                            className="w-full resize-none rounded-lg border border-line bg-surface px-3 py-2 text-sm text-fg placeholder:text-fg-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/25"
                         />
                     </div>
 
                     {/* Subtasks */}
-                    <div className="mt-5 border-t border-(--color-border) pt-4">
+                    <div className="mt-5 border-t border-line pt-4">
                         <SubtaskList subtasks={task.subtasks} onToggle={toggleSubtask} onAdd={addSubtask} />
                     </div>
 
                     {/* Comments (visual mock) */}
-                    <div className="mt-5 border-t border-(--color-border) pt-4">
-                        <h3 className="mb-3 text-sm font-semibold text-(--color-text)">Comentarios</h3>
+                    <div className="mt-5 border-t border-line pt-4">
+                        <h3 className="mb-3 text-sm font-semibold text-fg">Comentarios</h3>
                         <ul className="flex flex-col gap-3">
                             {task.comments.map((entry) => (
                                 <li key={entry.id} className="flex gap-2.5">
                                     <AssigneeAvatar assignee={entry.author} size="md" />
-                                    <div className="min-w-0 flex-1 rounded-lg border border-(--color-border) bg-(--color-bg-soft)/50 px-3 py-2">
+                                    <div className="min-w-0 flex-1 rounded-lg border border-line bg-canvas-subtle/50 px-3 py-2">
                                         <div className="flex items-baseline justify-between gap-2">
-                                            <span className="text-xs font-semibold text-(--color-text)">{entry.author.name}</span>
-                                            <span className="text-[11px] text-(--color-text-muted)">
+                                            <span className="text-xs font-semibold text-fg">{entry.author.name}</span>
+                                            <span className="text-2xs text-fg-muted">
                                                 {formatLongDate(entry.createdAt)}
                                             </span>
                                         </div>
-                                        <p className="mt-0.5 text-sm text-(--color-text)">{entry.body}</p>
+                                        <p className="mt-0.5 text-sm text-fg">{entry.body}</p>
                                     </div>
                                 </li>
                             ))}
                             {task.comments.length === 0 ? (
-                                <li className="text-sm text-(--color-text-muted)">Aún no hay comentarios.</li>
+                                <li className="text-sm text-fg-muted">Aún no hay comentarios.</li>
                             ) : null}
                         </ul>
 
@@ -230,7 +230,7 @@ export function TaskDetailPanel({ taskId, api, onClose }: Props) {
                                     onChange={(event) => setComment(event.target.value)}
                                     rows={2}
                                     placeholder="Escribe un comentario…"
-                                    className="w-full resize-none rounded-lg border border-(--color-border) bg-(--color-surface) px-3 py-2 text-sm text-(--color-text) placeholder:text-(--color-text-muted) focus:border-highlight focus:outline-none focus:ring-2 focus:ring-highlight/25"
+                                    className="w-full resize-none rounded-lg border border-line bg-surface px-3 py-2 text-sm text-fg placeholder:text-fg-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/25"
                                 />
                                 <div className="mt-2 flex justify-end">
                                     <ButtonComponent size="sm" onClick={addComment} disabled={!comment.trim()}>

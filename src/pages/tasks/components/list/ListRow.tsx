@@ -52,13 +52,13 @@ export function ListRow({ task, onOpen, onToggleComplete, onRename }: Props) {
         <div
             ref={setNodeRef}
             style={{ transform: CSS.Translate.toString(transform), transition }}
-            className={`group flex items-center gap-2 border-b border-(--color-border) bg-(--color-surface) px-2 py-2 transition-colors hover:bg-(--color-bg-soft)/50 ${
+            className={`group flex items-center gap-2 border-b border-line bg-surface px-2 py-2 transition-colors hover:bg-canvas-subtle/50 ${
                 isDragging ? 'opacity-40' : ''
             }`}
         >
             <button
                 type="button"
-                className="cursor-grab text-(--color-text-muted) opacity-0 transition-opacity group-hover:opacity-100 active:cursor-grabbing"
+                className="cursor-grab text-fg-muted opacity-0 transition-opacity group-hover:opacity-100 active:cursor-grabbing"
                 aria-label={`Reordenar ${task.title}`}
                 {...attributes}
                 {...listeners}
@@ -87,7 +87,7 @@ export function ListRow({ task, onOpen, onToggleComplete, onRename }: Props) {
                                 setEditing(false)
                             }
                         }}
-                        className="w-full rounded-md border border-highlight bg-(--color-surface) px-2 py-1 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-highlight/25"
+                        className="w-full rounded-md border border-brand bg-surface px-2 py-1 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand/25"
                     />
                 ) : (
                     <button
@@ -97,8 +97,8 @@ export function ListRow({ task, onOpen, onToggleComplete, onRename }: Props) {
                             setDraft(task.title)
                             setEditing(true)
                         }}
-                        className={`block truncate text-left text-sm font-medium text-(--color-text) hover:text-brand ${
-                            task.completed ? 'text-(--color-text-muted) line-through' : ''
+                        className={`block truncate text-left text-sm font-medium text-fg hover:text-brand ${
+                            task.completed ? 'text-fg-muted line-through' : ''
                         }`}
                         title="Clic para abrir · doble clic para renombrar"
                     >
@@ -115,8 +115,8 @@ export function ListRow({ task, onOpen, onToggleComplete, onRename }: Props) {
             <PriorityBadge priority={task.priority} />
             {due ? (
                 <span
-                    className={`hidden w-16 shrink-0 text-right text-[11px] font-medium md:inline ${
-                        overdue ? 'text-rose-600 dark:text-rose-400' : 'text-(--color-text-muted)'
+                    className={`hidden w-16 shrink-0 text-right text-2xs font-medium md:inline ${
+                        overdue ? 'text-danger' : 'text-fg-muted'
                     }`}
                 >
                     {due}

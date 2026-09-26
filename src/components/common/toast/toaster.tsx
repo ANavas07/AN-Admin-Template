@@ -1,7 +1,11 @@
 import { Toaster } from 'sileo'
 import { useTheme } from '../../../context/theme-context'
 
-
+/**
+ * Toasts use an inverted surface (dark in the light theme and vice versa) so
+ * they stand out over any page. The fill comes from the `--color-toast` token
+ * (see styles.css); text colors come from the same inverted tokens.
+ */
 export default function ThemedToaster() {
     const { isDarkMode } = useTheme()
 
@@ -10,10 +14,9 @@ export default function ThemedToaster() {
             position="bottom-right"
             theme={isDarkMode ? 'dark' : 'light'}
             options={{
-                fill: isDarkMode ? '#ffffff' : '#111e23',
                 styles: {
-                    title: isDarkMode ? 'text-slate-900!' : 'text-white!',
-                    description: isDarkMode ? 'text-slate-600!' : 'text-white/75!',
+                    title: 'text-toast-fg!',
+                    description: 'text-toast-fg/75!',
                 },
             }}
         />

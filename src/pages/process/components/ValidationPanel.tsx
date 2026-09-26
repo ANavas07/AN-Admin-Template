@@ -12,9 +12,9 @@ type ValidationPanelProps = {
 }
 
 const levelStyles = {
-    ok: { icon: '✓', row: 'text-emerald-700 dark:text-emerald-300', chip: 'bg-emerald-500/10' },
-    warning: { icon: '⚠', row: 'text-amber-700 dark:text-amber-300', chip: 'bg-amber-500/10' },
-    error: { icon: '✕', row: 'text-rose-700 dark:text-rose-300', chip: 'bg-rose-500/10' },
+    ok: { icon: '✓', row: 'text-success', chip: 'bg-success-soft' },
+    warning: { icon: '⚠', row: 'text-warning', chip: 'bg-warning-soft' },
+    error: { icon: '✕', row: 'text-danger', chip: 'bg-danger-soft' },
 } as const
 
 export default function ValidationPanel({ isOpen, onClose, results, onGoToNode }: ValidationPanelProps) {
@@ -38,13 +38,13 @@ export default function ValidationPanel({ isOpen, onClose, results, onGoToNode }
             }
         >
             <div className="mb-4 flex flex-wrap gap-2">
-                <span className="rounded-full bg-rose-500/10 px-3 py-1 text-xs font-semibold text-rose-700 dark:text-rose-300">
+                <span className="rounded-full bg-danger-soft px-3 py-1 text-xs font-semibold text-danger">
                     {summary.errors} {summary.errors === 1 ? 'error' : 'errores'}
                 </span>
-                <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300">
+                <span className="rounded-full bg-warning-soft px-3 py-1 text-xs font-semibold text-warning">
                     {summary.warnings} {summary.warnings === 1 ? 'advertencia' : 'advertencias'}
                 </span>
-                <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                <span className="rounded-full bg-success-soft px-3 py-1 text-xs font-semibold text-success">
                     {summary.passed} {summary.passed === 1 ? 'verificación correcta' : 'verificaciones correctas'}
                 </span>
             </div>
@@ -60,7 +60,7 @@ export default function ValidationPanel({ isOpen, onClose, results, onGoToNode }
                             <span className={`mt-0.5 shrink-0 font-bold ${style.row}`} aria-hidden="true">
                                 {style.icon}
                             </span>
-                            <span className="min-w-0 flex-1 text-(--color-text)">{result.message}</span>
+                            <span className="min-w-0 flex-1 text-fg">{result.message}</span>
                             {result.nodeId ? (
                                 <button
                                     type="button"

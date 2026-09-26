@@ -16,13 +16,16 @@ import ButtonComponent from '../buttons/ButtonComponent';
 import InputComponent from '../../ui/inputs/InputComponent';
 import { ChevronIcon, EditIcon, PlusIcon, TrashBinIcon} from '../../../icons/icons';
 import { cn } from '../../../utils/cn';
+import Badge from '../badge/Badge';
+import type { Tone } from '../tone';
 
-const statusStyles: Record<string, string> = {
-    active: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-300',
-    inactive: 'bg-slate-100 text-slate-700 ring-1 ring-slate-500/20 dark:bg-slate-500/15 dark:text-slate-300',
-    pending: 'bg-amber-50 text-amber-700 ring-1 ring-amber-600/20 dark:bg-amber-500/15 dark:text-amber-300',
-    cancelled: 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20 dark:bg-rose-500/15 dark:text-rose-300',
-    completed: 'bg-sky-50 text-sky-700 ring-1 ring-sky-600/20 dark:bg-sky-500/15 dark:text-sky-300',
+/** Tone of the well-known status values rendered by StatusBadge. Unknown values stay neutral. */
+const statusTones: Record<string, Tone> = {
+    active: 'success',
+    inactive: 'neutral',
+    pending: 'warning',
+    cancelled: 'danger',
+    completed: 'info',
 };
 
 interface ReusableTableProps<T> {
@@ -68,7 +71,7 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                         onClick={() => {
                             row.toggleExpanded();
                         }}
-                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                        className="rounded-sm p-1 text-fg-muted transition-colors hover:bg-canvas-subtle hover:text-fg"
                     >
                         <ChevronIcon className={`w-4 h-4 transition-transform duration-200 ${row.getIsExpanded() ? 'rotate-180' : '' }`}/>
                     </button>
@@ -139,7 +142,7 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
 
     if (loading) {
         return (
-            <div className="rounded-xl border border-(--color-border) bg-(--color-surface) p-4 text-sm text-(--color-text-muted)">
+            <div className="card p-4 text-sm text-fg-muted">
                 Loading...
             </div>
         );
@@ -172,18 +175,18 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                 </div>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-(--color-border) bg-(--color-surface) shadow-sm">
+            <div className="card overflow-x-auto">
                 <table className="min-w-full">
-                    <thead className="border-y border-(--color-border) bg-(--color-bg-soft)">
+                    <thead className="surface-header">
                         {table.getHeaderGroups().map(headerGroup => (
                             <tr key={headerGroup.id}>
                                 {headerGroup.headers.map(header => (
                                     <th
                                         key={header.id}
                                         className={cn(
-                                            'px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-(--color-text-muted) sm:px-6',
+                                            'px-4 py-2.5 text-start text-2xs font-semibold uppercase tracking-caps text-fg-muted sm:px-5',
                                             enableSorting && header.column.getCanSort()
-                                                ? 'cursor-pointer select-none hover:bg-brand-soft'
+                                                ? 'cursor-pointer select-none transition-colors hover:bg-canvas-subtle hover:text-fg'
                                                 : ''
                                         )}
                                         onClick={enableSorting ? header.column.getToggleSortingHandler() : undefined}
@@ -202,7 +205,7 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                                                     ) : header.column.getIsSorted() === 'desc' ? (
                                                         <ChevronIcon className="w-4 h-4 text-brand transition-transform duration-200" />
                                                     ) : (
-                                                        <ChevronIcon className="w-4 h-4 text-(--color-text-muted) transition-transform duration-200" />
+                                                        <ChevronIcon className="w-4 h-4 text-fg-muted transition-transform duration-200" />
                                                     )}
                                                 </div>
                                             )}
@@ -213,24 +216,21 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                         ))}
                     </thead>
 
-                    <tbody className="divide-y divide-(--color-border) text-sm text-(--color-text)">
+                    <tbody className="divide-y divide-line text-sm text-fg">
                         {table.getRowModel().rows.length === 0 && (
                             <tr>
                                 <td
                                     colSpan={finalColumns.length}
-                                    className="px-6 py-10 text-center text-sm text-(--color-text-muted)"
+                                    className="px-6 py-10 text-center text-sm text-fg-muted"
                                 >
                                     {emptyMessage || 'No hay datos para mostrar.'}
                                 </td>
                             </tr>
                         )}
 
-                        {table.getRowModel().rows.map((row, i) => (
+                        {table.getRowModel().rows.map((row) => (
                             <React.Fragment key={row.id}>
-                                <tr className={cn(
-                                    'transition-colors hover:bg-(--color-bg-soft)',
-                                    i % 2 === 0 ? 'bg-(--color-surface)' : 'bg-(--color-bg-soft)/35',
-                                )}
+                                <tr className="transition-colors hover:bg-canvas-subtle/60"
                                     {...(enableExpanding && {
                                         style: { cursor: 'pointer' }
                                     })}
@@ -239,7 +239,7 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                                     {row.getVisibleCells().map(cell => (
                                         <td
                                             key={cell.id}
-                                            className="px-4 py-3.5 whitespace-nowrap"
+                                            className="whitespace-nowrap px-4 py-3 sm:px-5"
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
@@ -252,7 +252,7 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                                 {/*Fila expandida solo si está habilitado y expandido */}
                                 {enableExpanding && row.getIsExpanded() && renderExpandedRowModel && (
                                     <tr>
-                                        <td colSpan={row.getVisibleCells().length} className="bg-(--color-bg-soft) p-4">
+                                        <td colSpan={row.getVisibleCells().length} className="bg-canvas-subtle p-4">
                                             {renderExpandedRowModel(row.original)}
                                         </td>
                                     </tr>
@@ -272,35 +272,39 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                             variant="outline"
                             onClick={() => table.setPageIndex(0)}
                             disabled={!table.getCanPreviousPage()}
+                            aria-label="Primera página"
                         >
-                            {'<<'}
+                            «
                         </ButtonComponent>
                         <ButtonComponent
                             size="sm"
                             variant="outline"
                             onClick={() => table.previousPage()}
                             disabled={!table.getCanPreviousPage()}
+                            aria-label="Página anterior"
                         >
-                            {'<'}
+                            ‹
                         </ButtonComponent>
                         <ButtonComponent
                             size="sm"
                             variant="outline"
                             onClick={() => table.nextPage()}
                             disabled={!table.getCanNextPage()}
+                            aria-label="Página siguiente"
                         >
-                            {'>'}
+                            ›
                         </ButtonComponent>
                         <ButtonComponent
                             size="sm"
                             variant="outline"
                             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                             disabled={!table.getCanNextPage()}
+                            aria-label="Última página"
                         >
-                            {'>>'}
+                            »
                         </ButtonComponent>
                     </div>
-                    <span className="text-sm text-(--color-text-muted)">
+                    <span className="text-sm text-fg-muted">
                         Page {table.getState().pagination.pageIndex + 1} of{' '}
                         {table.getPageCount()}
                     </span>
@@ -322,7 +326,7 @@ export const ActionCell = ({ onEdit, onDelete, onAdditional }: ActionCellProps) 
                     aria-label="Editar"
                     title="Editar"
                 >
-                    <EditIcon className="h-5 w-5 text-sky-600 dark:text-sky-300" />
+                    <EditIcon className="size-4.5 text-fg-muted" />
                 </ButtonComponent>
             )
         }
@@ -335,7 +339,7 @@ export const ActionCell = ({ onEdit, onDelete, onAdditional }: ActionCellProps) 
                 aria-label="Eliminar"
                 title="Eliminar"
             >
-                <TrashBinIcon className="h-5 w-5 text-rose-600 dark:text-rose-300" />
+                <TrashBinIcon className="size-4.5 text-danger" />
             </ButtonComponent>
         )}
 
@@ -347,7 +351,7 @@ export const ActionCell = ({ onEdit, onDelete, onAdditional }: ActionCellProps) 
                 aria-label="Agregar"
                 title="Agregar"
             >
-                <PlusIcon className="h-5 w-5 text-green-600 dark:text-green-300" />
+                <PlusIcon className="size-4.5 text-brand" />
             </ButtonComponent>
         )}
     </div>
@@ -358,14 +362,8 @@ export const StatusBadge = ({ value }: { value: string }) => {
     const normalizedValue = value.toLowerCase();
 
     return (
-        <span
-            className={cn(
-                'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold',
-                statusStyles[normalizedValue] ??
-                'bg-(--color-bg-soft) text-(--color-text-muted) ring-1 ring-(--color-border)'
-            )}
-        >
+        <Badge tone={statusTones[normalizedValue] ?? 'neutral'} dot>
             {value}
-        </span>
+        </Badge>
     );
 };

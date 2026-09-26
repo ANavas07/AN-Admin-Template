@@ -3,6 +3,8 @@ import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import ButtonComponent from '../../ui/buttons/ButtonComponent'
 import DataList from '../../ui/inputs/DataList'
 import { cn } from '../../../utils/cn'
+import { FieldLabel } from '../../ui/inputs/field'
+import { fieldControlClass } from '../../ui/inputs/fieldStyles'
 
 type FieldType =
     | 'text'
@@ -178,13 +180,7 @@ export default function FormRender({
             .filter(Boolean)
             .join(' ')
 
-        const baseInputClass = cn(
-            'min-h-11 w-full rounded-lg border bg-(--color-surface) px-3 py-2 text-sm text-(--color-text)',
-            'placeholder:text-(--color-text-muted)',
-            'focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15',
-            'disabled:cursor-not-allowed disabled:opacity-60',
-            error ? 'border-red-500' : 'border-(--color-border)'
-        )
+        const baseInputClass = cn(fieldControlClass(Boolean(error)), 'min-h-9 px-3 py-1.5 text-sm')
 
         if (field.type === 'textarea') {
             return (
@@ -215,7 +211,7 @@ export default function FormRender({
                     required={field.required}
                     aria-invalid={Boolean(error)}
                     aria-describedby={describedBy || undefined}
-                    className={baseInputClass}
+                    className={cn(baseInputClass, 'h-9 py-0')}
                     onChange={(event) => updateValue(field.name, event.target.value)}
                 >
                     <option value="">Selecciona una opcion</option>
@@ -257,7 +253,7 @@ export default function FormRender({
                     {field.options?.map((option) => (
                         <label
                             key={String(option.value)}
-                            className="flex min-h-10 items-center gap-3 rounded-lg border border-(--color-border) px-3 text-sm text-(--color-text)"
+                            className="flex min-h-10 items-center gap-3 rounded-lg border border-line px-3 text-sm text-fg"
                         >
                             <input
                                 type="radio"
@@ -266,7 +262,7 @@ export default function FormRender({
                                 checked={String(value) === String(option.value)}
                                 disabled={field.disabled}
                                 required={field.required}
-                                className="size-4 accent-brand"
+                                className="size-4 accent-brand-solid"
                                 onChange={() => updateValue(field.name, option.value)}
                             />
                             {option.label}
@@ -278,7 +274,7 @@ export default function FormRender({
 
         if (field.type === 'checkbox') {
             return (
-                <label className="flex min-h-11 items-center gap-3 rounded-lg border border-(--color-border) px-3 text-sm text-(--color-text)">
+                <label className="flex min-h-11 items-center gap-3 rounded-lg border border-line px-3 text-sm text-fg">
                     <input
                         id={fieldId}
                         name={field.name}
@@ -288,7 +284,7 @@ export default function FormRender({
                         required={field.required}
                         aria-invalid={Boolean(error)}
                         aria-describedby={describedBy || undefined}
-                        className="size-4 accent-brand"
+                        className="size-4 accent-brand-solid"
                         onChange={(event) => updateValue(field.name, event.target.checked)}
                     />
                     {field.placeholder ?? field.label}
@@ -306,7 +302,7 @@ export default function FormRender({
                     required={field.required}
                     aria-invalid={Boolean(error)}
                     aria-describedby={describedBy || undefined}
-                    className={cn(baseInputClass, 'file:mr-3 file:rounded-md file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white')}
+                    className={cn(baseInputClass, 'file:mr-3 file:rounded-md file:border-0 file:bg-brand-solid file:px-3 file:py-1 file:text-sm file:font-medium file:text-on-solid')}
                     onChange={(event: ChangeEvent<HTMLInputElement>) =>
                         updateValue(field.name, event.target.files?.[0] ?? null)
                     }
@@ -345,19 +341,19 @@ export default function FormRender({
 
     return (
         <form
-            className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 shadow-sm"
+            className="card p-5"
             onSubmit={handleSubmit}
             noValidate
         >
             {(config.title || config.description) && (
                 <header className="mb-5">
                     {config.title && (
-                        <h2 className="text-lg font-semibold text-(--color-text)">
+                        <h2 className="text-lg font-semibold text-fg">
                             {config.title}
                         </h2>
                     )}
                     {config.description && (
-                        <p className="mt-1 text-sm text-(--color-text-muted)">
+                        <p className="mt-1 text-sm text-fg-muted">
                             {config.description}
                         </p>
                     )}
@@ -372,13 +368,9 @@ export default function FormRender({
                     return (
                         <div key={field.name} className={cn('grid gap-1.5', field.className)}>
                             {field.type !== 'checkbox' && field.type !== 'datalist' && (
-                                <label
-                                    htmlFor={fieldId}
-                                    className="text-sm font-semibold text-(--color-text)"
-                                >
+                                <FieldLabel htmlFor={fieldId} required={field.required} className="mb-0">
                                     {field.label}
-                                    {field.required && <span className="text-red-500"> *</span>}
-                                </label>
+                                </FieldLabel>
                             )}
 
                             {renderField(field)}
@@ -386,14 +378,14 @@ export default function FormRender({
                             {field.type !== 'datalist' && field.helperText && !error && (
                                 <p
                                     id={`${fieldId}-helper`}
-                                    className="text-xs text-(--color-text-muted)"
+                                    className="text-xs text-fg-muted"
                                 >
                                     {field.helperText}
                                 </p>
                             )}
 
                             {field.type !== 'datalist' && error && (
-                                <p id={`${fieldId}-error`} className="text-xs font-medium text-red-600">
+                                <p id={`${fieldId}-error`} className="text-xs font-medium text-danger">
                                     {error}
                                 </p>
                             )}

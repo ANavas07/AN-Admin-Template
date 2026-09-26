@@ -25,7 +25,7 @@ export default function PlanningLayout() {
         description="Plantilla de planificación con celdas de texto, íconos e imágenes configurables en cualquier punto de la grilla."
         actions={
           <div className="flex items-center gap-2">
-            <div className="flex rounded-xl bg-(--color-bg-soft) p-1">
+            <div className="flex rounded-xl bg-canvas-subtle p-1">
               <ButtonComponent
                 variant={mode === 'edit' ? 'primary' : 'ghost'}
                 size="sm"
@@ -54,7 +54,7 @@ export default function PlanningLayout() {
         }
       />
 
-      <div className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 shadow-sm sm:p-6">
+      <div className="card p-4 sm:p-6">
         <TemplateGrid
           template={planning.template}
           mode={mode}

@@ -1,5 +1,6 @@
 import type { FormConfig, FormValues } from '../../components/common/forms/FormRender'
 import FormRender from '../../components/common/forms/FormRender'
+import { CatalogHeader } from './components/CatalogLayout'
 
 export default function FormsCatalog() {
 
@@ -81,22 +82,10 @@ export default function FormsCatalog() {
 
     return (
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <section className="relative overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) p-6 shadow-sm sm:p-10">
-                <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand-soft blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-20 left-10 h-56 w-56 rounded-full bg-highlight-soft blur-3xl" />
-
-                <div className="relative max-w-3xl">
-                    <p className="inline-flex rounded-full border border-(--color-border) bg-(--color-bg-soft) px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
-                        UI Catalog
-                    </p>
-                    <h1 className="mt-4 text-3xl font-bold tracking-tight text-(--color-text) sm:text-4xl">
-                        Catalogo de formulario reutilizables
-                    </h1>
-                    <p className="mt-3 text-sm text-(--color-text-muted) sm:text-base">
-                        Guia visual para usar formulario reutilizables del panel
-                    </p>
-                </div>
-            </section>
+            <CatalogHeader
+                title="Catalogo de formulario reutilizables"
+                description="Guia visual para usar formulario reutilizables del panel"
+            />
 
             <section className="mt-8">
                 <FormRender config={config} onSubmit={handleSubmit} />

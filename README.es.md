@@ -85,7 +85,7 @@ src/
 ├── components/
 │   ├── admin-panel/         Dashboard del home + catálogo de módulos
 │   ├── common/              Navbar, formularios, modales, toasts
-│   └── ui/                  Botones, inputs, tabla, Gantt
+│   └── ui/                  Botones, inputs, tabla, badge, alert, avatar, tonos
 ├── pages/
 │   ├── tasks/               Tablero, lista, cronograma, calendario (dnd-kit)
 │   ├── planning/            Grilla de plantillas con iconos/imágenes por celda
@@ -97,7 +97,10 @@ src/
 ├── services/                Cliente HTTP + servicios por dominio
 ├── utils/                   Utilidades compartidas (p. ej. `cn` para clases)
 ├── context/ThemeContext.tsx Tema claro/oscuro
-└── css/styles.css           Entrada de Tailwind + tokens de diseño
+└── css/
+    ├── theme.css            Tokens de diseño (claro + oscuro), fuente única de verdad
+    ├── components.css       Clases reutilizables: card, eyebrow, page-title…
+    └── styles.css           Entrada de Tailwind, capa base, puentes con terceros
 ```
 
 ## Cómo funciona el dashboard
@@ -129,6 +132,43 @@ Revisa los chunks resultantes con:
 pnpm build
 ```
 
+## Sistema de diseño
+
+Todo el lenguaje visual vive en **un solo archivo**:
+[`src/css/theme.css`](src/css/theme.css). Declara cada color, sombra, radio,
+fuente, curva de animación, z-index y medida de layout, con su valor claro y su
+variante oscura. Los componentes no escriben valores a mano.
+
+| Capa | Dónde | Qué aporta |
+| --- | --- | --- |
+| Tokens | `src/css/theme.css` | Variables CSS + utilidades de Tailwind (`bg-surface`, `text-fg-muted`, `border-line`, `text-danger`, `shadow-md`, `rounded-lg`) |
+| Clases de componente | `src/css/components.css` | Patrones repetidos: `card`, `card-interactive`, `eyebrow`, `page-title`, `surface-header` |
+| Tonos | `src/components/ui/tone.ts` | Un único mapa para todo color de estado o categoría: `toneSoft`, `toneTint`, `toneSolid`, `toneText`, `toneBorder` |
+| Primitivos | `src/components/ui/` | `ButtonComponent`, `InputComponent`, `Select`, `DataList`, `Badge`, `Alert`, `Avatar`, `PopUp`, `TableTs` |
+
+**Roles de color**
+
+- Neutros: `canvas` (fondo de la app), `canvas-subtle` (hover, zonas hundidas),
+  `surface` (tarjetas, inputs), `surface-muted` (cabeceras de tabla), `line` /
+  `line-strong` (bordes), `fg` / `fg-muted` / `fg-subtle` (texto).
+- Marca y estados siguen la misma tríada: `X` para texto, iconos y bordes,
+  `X-soft` para fondos tintados y `X-solid` para rellenos con `text-on-solid`.
+  Existe para `brand`, `success`, `warning`, `danger` e `info`.
+- Los acentos categóricos (`accent-emerald`, `accent-sky`, …) solo distinguen
+  datos (nodos de procesos, etiquetas, avatares, tipos de archivo); sus nombres
+  coinciden con los valores guardados en los datos.
+
+La paleta por defecto de Tailwind está desactivada (`--color-*: initial`): una
+clase como `bg-red-500` no genera CSS, hay que usar un token semántico. Todos
+los pares texto/fondo cumplen WCAG AA (4.5:1) en ambos temas.
+
+**Cambiar de marca** es editar solo `theme.css`: cambia `--color-brand*` (y sus
+variantes oscuras) y todos los botones, enlaces, anillos de foco y estados
+activos se actualizan.
+
+Los nombres anteriores (`--color-bg`, `--color-text`, `--color-border`,
+`--color-highlight`, …) siguen existiendo como alias por compatibilidad.
+
 ## Usarlo como plantilla
 
 Qué tocar al arrancar un proyecto nuevo:
@@ -137,7 +177,7 @@ Qué tocar al arrancar un proyecto nuevo:
 - `src/components/admin-panel/data/modules.ts` — tu catálogo de módulos.
 - `src/app/App.tsx` — reemplaza `DEMO_USER` y `handleLogin` por auth real.
 - `src/services/` — cambia los servicios simulados por tus endpoints.
-- `src/css/styles.css` — tokens de diseño (colores, radios, modo oscuro).
+- `src/css/theme.css` — tokens de diseño (ver [Sistema de diseño](#sistema-de-diseño)).
 - `index.html` — título de la página y favicon.
 
 Los datos simulados están aislados en carpetas `data/`

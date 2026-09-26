@@ -83,11 +83,11 @@ export default function PopUp({
             aria-modal="true"
             aria-labelledby={title ? 'popup-title' : undefined}
             aria-describedby={description ? 'popup-description' : undefined}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-(--z-modal) flex items-center justify-center p-4"
         >
             {/* Overlay */}
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+                className="absolute inset-0 bg-overlay transition-opacity"
                 onClick={closeOnOverlay ? onClose : undefined}
                 aria-hidden="true"
             />
@@ -95,19 +95,19 @@ export default function PopUp({
             {/* Dialog */}
             <div
                 className={cn(
-                    'relative z-10 w-full rounded-2xl border border-(--color-border)',
-                    'bg-(--color-surface) shadow-2xl',
+                    'relative z-10 flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-3xl border border-line',
+                    'bg-surface shadow-2xl',
                     sizeClasses[size]
                 )}
             >
                 {/* Header */}
                 {hasHeader && (
-                    <div className="flex items-start justify-between gap-3 border-b border-(--color-border) px-6 py-4">
+                    <div className="flex shrink-0 items-start justify-between gap-3 border-b border-line px-6 py-4">
                         <div className="min-w-0">
                             {title && (
                                 <h2
                                     id="popup-title"
-                                    className="text-base font-semibold text-(--color-text)"
+                                    className="text-base font-semibold text-fg"
                                 >
                                     {title}
                                 </h2>
@@ -115,7 +115,7 @@ export default function PopUp({
                             {description && (
                                 <p
                                     id="popup-description"
-                                    className="mt-1 text-sm text-(--color-text-muted)"
+                                    className="mt-1 text-sm text-fg-muted"
                                 >
                                     {description}
                                 </p>
@@ -149,7 +149,7 @@ export default function PopUp({
                 {/* Body */}
                 {isFormMode ? (
                     /* Form mode: FormRender ocupa todo el cuerpo, su card ES el body */
-                    <div className="[&>form]:rounded-t-none [&>form]:border-0 [&>form]:shadow-none [&>form]:bg-transparent">
+                    <div className="min-h-0 overflow-y-auto [&>form]:rounded-t-none [&>form]:border-0 [&>form]:shadow-none [&>form]:bg-transparent">
                         <FormRender
                             config={formConfig!}
                             initialValues={initialValues}
@@ -161,12 +161,12 @@ export default function PopUp({
                 ) : (
                     <>
                         {/* Custom content mode */}
-                        <div className="px-6 py-5 text-sm text-(--color-text)">
+                        <div className="min-h-0 overflow-y-auto px-6 py-5 text-sm text-fg">
                             {children}
                         </div>
 
                         {footer && (
-                            <div className="flex items-center justify-end gap-3 border-t border-(--color-border) px-6 py-4">
+                            <div className="flex shrink-0 items-center justify-end gap-3 border-t border-line bg-surface-muted px-6 py-3.5">
                                 {footer}
                             </div>
                         )}

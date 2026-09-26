@@ -3,7 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
 import InputComponent from '../../components/ui/inputs/InputComponent'
 import { sanitize } from '../../services/sanitize'
-import { EyeIcon, EyeOffIcon, ShieldIcon, SparkIcon } from '../../icons/icons'
+import Alert from '../../components/ui/alert/Alert'
+import { FieldLabel, FieldMessage } from '../../components/ui/inputs/field'
+import { fieldControlClass, fieldSizeClasses } from '../../components/ui/inputs/fieldStyles'
+import { EyeIcon, EyeOffIcon, MoonIcon, ShieldIcon, SunIcon, UserIcon } from '../../icons/icons'
+import { cn } from '../../utils/cn'
 
 type LoginCredentials = {
     email: string
@@ -15,9 +19,6 @@ type LoginProps = {
     isDarkMode: boolean
     onToggleTheme: () => void
 }
-
-
-
 
 export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps) {
     const navigate = useNavigate()
@@ -71,127 +72,110 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
         }
     }
 
-    return (
-        <main className="min-h-screen bg-(--color-bg) text-(--color-text)">
-            <div className="grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
-                <section className="relative overflow-hidden border-b border-(--color-border) bg-(--color-surface) lg:border-b-0 lg:border-r">
-                    <div className="absolute inset-0">
-                        <div className="absolute inset-x-0 top-0 h-64 bg-brand-soft/70 blur-3xl" />
-                        <div className="absolute -left-10 top-1/3 h-72 w-72 rounded-full bg-highlight-soft/60 blur-3xl" />
-                        <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-emerald-400/10 blur-3xl" />
-                        <div className="absolute inset-0 opacity-40 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-size-[56px_56px]" />
-                    </div>
+    const highlights = [
+        { value: '24/7', label: 'Supervisa actividad, incidencias y progreso operativo.' },
+        { value: '+10', label: 'Empresas confian en nuestro productos.' },
+        { value: '99.9%', label: 'Flujo listo para trabajo administrativo continuo.' },
+    ]
 
-                    <div className="relative flex min-h-full flex-col justify-between px-6 py-6 sm:px-10 sm:py-8 lg:px-12 lg:py-10">
+    return (
+        <main className="min-h-screen bg-canvas text-fg">
+            <div className="grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
+                <section className="relative overflow-hidden border-b border-line bg-surface lg:border-b-0 lg:border-r">
+                    {/* Blueprint grid, faded towards the edges */}
+                    <div
+                        className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-line)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-line)_1px,transparent_1px)] bg-size-[48px_48px] opacity-50 mask-[radial-gradient(ellipse_at_top_left,black,transparent_70%)]"
+                        aria-hidden="true"
+                    />
+
+                    <div className="relative flex min-h-full flex-col justify-between gap-10 px-6 py-6 sm:px-10 sm:py-8 lg:px-12 lg:py-10">
                         <div className="flex items-center justify-between">
                             <div className="inline-flex items-center gap-3">
-                                <span className="inline-flex size-11 items-center justify-center rounded-2xl bg-brand text-lg font-bold text-white shadow-sm">
+                                <span className="inline-flex size-10 items-center justify-center rounded-lg bg-brand-solid text-sm font-bold tracking-wide text-on-solid">
                                     SGC
                                 </span>
-                                <div>
-                                    <p className="text-sm font-semibold tracking-[0.08em] text-(--color-text-muted)">
-                                        Sistema de Gestion Centralizada
-                                    </p>
-                                    <h1 className="text-lg font-bold text-(--color-text)">
-                                        Panel administrativo
-                                    </h1>
+                                <div className="leading-tight">
+                                    <p className="text-xs font-medium text-fg-muted">Sistema de Gestion Centralizada</p>
+                                    <h1 className="text-base font-semibold text-fg">Panel administrativo</h1>
                                 </div>
                             </div>
 
-                            <button
-                                type="button"
+                            <ButtonComponent
+                                variant="ghost"
+                                size="icon"
                                 onClick={onToggleTheme}
-                                className="inline-flex size-11 items-center justify-center rounded-2xl border border-(--color-border) bg-(--color-bg-soft) text-(--color-text) transition-colors hover:border-brand hover:text-brand"
                                 aria-label={isDarkMode ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
                             >
-                                <span className="text-lg leading-none" aria-hidden="true">
-                                    {isDarkMode ? '☀️' : '🌙'}
-                                </span>
-                            </button>
+                                {isDarkMode ? <SunIcon className="size-4.5" /> : <MoonIcon className="size-4.5" />}
+                            </ButtonComponent>
                         </div>
 
-                        <div className="mt-10 max-w-2xl lg:mt-0">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-(--color-border) bg-(--color-bg-soft) px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
-                                <SparkIcon className='size-4' />
+                        <div className="max-w-2xl">
+                            <p className="eyebrow inline-flex items-center gap-2 text-brand">
+                                <ShieldIcon className="size-4" />
                                 Acceso centralizado
-                            </div>
+                            </p>
 
-                            <h2 className="mt-6 max-w-xl text-4xl font-bold tracking-tight text-(--color-text) sm:text-5xl">
+                            <h2 className="mt-5 max-w-xl text-4xl font-semibold tracking-tight text-fg sm:text-5xl sm:leading-[1.05]">
                                 Entra al sistema integrado + completo.
                             </h2>
-                            <p className="mt-4 max-w-xl text-base leading-7 text-(--color-text-muted) sm:text-lg">
+                            <p className="mt-4 max-w-xl text-base leading-7 text-fg-muted">
                                 Controla usuarios, tareas, procesos desde una plataforma centralizada y en tiempo real.
                             </p>
 
-                            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                                <article className="rounded-2xl border border-(--color-border) bg-(--color-bg-soft) p-4 shadow-sm">
-                                    <p className="text-2xl font-bold text-(--color-text)">24/7</p>
-                                    <p className="mt-1 text-sm text-(--color-text-muted)">
-                                        Supervisa actividad, incidencias y progreso operativo.
-                                    </p>
-                                </article>
-                                <article className="rounded-2xl border border-(--color-border) bg-(--color-bg-soft) p-4 shadow-sm">
-                                    <p className="text-2xl font-bold text-(--color-text)">+10</p>
-                                    <p className="mt-1 text-sm text-(--color-text-muted)">
-                                        Empresas confian en nuestro productos.
-                                    </p>
-                                </article>
-                                <article className="rounded-2xl border border-(--color-border) bg-(--color-bg-soft) p-4 shadow-sm">
-                                    <p className="text-2xl font-bold text-(--color-text)">99.9%</p>
-                                    <p className="mt-1 text-sm text-(--color-text-muted)">
-                                        Flujo listo para trabajo administrativo continuo.
-                                    </p>
-                                </article>
-                            </div>
+                            <dl className="mt-10 grid max-w-xl gap-6 border-t border-line pt-6 sm:grid-cols-3">
+                                {highlights.map((item) => (
+                                    <div key={item.value}>
+                                        <dt className="text-2xl font-semibold tabular-nums text-fg">{item.value}</dt>
+                                        <dd className="mt-1 text-sm leading-6 text-fg-muted">{item.label}</dd>
+                                    </div>
+                                ))}
+                            </dl>
                         </div>
 
-                        <div className="mt-10 grid gap-4 sm:grid-cols-2">
-                            <article className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 shadow-sm">
-                                <div className="flex items-center gap-3">
-                                    <span className="inline-flex size-10 items-center justify-center rounded-xl bg-brand-soft text-brand">
-                                        <ShieldIcon className='size-6' />
-                                    </span>
-                                    <div>
-                                        <p className="text-sm font-semibold text-(--color-text)">
-                                            Seguridad operativa
-                                        </p>
-                                        <p className="text-sm text-(--color-text-muted)">
-                                            Acceso independiente del resto del sistema y listo para autenticacion real.
-                                        </p>
-                                    </div>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <article className="card flex items-start gap-3 p-4">
+                                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand-strong">
+                                    <ShieldIcon className="size-5" />
+                                </span>
+                                <div>
+                                    <p className="text-sm font-semibold text-fg">Seguridad operativa</p>
+                                    <p className="mt-0.5 text-sm text-fg-muted">
+                                        Acceso independiente del resto del sistema y listo para autenticacion real.
+                                    </p>
                                 </div>
                             </article>
 
-                            <article className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 shadow-sm">
-                                <p className="text-sm font-semibold text-(--color-text)">
-                                    Recomendaciones
-                                </p>
-                                <p className="mt-2 text-sm text-(--color-text-muted)">
-                                    Si eres un nuevo usuario debes solicitar acceso a tus administradores
-                                </p>
+                            <article className="card flex items-start gap-3 p-4">
+                                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-canvas-subtle text-fg-muted">
+                                    <UserIcon className="size-5" />
+                                </span>
+                                <div>
+                                    <p className="text-sm font-semibold text-fg">Recomendaciones</p>
+                                    <p className="mt-0.5 text-sm text-fg-muted">
+                                        Si eres un nuevo usuario debes solicitar acceso a tus administradores
+                                    </p>
+                                </div>
                             </article>
                         </div>
                     </div>
                 </section>
 
                 <section className="flex items-center justify-center px-4 py-8 sm:px-8 lg:px-10">
-                    <div className="w-full max-w-md rounded-3xl border border-(--color-border) bg-(--color-surface) p-6 shadow-xl sm:p-8">
-                        <div className="mb-8">
-                            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-(--color-text-muted)">
-                                Iniciar sesion
-                            </p>
-                            <h3 className="mt-3 text-3xl font-bold tracking-tight text-(--color-text)">
-                                Bienvenido al SGC
-                            </h3>
-                            <p className="mt-2 text-sm leading-6 text-(--color-text-muted)">
+                    <div className="w-full max-w-md rounded-3xl border border-line bg-surface p-6 shadow-lg sm:p-8">
+                        <div className="mb-7">
+                            <p className="eyebrow">Iniciar sesion</p>
+                            <h3 className="mt-2 text-2xl font-semibold tracking-tight text-fg">Bienvenido al SGC</h3>
+                            <p className="mt-1.5 text-sm leading-6 text-fg-muted">
                                 Accede a la administracion del sistema con tu cuenta operativa.
                             </p>
                         </div>
 
-                        <form className="space-y-5" onSubmit={handleSubmit}>
+                        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
                             <InputComponent
                                 label="Correo electronico"
                                 type="email"
+                                autoComplete="email"
                                 placeholder="admin@crm-tournaments.com"
                                 value={form.email}
                                 onChange={(event) =>
@@ -201,19 +185,21 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
                                     }))
                                 }
                                 error={emailError || undefined}
+                                size="lg"
                                 requiredMark
                                 fullWidth
                             />
 
                             <div>
-                                <label className="mb-1.5 block text-sm font-medium text-(--color-text)">
+                                <FieldLabel htmlFor="login-password" required>
                                     Contrasena
-                                    <span className="ml-1 text-red-500">*</span>
-                                </label>
+                                </FieldLabel>
 
                                 <div className="relative">
                                     <input
+                                        id="login-password"
                                         type={showPassword ? 'text' : 'password'}
+                                        autoComplete="current-password"
                                         value={form.password}
                                         onChange={(event) =>
                                             setForm((currentForm) => ({
@@ -222,46 +208,34 @@ export default function Login({ onLogin, isDarkMode, onToggleTheme }: LoginProps
                                             }))
                                         }
                                         placeholder="Ingresa tu contrasena"
-                                        className={`h-11 w-full rounded-xl border bg-(--color-surface) px-4 pr-12 text-sm text-(--color-text) placeholder:text-(--color-text-muted) transition-all duration-200 focus:outline-none focus:ring-2 ${passwordError
-                                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                                            : 'border-(--color-border) focus:border-highlight focus:ring-highlight/25'
-                                            }`}
+                                        aria-invalid={Boolean(passwordError)}
+                                        aria-describedby={passwordError ? 'login-password-message' : undefined}
+                                        className={cn(fieldControlClass(Boolean(passwordError)), fieldSizeClasses.lg, 'px-3.5 pr-11')}
                                     />
 
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword((currentValue) => !currentValue)}
-                                        className="absolute right-2 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-(--color-text-muted) transition-colors hover:bg-(--color-bg-soft) hover:text-(--color-text)"
+                                        className="absolute right-1.5 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-canvas-subtle hover:text-fg"
                                         aria-label={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
                                     >
-                                        {showPassword ? <EyeOffIcon className='size-5' /> : <EyeIcon className='size-5' />}
+                                        {showPassword ? <EyeOffIcon className="size-4.5" /> : <EyeIcon className="size-4.5" />}
                                     </button>
                                 </div>
 
-                                {passwordError ? (
-                                    <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                                        {passwordError}
-                                    </p>
-                                ) : null}
+                                <FieldMessage id="login-password-message" error={passwordError || undefined} />
                             </div>
 
-                            {error ? (
-                                <div className="rounded-2xl border border-red-500/30 bg-red-500/8 px-4 py-3 text-sm text-red-700 dark:text-red-300">
-                                    {error}
-                                </div>
-                            ) : null}
+                            {error ? <Alert tone="danger">{error}</Alert> : null}
 
                             <div className="flex items-center justify-between gap-3 text-sm">
-                                <label className="inline-flex items-center gap-2 text-(--color-text-muted)">
-                                    <input
-                                        type="checkbox"
-                                        className="size-4 rounded border-(--color-border) accent-brand"
-                                    />
+                                <label className="inline-flex items-center gap-2 text-fg-muted">
+                                    <input type="checkbox" className="size-4 rounded-sm border-line accent-brand-solid" />
                                     Mantener sesion activa
                                 </label>
                                 <button
                                     type="button"
-                                    className="font-semibold text-brand transition-colors hover:text-highlight"
+                                    className="font-medium text-brand transition-colors hover:text-brand-strong"
                                 >
                                     Recuperar acceso
                                 </button>

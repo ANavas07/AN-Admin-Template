@@ -4,7 +4,7 @@ import TableTS, { ActionCell } from '../../../../components/ui/table/TableTs'
 import ButtonComponent from '../../../../components/ui/buttons/ButtonComponent'
 import PopUp from '../../../../components/common/pop-up/PopUp'
 import ModuleHeader from '../../../../components/common/page/ModuleHeader'
-import { PlusIcon, UsersIcon } from '../../../../icons/icons'
+import { PlusIcon, UsersIcon, LockIcon } from '../../../../icons/icons'
 import GroupFormModal from './GroupFormModal'
 import GroupMembersPanel from './GroupMembersPanel'
 import GroupRolesPanel from './GroupRolesPanel'
@@ -111,9 +111,9 @@ export default function GroupsPage() {
       header: 'Descripción',
       cell: (info) => {
         const val = info.getValue() as string | null
-        if (!val) return <span className="text-(--color-text-muted)">—</span>
+        if (!val) return <span className="text-fg-muted">—</span>
         return (
-          <span className="text-sm text-(--color-text-muted)">
+          <span className="text-sm text-fg-muted">
             {val.length > 80 ? `${val.slice(0, 80)}…` : val}
           </span>
         )
@@ -125,7 +125,7 @@ export default function GroupsPage() {
       cell: ({ row }) =>
         row.original.parentGroup
           ? <span className="text-sm">{row.original.parentGroup.name}</span>
-          : <span className="text-(--color-text-muted)">—</span>,
+          : <span className="text-fg-muted">—</span>,
     },
     {
       accessorKey: 'memberCount',
@@ -163,7 +163,7 @@ export default function GroupsPage() {
               aria-label="Gestionar roles"
               title="Gestionar roles"
             >
-              🔐
+              <LockIcon className="size-4.5" />
             </ButtonComponent>
           </div>
         )
@@ -250,9 +250,9 @@ export default function GroupsPage() {
           </>
         }
       >
-        <p className="text-sm text-(--color-text-muted)">
+        <p className="text-sm text-fg-muted">
           Se eliminará el grupo{' '}
-          <span className="font-semibold text-(--color-text)">{deleteTarget?.name}</span>
+          <span className="font-semibold text-fg">{deleteTarget?.name}</span>
           . Esta acción no se puede deshacer.
         </p>
       </PopUp>

@@ -30,8 +30,8 @@ export function CompletionCheck({ completed, onToggle, label = 'Completar tarea'
             onClick={handleClick}
             className={`group inline-flex ${dimension} shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${
                 completed
-                    ? 'border-brand bg-brand text-white'
-                    : 'border-(--color-border) text-transparent hover:border-brand hover:text-brand/40'
+                    ? 'border-brand bg-brand-solid text-on-solid'
+                    : 'border-line text-transparent hover:border-brand hover:text-brand/40'
             }`}
         >
             <svg
