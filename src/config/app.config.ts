@@ -7,13 +7,22 @@
 
 export const appConfig = {
     /** Nombre visible de la aplicacion. */
-    name: import.meta.env.VITE_APP_NAME ?? 'System Panel 2026',
+    name: import.meta.env.VITE_APP_NAME ?? 'Sistema de Gestión',
+    /** Siglas del logotipo (2 o 3 letras). */
+    shortName: import.meta.env.VITE_APP_SHORT_NAME ?? 'SG',
+    /** Frase corta bajo el nombre en la barra superior y el inicio de sesión. */
+    tagline: import.meta.env.VITE_APP_TAGLINE ?? 'Panel administrativo',
     /** Organizacion mostrada en el panel lateral del dashboard. */
-    organization: import.meta.env.VITE_APP_ORGANIZATION ?? 'Mi Organizacion',
+    organization: import.meta.env.VITE_APP_ORGANIZATION ?? 'Mi Organización',
     /** Sede / ubicacion mostrada en el panel lateral del dashboard. */
     location: import.meta.env.VITE_APP_LOCATION ?? 'Sede principal',
     /** URL base del API REST consumido por src/services/http.ts. */
     apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api',
+    /**
+     * API simulada en el navegador para los módulos que llaman a REST (roles,
+     * permisos, grupos, auditoría). Pon VITE_USE_MOCK_API=false al conectar tu backend.
+     */
+    mockApi: import.meta.env.VITE_USE_MOCK_API !== 'false',
     /** Canales de soporte: pagina 403, Centro de soporte y paginas de error. */
     support: {
         email: import.meta.env.VITE_SUPPORT_EMAIL ?? 'soporte@example.com',
@@ -37,10 +46,10 @@ export type UserRole = 'admin' | 'organizer' | 'analyst' | 'viewer'
 
 /** Etiqueta visible de cada rol (navbar, sidebar, paleta de comandos). */
 export const ROLE_LABELS: Record<UserRole, string> = {
-    admin: 'Administrator',
-    organizer: 'Organizer',
-    analyst: 'Analyst',
-    viewer: 'Viewer',
+    admin: 'Administrador',
+    organizer: 'Organizador',
+    analyst: 'Analista',
+    viewer: 'Lector',
 }
 
 export type CurrentUser = {

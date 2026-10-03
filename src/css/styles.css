@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+@import "@fontsource-variable/bricolage-grotesque/opsz.css";
 @import "./theme.css";
 @import "./components.css";
 
@@ -81,6 +83,11 @@ span[data-menu-ignore] {
 
 [data-sileo-viewport] {
 	z-index: var(--z-toast) !important;
+}
+
+/* Titles are sentences: keep their casing ("Cambios guardados", not "Cambios Guardados") */
+[data-sileo-title] {
+	text-transform: none;
 }
 
 /* Sileo paints the toast shape with an SVG `fill` attribute; CSS takes precedence */

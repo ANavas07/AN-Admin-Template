@@ -55,6 +55,13 @@ export default function AppShell({ renderNavbar, children }: AppShellProps) {
 
     return (
         <ShellContext.Provider value={{ isSidebarCollapsed: isCollapsed, setSidebarCollapsed: setCollapsed }}>
+            {/* First tab stop: jump over the navbar and the sidebar */}
+            <a
+                href="#contenido"
+                className="sr-only rounded-md bg-brand-solid px-3 py-2 text-sm font-medium text-on-solid focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-(--z-toast)"
+            >
+                Saltar al contenido
+            </a>
             {renderNavbar(toggleSidebar)}
             <div className="flex">
                 <AppSidebar
@@ -63,7 +70,9 @@ export default function AppShell({ renderNavbar, children }: AppShellProps) {
                     isMobileOpen={isMobileOpen}
                     onCloseMobile={() => setIsMobileOpen(false)}
                 />
-                <div className="min-w-0 flex-1">{children}</div>
+                <div id="contenido" tabIndex={-1} className="min-w-0 flex-1 focus:outline-none">
+                    {children}
+                </div>
             </div>
         </ShellContext.Provider>
     )

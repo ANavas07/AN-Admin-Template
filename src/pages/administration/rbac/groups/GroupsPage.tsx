@@ -174,7 +174,7 @@ export default function GroupsPage() {
   return (
     <div className="space-y-6">
       <ModuleHeader
-        eyebrow="RBAC"
+        eyebrow="Roles y permisos"
         title="Grupos"
         description="Organiza usuarios en grupos y asigna roles colectivos."
         actions={

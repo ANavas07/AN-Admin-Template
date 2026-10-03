@@ -28,6 +28,15 @@ const statusTones: Record<string, Tone> = {
     completed: 'info',
 };
 
+/** Visible label of the well-known status values. Other values are shown as they come. */
+const statusLabels: Record<string, string> = {
+    active: 'Activo',
+    inactive: 'Inactivo',
+    pending: 'Pendiente',
+    cancelled: 'Cancelado',
+    completed: 'Completado',
+};
+
 interface ReusableTableProps<T> {
     data: T[];
     columns: ColumnDef<T>[];
@@ -42,6 +51,10 @@ interface ReusableTableProps<T> {
     onClickBtn?: () => void;
     enableExpanding?: boolean;
     renderExpandedRowModel?: (original: T) => React.ReactNode;
+    /** Placeholder of the search box (say what can be searched) */
+    searchPlaceholder?: string;
+    /** Extra filters shown on the same row as the search box */
+    toolbar?: React.ReactNode;
 }
 
 type ActionCellProps = {
@@ -52,7 +65,7 @@ type ActionCellProps = {
 
 export default function TableTS<T>({ data, columns, loading, enableFiltering,
     enablePagination, enableSorting, pageSize, existBtn, btnMessage, onClickBtn,
-    enableExpanding, renderExpandedRowModel, emptyMessage }: ReusableTableProps<T>) {
+    enableExpanding, renderExpandedRowModel, emptyMessage, searchPlaceholder = 'Buscar…', toolbar }: ReusableTableProps<T>) {
 
     //to order i need to set a state.
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -143,13 +156,14 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
     if (loading) {
         return (
             <div className="card p-4 text-sm text-fg-muted">
-                Loading...
+                Cargando…
             </div>
         );
     }
 
     return (
         <div>
+            {(existBtn || enableFiltering || toolbar) && (
             <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:gap-4'>
                 {
                     existBtn && (
@@ -164,18 +178,23 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                         </ButtonComponent>
                     )
                 }
-                <div className="w-full sm:flex-1 sm:max-w-50 lg:max-w-75">
+                {enableFiltering ? (
+                <div className="w-full sm:flex-1 sm:max-w-60 lg:max-w-80">
                     <InputComponent
-                        inpPlaceHolder='Buscar...'
+                        inpPlaceHolder={searchPlaceholder}
+                        aria-label={searchPlaceholder}
                         value={filter}
                         onChange={e => setFilter(e.target.value)}
                         showSearchIcon
                         iconPosition="left"
                     />
                 </div>
+                ) : null}
+                {toolbar ? <div className="flex min-w-0 items-center sm:ml-auto">{toolbar}</div> : null}
             </div>
+            )}
 
-            <div className="card overflow-x-auto">
+            <div className="card relative overflow-x-auto">
                 <table className="min-w-full">
                     <thead className="surface-header">
                         {table.getHeaderGroups().map(headerGroup => (
@@ -264,7 +283,13 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                 </table>
             </div>
             {/* Pagination */}
-            {enablePagination && (
+            {/* A single page needs no pager, only the count */}
+            {enablePagination && table.getPageCount() <= 1 && (
+                <p className="mt-3 text-right text-xs text-fg-muted" aria-live="polite">
+                    {table.getFilteredRowModel().rows.length} resultados
+                </p>
+            )}
+            {enablePagination && table.getPageCount() > 1 && (
                 <div className="mt-4 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                         <ButtonComponent
@@ -304,9 +329,9 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                             »
                         </ButtonComponent>
                     </div>
-                    <span className="text-sm text-fg-muted">
-                        Page {table.getState().pagination.pageIndex + 1} of{' '}
-                        {table.getPageCount()}
+                    <span className="text-sm text-fg-muted" aria-live="polite">
+                        Página {table.getState().pagination.pageIndex + 1} de {Math.max(table.getPageCount(), 1)}
+                        <span className="hidden sm:inline"> · {table.getFilteredRowModel().rows.length} resultados</span>
                     </span>
                 </div>
             )}
@@ -363,7 +388,7 @@ export const StatusBadge = ({ value }: { value: string }) => {
 
     return (
         <Badge tone={statusTones[normalizedValue] ?? 'neutral'} dot>
-            {value}
+            {statusLabels[normalizedValue] ?? value}
         </Badge>
     );
 };

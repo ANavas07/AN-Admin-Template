@@ -159,7 +159,7 @@ export default function RolesPage() {
   return (
     <div className="space-y-6">
       <ModuleHeader
-        eyebrow="RBAC"
+        eyebrow="Roles y permisos"
         title="Roles"
         description="Administra los roles del sistema, su jerarquía y los permisos asociados."
         actions={

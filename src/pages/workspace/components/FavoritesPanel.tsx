@@ -52,7 +52,7 @@ export default function FavoritesPanel({ favorites, suggestions, usageOf, classN
                     ))}
                 </div>
             ) : (
-                <div className="flex h-full flex-col justify-center rounded-lg border border-dashed border-line-strong p-5">
+                <div className="flex flex-col rounded-lg border border-dashed border-line-strong p-4">
                     <div className="flex items-center gap-3">
                         <span className="inline-flex size-9 items-center justify-center rounded-lg bg-warning-soft text-warning">
                             <StarIcon className="size-4.5" />

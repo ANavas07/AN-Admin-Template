@@ -19,7 +19,7 @@ type SegmentedControlProps<T extends string> = {
 /** Mutually exclusive choice among a few options (filters, modes, environments). */
 export default function SegmentedControl<T extends string>({ options, value, onChange, label, size = 'md', className }: SegmentedControlProps<T>) {
     return (
-        <div role="radiogroup" aria-label={label} className={cn('inline-flex max-w-full overflow-x-auto rounded-md border border-line bg-canvas p-0.5', className)}>
+        <div role="radiogroup" aria-label={label} className={cn('inline-flex min-w-0 max-w-full overflow-x-auto rounded-md border border-line bg-canvas p-0.5', className)}>
             {options.map((option) => {
                 const isSelected = option.value === value
                 return (

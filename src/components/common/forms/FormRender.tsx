@@ -214,7 +214,7 @@ export default function FormRender({
                     className={cn(baseInputClass, 'h-9 py-0')}
                     onChange={(event) => updateValue(field.name, event.target.value)}
                 >
-                    <option value="">Selecciona una opcion</option>
+                    <option value="">Selecciona una opción</option>
                     {field.options?.map((option) => (
                         <option key={String(option.value)} value={String(option.value)}>
                             {option.label}

@@ -35,7 +35,7 @@ const DataList = <T,>({
     id,
     label,
     options,
-    placeholder = 'Seleccione una opcion',
+    placeholder = 'Selecciona una opción',
     className,
     containerClassName,
     disabled = false,
@@ -261,7 +261,7 @@ const DataList = <T,>({
                         <button
                             type="button"
                             className="inline-flex size-8 items-center justify-center rounded-lg hover:bg-canvas-subtle hover:text-fg"
-                            aria-label="Limpiar seleccion"
+                            aria-label="Limpiar selección"
                             onClick={clearSelection}
                         >
                             <ClearIcon />

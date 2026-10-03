@@ -21,6 +21,7 @@ import { cn } from '../../../utils/cn'
 import { modifierKeyLabel } from '../../../utils/platform'
 import { HOME_PATH } from '../../../navigation/navigation'
 import Avatar from '../../ui/avatar/Avatar'
+import BrandMark from '../brand/BrandMark'
 import { fieldControlClass, fieldSizeClasses } from '../../ui/inputs/fieldStyles'
 import Kbd from '../../ui/kbd/Kbd'
 import { useCommandPalette } from '../command-palette/command-palette-context'
@@ -89,13 +90,15 @@ export default function Navbar({
     }
 
     const isHome = location.pathname === HOME_PATH
-    const themeLabel = isDarkMode ? 'Switch to light theme' : 'Switch to dark theme'
+    const themeLabel = isDarkMode ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'
+    // Switching role changes the menu, the home and the module access (one active role at a time)
     const roleSelect = (className?: string) => (
         <select
             value={currentRole}
             onChange={(e) => onChangeRole(e.target.value as UserRole)}
             className={cn(fieldControlClass(), fieldSizeClasses.md, 'px-3 font-medium', className)}
-            aria-label="Select your role"
+            aria-label="Rol activo"
+            title="Cambia el rol con el que trabajas"
         >
             {currentUser.roles.map((role) => (
                 <option key={role} value={role}>
@@ -126,22 +129,16 @@ export default function Navbar({
                         onClick={handleGoBack}
                         disabled={isHome}
                         className={cn(iconButtonClass, 'hidden sm:inline-flex')}
-                        aria-label="Go back to the previous module"
-                        title="Back to previous module"
+                        aria-label="Volver a la página anterior"
+                        title="Volver"
                     >
                         <ArrowLeftIcon className="size-4.5" />
                     </button>
 
                     <div className="mx-1 hidden h-6 w-px bg-line sm:block" />
 
-                    <NavLink to={HOME_PATH} className="flex min-w-0 items-center gap-2.5" aria-label="Go to home">
-                        <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-md bg-brand-solid text-xs font-bold tracking-wide text-on-solid">
-                            CT
-                        </span>
-                        <span className="hidden min-w-0 leading-tight xl:block">
-                            <span className="block truncate text-sm font-semibold text-fg">Sistema de Gestion</span>
-                            <span className="block text-xs text-fg-muted">Panel de Control</span>
-                        </span>
+                    <NavLink to={HOME_PATH} className="rounded-md focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-brand/25" aria-label="Ir al inicio">
+                        <BrandMark nameClassName="hidden xl:block" />
                     </NavLink>
                 </div>
 
@@ -166,7 +163,10 @@ export default function Navbar({
                         <SearchIcon className="size-4.5" />
                     </button>
 
-                    <div className="hidden lg:block">{roleSelect('w-auto')}</div>
+                    <label className="hidden items-center gap-2 lg:flex">
+                        <span className="text-xs font-medium text-fg-muted">Rol</span>
+                        {roleSelect('w-auto')}
+                    </label>
 
                     <button type="button" onClick={onToggleTheme} className={iconButtonClass} aria-label={themeLabel} title={themeLabel}>
                         {isDarkMode ? <SunIcon className="size-4.5" /> : <MoonIcon className="size-4.5" />}
@@ -181,7 +181,7 @@ export default function Navbar({
                             className="inline-flex h-9 items-center gap-2 rounded-md pl-1 pr-1 text-sm font-medium text-fg transition-colors hover:bg-canvas-subtle focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-brand/25 sm:pr-2"
                             aria-expanded={isUserMenuOpen}
                             aria-haspopup="true"
-                            aria-label="Account menu"
+                            aria-label="Menú de la cuenta"
                         >
                             <Avatar name={currentUser.name} tone="brand" size="sm" />
                             <span className="hidden max-w-30 truncate sm:inline">{currentUser.name.split(' ')[0]}</span>
@@ -196,7 +196,7 @@ export default function Navbar({
                                 </div>
                                 {/* On smaller screens the role selector lives here */}
                                 <div className="border-b border-line px-3 py-2.5 lg:hidden">
-                                    <p className="eyebrow mb-1.5 text-3xs">My role</p>
+                                    <p className="eyebrow mb-1.5 text-3xs">Rol activo</p>
                                     {roleSelect()}
                                 </div>
                                 <div className="py-1">
@@ -215,7 +215,7 @@ export default function Navbar({
                                 <div className="border-t border-line py-1">
                                     <button type="button" onClick={signOut} className={cn(menuItemClass, 'text-danger hover:bg-danger-soft')}>
                                         <LogOutIcon className="size-4" />
-                                        Sign out
+                                        Cerrar sesión
                                     </button>
                                 </div>
                             </div>

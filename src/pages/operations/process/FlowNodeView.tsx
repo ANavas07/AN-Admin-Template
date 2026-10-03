@@ -344,7 +344,7 @@ export default function FlowNodeView({
                         colorStyle.border
                     )}
                     aria-label={`Resize ${node.title}`}
-                    title="Drag to resize"
+                    title="Arrastra para cambiar el tamaño"
                 />
             ) : null}
         </div>

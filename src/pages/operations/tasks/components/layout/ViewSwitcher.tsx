@@ -44,7 +44,7 @@ const tabs: { id: TaskView; label: string; icon: ReactNode }[] = [
 
 export function ViewSwitcher({ active, onChange }: Props) {
     return (
-        <div role="tablist" aria-label="Cambiar vista" className="inline-flex items-center gap-1 rounded-xl border border-line bg-surface p-1">
+        <div role="tablist" aria-label="Cambiar vista" className="inline-flex min-w-0 max-w-full items-center gap-1 overflow-x-auto rounded-xl border border-line bg-surface p-1">
             {tabs.map((tab) => {
                 const selected = tab.id === active
                 return (
@@ -53,7 +53,7 @@ export function ViewSwitcher({ active, onChange }: Props) {
                         role="tab"
                         aria-selected={selected}
                         onClick={() => onChange(tab.id)}
-                        className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                             selected
                                 ? 'bg-surface text-fg shadow-sm ring-1 ring-line'
                                 : 'text-fg-muted hover:bg-canvas-subtle hover:text-fg'

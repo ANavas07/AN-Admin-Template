@@ -67,10 +67,12 @@ backed by environment variables declared in [`.env.example`](.env.example).
 
 | Variable | Default | Used for |
 | --- | --- | --- |
-| `VITE_APP_NAME` | `System Panel 2026` | Application name |
-| `VITE_APP_ORGANIZATION` | `Mi Organizacion` | Organization shown in the dashboard sidebar |
+| `VITE_APP_NAME` | `Sistema de Gestión` | Application name (navbar, login) |
+| `VITE_APP_SHORT_NAME` / `VITE_APP_TAGLINE` | `SG` / `Panel administrativo` | Logo initials and the line under the name |
+| `VITE_APP_ORGANIZATION` | `Mi Organización` | Organization shown in the sidebar and on the login |
 | `VITE_APP_LOCATION` | `Sede principal` | Location shown in the dashboard sidebar |
 | `VITE_API_BASE_URL` | `http://localhost:3000/api` | Base URL for `src/services/http.ts` |
+| `VITE_USE_MOCK_API` | `true` | Answers the RBAC REST calls (roles, permissions, groups, audit) in the browser; set `false` when your backend is ready |
 | `VITE_SUPPORT_EMAIL` / `_PHONE` / `_HOURS` | sample values | Support channels (support center, 403 and error pages) |
 | `VITE_MAINTENANCE_MODE` | `false` | `true` replaces the whole app with the maintenance page |
 | `VITE_MAINTENANCE_MESSAGE` / `_UNTIL` | empty | Optional message and estimated end (ISO 8601) |
@@ -161,10 +163,18 @@ with a key from the browser.
 
 ## How the home dashboard works
 
-The home is a **personal workspace**, not a grid of static cards. In order of
-priority it shows the user's favorite modules, the recently visited pages,
-quick actions, system information, usage analytics and, last, the full catalog.
-Favorites and quick actions are ordered by how often the user opens each module.
+The home is a **personal workspace**, not a grid of static cards. It answers, in
+order, the questions people bring to it:
+
+1. **What needs me today?** A *pending* agenda gathered from mail (unread,
+   drafts), support (tickets waiting for your reply), API keys about to expire
+   and processes in review. Each tile opens the first item; the greeting
+   summarizes it in one sentence ([`useAgenda.ts`](src/pages/workspace/hooks/useAgenda.ts)).
+2. **Where do I usually go?** Favorites and recently visited pages.
+3. **What can I start?** Quick actions, ordered by how much you use each module.
+4. **How am I using the system?** Compact metrics (optional in Preferences);
+   the full analysis lives in Workspace › Recent activity, and the catalog in
+   Workspace › Modules.
 
 ### One navigation registry
 
@@ -239,6 +249,10 @@ The whole visual language lives in **one file**:
 [`src/css/theme.css`](src/css/theme.css). It declares every color, shadow,
 radius, font, motion curve, z-index and layout size, with a light value and a
 dark override. Components never hardcode values.
+
+Typography: **Geist** for the interface, **Bricolage Grotesque** only for page
+titles and the greeting (`font-display`), **Geist Mono** for codes, keys and
+references (`font-mono`).
 
 | Layer | Where | What it gives you |
 | --- | --- | --- |

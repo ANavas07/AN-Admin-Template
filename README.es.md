@@ -69,10 +69,12 @@ variables de entorno declaradas en [`.env.example`](.env.example).
 
 | Variable | Valor por defecto | Para qué sirve |
 | --- | --- | --- |
-| `VITE_APP_NAME` | `System Panel 2026` | Nombre de la aplicación |
-| `VITE_APP_ORGANIZATION` | `Mi Organizacion` | Organización del panel lateral |
+| `VITE_APP_NAME` | `Sistema de Gestión` | Nombre de la aplicación (barra superior, inicio de sesión) |
+| `VITE_APP_SHORT_NAME` / `VITE_APP_TAGLINE` | `SG` / `Panel administrativo` | Siglas del logotipo y la frase bajo el nombre |
+| `VITE_APP_ORGANIZATION` | `Mi Organización` | Organización del panel lateral y del inicio de sesión |
 | `VITE_APP_LOCATION` | `Sede principal` | Ubicación del panel lateral |
 | `VITE_API_BASE_URL` | `http://localhost:3000/api` | URL base de `src/services/http.ts` |
+| `VITE_USE_MOCK_API` | `true` | Responde en el navegador las llamadas REST de RBAC (roles, permisos, grupos, auditoría); ponlo en `false` al conectar tu backend |
 | `VITE_SUPPORT_EMAIL` / `_PHONE` / `_HOURS` | valores de ejemplo | Canales de soporte (centro de soporte, 403 y páginas de error) |
 | `VITE_MAINTENANCE_MODE` | `false` | `true` reemplaza toda la app por la página de mantenimiento |
 | `VITE_MAINTENANCE_MESSAGE` / `_UNTIL` | vacío | Mensaje opcional y fin estimado (ISO 8601) |
@@ -167,10 +169,17 @@ proveedor de modelos con una clave desde el navegador.
 ## Cómo funciona el dashboard
 
 El home es un **espacio de trabajo personal**, no una grilla de tarjetas
-estáticas. En orden de prioridad muestra los módulos favoritos del usuario, las
-páginas visitadas recientemente, accesos rápidos, información del sistema,
-métricas de uso y, al final, el catálogo completo. Favoritos y accesos rápidos se
-ordenan según la frecuencia con que el usuario abre cada módulo.
+estáticas. Responde, en orden, a las preguntas con que la gente llega:
+
+1. **¿Qué me espera hoy?** Una agenda de *pendientes* reunida desde el correo
+   (sin leer, borradores), soporte (tickets que esperan tu respuesta), API keys
+   por vencer y procesos en revisión. Cada tarjeta abre el primer elemento y el
+   saludo lo resume en una frase ([`useAgenda.ts`](src/pages/workspace/hooks/useAgenda.ts)).
+2. **¿A dónde suelo ir?** Favoritos y páginas visitadas recientemente.
+3. **¿Qué puedo empezar?** Accesos rápidos, ordenados según cuánto usas cada módulo.
+4. **¿Cómo uso el sistema?** Métricas compactas (opcionales en Preferencias); el
+   análisis completo está en Espacio de trabajo › Actividad reciente y el
+   catálogo en Espacio de trabajo › Módulos.
 
 ### Un único registro de navegación
 
@@ -248,6 +257,10 @@ Todo el lenguaje visual vive en **un solo archivo**:
 [`src/css/theme.css`](src/css/theme.css). Declara cada color, sombra, radio,
 fuente, curva de animación, z-index y medida de layout, con su valor claro y su
 variante oscura. Los componentes no escriben valores a mano.
+
+Tipografía: **Geist** para la interfaz, **Bricolage Grotesque** solo en títulos
+de página y el saludo (`font-display`), **Geist Mono** para códigos, claves y
+referencias (`font-mono`).
 
 | Capa | Dónde | Qué aporta |
 | --- | --- | --- |

@@ -1,14 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { ModuleCategory } from '../../../navigation/modules'
-import { getCatalogCategories } from '../../../navigation/navigation'
 import PageContainer from '../../../components/common/page/PageContainer'
 import { useAccount } from '../../../context/account-context'
+import { ArrowRightIcon, GridIcon } from '../../../icons/icons'
 import ActivityMetrics from '../components/ActivityMetrics'
+import AgendaPanel from '../components/AgendaPanel'
 import FavoritesPanel from '../components/FavoritesPanel'
-import ModuleCatalog from '../components/ModuleCatalog'
 import QuickActionsPanel from '../components/QuickActionsPanel'
 import RecentPanel from '../components/RecentPanel'
-import SystemInfoPanel from '../components/SystemInfoPanel'
+import { summarizeAgenda, useAgenda } from '../hooks/useAgenda'
 import { useWorkspaceInsights } from '../hooks/useWorkspaceInsights'
 
 export type { ModuleCategory }
@@ -37,18 +38,18 @@ function greeting(hour: number) {
 }
 
 /**
- * Home as a personal workspace: favorites, recent history, quick actions and
- * system context first, then the user's activity metrics and the full catalog.
+ * Home, ordered by the questions people bring to it:
+ * 1. What needs me today? (agenda from mail, support, API keys, processes)
+ * 2. Where do I usually go? (favorites and recent pages)
+ * 3. What can I start? (quick actions)
+ * 4. How am I using the system? (compact metrics, optional in Preferences)
+ * The full module catalog lives in Workspace › Modules.
  */
-export default function MainPanel({ categories, userRole, userName, onModuleClick }: MainPanelProps) {
+export default function MainPanel({ userName }: MainPanelProps) {
     const insights = useWorkspaceInsights()
+    const agenda = useAgenda()
     const { preferences } = useAccount()
     const [now] = useState(() => new Date())
-
-    // Same role filter as before; sections flagged catalog: false (workspace, account) are skipped
-    const visibleCategories = useMemo(() => getCatalogCategories(userRole, categories), [categories, userRole])
-
-    const openModule = (url: string) => onModuleClick?.(url)
     const firstName = userName.split(' ')[0]
 
     return (
@@ -59,28 +60,40 @@ export default function MainPanel({ categories, userRole, userName, onModuleClic
                     <h1 className="page-title mt-1.5">
                         {greeting(now.getHours())}, {firstName}
                     </h1>
-                    <p className="mt-1.5 text-sm text-fg-muted">
-                        Tu espacio de trabajo: favoritos, actividad reciente y accesos según cómo usas el sistema.
+                    <p className="mt-1.5 max-w-2xl text-sm text-fg-muted" aria-live="polite">
+                        {agenda.isLoading ? 'Revisando tus pendientes…' : summarizeAgenda(agenda.items)}
                     </p>
                 </div>
             </header>
 
-            {/* Tablet: two columns, dense so the narrow panels pair up; desktop: 8 / 4 split */}
-            <div className="grid gap-4 md:grid-flow-dense md:grid-cols-2 xl:grid-flow-row xl:grid-cols-12">
+            <AgendaPanel items={agenda.items} isLoading={agenda.isLoading} />
+
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
                 <FavoritesPanel
                     favorites={insights.favoriteModules}
                     suggestions={insights.suggestions}
                     usageOf={insights.usageOf}
-                    className="md:col-span-2 xl:col-span-8"
+                    className="xl:col-span-8"
                 />
                 <RecentPanel className="xl:col-span-4" />
-                <QuickActionsPanel actions={insights.quickActions} className="md:col-span-2 xl:col-span-8" />
-                <SystemInfoPanel lastVisitAt={insights.summary.lastVisitAt} className="xl:col-span-4" />
             </div>
 
-            {preferences.showHomeMetrics ? <ActivityMetrics insights={insights} /> : null}
+            <QuickActionsPanel actions={insights.quickActions} />
 
-            <ModuleCatalog categories={visibleCategories} usageOf={insights.usageOf} onOpen={openModule} />
+            {preferences.showHomeMetrics ? <ActivityMetrics insights={insights} compact /> : null}
+
+            <Link to="/workspace/modules" className="card-interactive group flex items-center gap-4 p-4">
+                <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-canvas-subtle text-fg-muted">
+                    <GridIcon className="size-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-fg">Explorar todos los módulos</span>
+                    <span className="block text-xs text-fg-muted">
+                        {insights.accessibleModules.length} módulos disponibles para tu rol, agrupados por área.
+                    </span>
+                </span>
+                <ArrowRightIcon className="size-4 text-fg-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-brand" />
+            </Link>
         </PageContainer>
     )
 }
