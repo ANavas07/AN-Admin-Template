@@ -24,7 +24,8 @@
 
 /* Page-level heading used by every module header */
 @utility page-title {
-	@apply text-2xl font-semibold tracking-tight text-fg;
+	@apply font-display text-[1.75rem] leading-9 font-semibold tracking-[-0.02em] text-fg;
+	font-variation-settings: "opsz" 32;
 }
 
 /* Recessed toolbar / header strip inside a card (tables, panels) */

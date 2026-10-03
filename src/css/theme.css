@@ -117,9 +117,13 @@
 	--color-code-tag: #b0384f;
 
 	/* ---- Typography ----------------------------------------------------- */
-	--font-sans: "Inter Variable", "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
+	/* UI text: Geist, neutral and very legible in dense tables and forms */
+	--font-sans: "Geist Variable", "Geist", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
 		"Helvetica Neue", Arial, sans-serif;
-	--font-mono: "JetBrains Mono", "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+	/* Titles only (page titles, greeting, empty states): a warmer, human grotesque */
+	--font-display: "Bricolage Grotesque Variable", "Geist Variable", "Segoe UI", system-ui, sans-serif;
+	/* Codes, keys, references, numbers in code blocks */
+	--font-mono: "Geist Mono Variable", "Geist Mono", "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 	/* Compact sizes for dense enterprise UI (meta text, chips, canvas labels) */
 	--text-3xs: 0.625rem;
 	--text-3xs--line-height: 0.875rem;

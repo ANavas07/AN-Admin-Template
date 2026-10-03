@@ -153,7 +153,7 @@ export default function UserRolesPage() {
   return (
     <div className="space-y-6">
       <ModuleHeader
-        eyebrow="RBAC"
+        eyebrow="Roles y permisos"
         title="Asignación de Usuarios"
         description="Asigna y revoca roles directos a usuarios individuales."
       />

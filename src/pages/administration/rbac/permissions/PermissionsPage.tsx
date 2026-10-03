@@ -151,7 +151,7 @@ export default function PermissionsPage() {
   return (
     <div className="space-y-6">
       <ModuleHeader
-        eyebrow="RBAC"
+        eyebrow="Roles y permisos"
         title="Permisos"
         description="Define los permisos del sistema por recurso y acción."
         actions={

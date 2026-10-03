@@ -225,7 +225,7 @@ export default function GroupMembersPanel({
                       isLoading={removingId === m.userId}
                       onClick={() => handleRemove(m.userId, m.username)}
                       aria-label={`Remover a ${m.username}`}
-                      title="Remover miembro"
+                      title="Quitar del grupo"
                     >
                       <TrashBinIcon className="size-4 text-danger" />
                     </ButtonComponent>

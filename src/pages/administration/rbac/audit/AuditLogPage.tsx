@@ -158,7 +158,7 @@ export default function AuditLogPage() {
   return (
     <div className="space-y-6">
       <ModuleHeader
-        eyebrow="RBAC"
+        eyebrow="Roles y permisos"
         title="Log de Auditoría"
         description="Registro de todos los eventos de acceso y cambios de permisos. Solo lectura."
       />

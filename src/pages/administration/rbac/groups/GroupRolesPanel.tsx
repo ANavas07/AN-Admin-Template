@@ -165,7 +165,7 @@ export default function GroupRolesPanel({
                 isLoading={removingId === gr.roleId}
                 onClick={() => handleRemove(gr.roleId, gr.role.name)}
                 aria-label={`Remover rol ${gr.role.name}`}
-                title="Remover rol"
+                title="Quitar rol"
               >
                 <TrashBinIcon className="size-4 text-danger" />
               </ButtonComponent>
