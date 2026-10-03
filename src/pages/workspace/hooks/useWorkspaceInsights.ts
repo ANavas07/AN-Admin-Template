@@ -53,6 +53,8 @@ export function useWorkspaceInsights() {
 
         return {
             accessibleModules: accessible,
+            // Only modules of the catalog count (workspace and account pages are not "modules")
+            modulesInUse: accessible.filter((module) => usageOf(module.id) > 0).length,
             usageOf,
             topModules,
             favoriteModules,

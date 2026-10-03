@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import type { ColumnDef } from '@tanstack/react-table'
 import { useWorkspace } from '../../../context/workspace-context'
 import type { DailyCount, MonthlyCount, WeekdayCount } from '../../../services/workspace/metrics'
@@ -39,8 +39,14 @@ const moduleColumns: ColumnDef<ModuleUsage>[] = [
     { accessorKey: 'count', header: 'Visitas (30 días)' },
 ]
 
+type ActivityMetricsProps = {
+    insights: Insights
+    /** Home: headline figures and the daily chart; the full analysis lives in Recent activity */
+    compact?: boolean
+}
+
 /** Usage analytics of the signed-in user, derived from the visit log. */
-export default function ActivityMetrics({ insights }: { insights: Insights }) {
+export default function ActivityMetrics({ insights, compact = false }: ActivityMetricsProps) {
     const navigate = useNavigate()
     const { hasDemoActivity, clearDemoActivity } = useWorkspace()
     const { summary, daily, monthly, weekly, topModules } = insights
@@ -56,16 +62,23 @@ export default function ActivityMetrics({ insights }: { insights: Insights }) {
                     </h2>
                     <p className="mt-0.5 text-xs text-fg-muted">Calculada a partir de los módulos que visitas</p>
                 </div>
-                {hasDemoActivity ? (
-                    <div className="flex items-center gap-2">
-                        <Badge tone="info" size="sm">
-                            Incluye datos de demostración
-                        </Badge>
-                        <button type="button" onClick={clearDemoActivity} className="text-xs font-medium text-brand hover:text-brand-strong">
-                            Borrar demo
-                        </button>
-                    </div>
-                ) : null}
+                <div className="flex items-center gap-3">
+                    {hasDemoActivity ? (
+                        <div className="flex items-center gap-2">
+                            <Badge tone="info" size="sm">
+                                Incluye datos de demostración
+                            </Badge>
+                            <button type="button" onClick={clearDemoActivity} className="text-xs font-medium text-brand hover:text-brand-strong">
+                                Borrar demo
+                            </button>
+                        </div>
+                    ) : null}
+                    {compact ? (
+                        <Link to="/workspace/activity" className="text-xs font-medium text-brand hover:text-brand-strong">
+                            Ver análisis completo
+                        </Link>
+                    ) : null}
+                </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -81,15 +94,10 @@ export default function ActivityMetrics({ insights }: { insights: Insights }) {
                     delta={percentChange(summary.last30, summary.previous30)}
                     deltaLabel="vs. 30 días previos"
                 />
-                <StatTile
-                    label="Últimos 7 días"
-                    value={formatNumber(last7)}
-                    delta={percentChange(last7, previous7)}
-                    deltaLabel="vs. semana anterior"
-                />
+                <StatTile label="Últimos 7 días" value={formatNumber(last7)} delta={percentChange(last7, previous7)} deltaLabel="vs. semana anterior" />
                 <StatTile
                     label="Módulos en uso"
-                    value={`${summary.activeModules30} / ${insights.accessibleModules.length}`}
+                    value={`${insights.modulesInUse} / ${insights.accessibleModules.length}`}
                     deltaLabel={summary.streakDays > 0 ? `${summary.streakDays} días seguidos con actividad` : 'Sin actividad reciente'}
                 />
             </div>
@@ -135,41 +143,45 @@ export default function ActivityMetrics({ insights }: { insights: Insights }) {
                     )}
                 </ChartCard>
 
-                <ChartCard
-                    title="Tendencia mensual"
-                    description="Visitas por mes, últimos 6 meses"
-                    data={monthly}
-                    columns={monthlyColumns}
-                    className="xl:col-span-6"
-                >
-                    <AreaLineChart
-                        data={monthly}
-                        x={(row) => monthLabel.format(row.month)}
-                        y={(row) => row.count}
-                        tooltipTitle={(row) => monthTitle.format(row.month)}
-                        seriesLabel="visitas"
-                        height={200}
-                        ariaLabel="Gráfico de línea: visitas por mes en los últimos 6 meses"
-                    />
-                </ChartCard>
+                {compact ? null : (
+                    <>
+                        <ChartCard
+                            title="Tendencia mensual"
+                            description="Visitas por mes, últimos 6 meses"
+                            data={monthly}
+                            columns={monthlyColumns}
+                            className="xl:col-span-6"
+                        >
+                            <AreaLineChart
+                                data={monthly}
+                                x={(row) => monthLabel.format(row.month)}
+                                y={(row) => row.count}
+                                tooltipTitle={(row) => monthTitle.format(row.month)}
+                                seriesLabel="visitas"
+                                height={200}
+                                ariaLabel="Gráfico de línea: visitas por mes en los últimos 6 meses"
+                            />
+                        </ChartCard>
 
-                <ChartCard
-                    title="Patrón semanal"
-                    description="Visitas promedio por día de la semana (8 semanas)"
-                    data={weekly}
-                    columns={weeklyColumns}
-                    className="xl:col-span-6"
-                >
-                    <ColumnChart
-                        data={weekly}
-                        x={(row) => row.label}
-                        y={(row) => row.count}
-                        seriesLabel="visitas promedio"
-                        formatValue={(value) => formatNumber(Math.round(value * 10) / 10)}
-                        height={200}
-                        ariaLabel="Gráfico de columnas: visitas promedio por día de la semana"
-                    />
-                </ChartCard>
+                        <ChartCard
+                            title="Patrón semanal"
+                            description="Visitas promedio por día de la semana (8 semanas)"
+                            data={weekly}
+                            columns={weeklyColumns}
+                            className="xl:col-span-6"
+                        >
+                            <ColumnChart
+                                data={weekly}
+                                x={(row) => row.label}
+                                y={(row) => row.count}
+                                seriesLabel="visitas promedio"
+                                formatValue={(value) => formatNumber(Math.round(value * 10) / 10)}
+                                height={200}
+                                ariaLabel="Gráfico de columnas: visitas promedio por día de la semana"
+                            />
+                        </ChartCard>
+                    </>
+                )}
             </div>
         </section>
     )

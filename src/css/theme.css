@@ -155,6 +155,19 @@
 	/* ---- Motion --------------------------------------------------------- */
 	--ease-standard: cubic-bezier(0.2, 0, 0, 1);
 	--ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+
+	/* Entrance: content rises a few pixels while fading in (disabled by prefers-reduced-motion) */
+	--animate-rise: rise 420ms var(--ease-emphasized) both;
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(6px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
 	--default-transition-duration: 150ms;
 	--default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
 }
