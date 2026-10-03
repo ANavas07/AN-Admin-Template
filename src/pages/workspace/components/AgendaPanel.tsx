@@ -18,7 +18,7 @@ type AgendaPanelProps = {
 export default function AgendaPanel({ items, isLoading, className }: AgendaPanelProps) {
     if (isLoading) {
         return (
-            <section aria-label="Pendientes" aria-busy="true" className={cn('grid gap-3 sm:grid-cols-2 xl:grid-cols-4', className)}>
+            <section aria-label="Pendientes" aria-busy="true" className={cn('grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4', className)}>
                 {[0, 1, 2, 3].map((index) => (
                     <div key={index} className="card h-28 animate-pulse bg-surface-muted" />
                 ))}
@@ -45,7 +45,7 @@ export default function AgendaPanel({ items, isLoading, className }: AgendaPanel
             <h2 id="agenda-title" className="sr-only">
                 Pendientes
             </h2>
-            <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {items.map((item, index) => (
                     <li key={item.id} className="animate-rise" style={{ animationDelay: `${index * 60}ms` }}>
                         <Link

@@ -47,7 +47,8 @@ export function TasksSidebar({
     onManageMembers,
     onNewProject,
 }: Props) {
-    const [collapsed, setCollapsed] = useState(false)
+    // Phones and tablets start with the compact rail so the board keeps the width
+    const [collapsed, setCollapsed] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 63.99rem)').matches)
     const [closedTeams, setClosedTeams] = useState<Set<string>>(new Set())
     const [menuTeamId, setMenuTeamId] = useState<string | null>(null)
 

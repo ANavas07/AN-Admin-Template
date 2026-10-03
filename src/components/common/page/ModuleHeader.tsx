@@ -21,7 +21,7 @@ export default function ModuleHeader({ eyebrow, title, description, actions }: M
                     {description}
                 </p>
             </div>
-            {actions ? <div className="flex shrink-0 items-center gap-3">{actions}</div> : null}
+            {actions ? <div className="flex min-w-0 max-w-full shrink-0 flex-wrap items-center gap-3">{actions}</div> : null}
         </div>
     )
 }

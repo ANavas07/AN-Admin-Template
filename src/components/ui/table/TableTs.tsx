@@ -163,6 +163,7 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
 
     return (
         <div>
+            {(existBtn || enableFiltering || toolbar) && (
             <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:gap-4'>
                 {
                     existBtn && (
@@ -177,6 +178,7 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                         </ButtonComponent>
                     )
                 }
+                {enableFiltering ? (
                 <div className="w-full sm:flex-1 sm:max-w-60 lg:max-w-80">
                     <InputComponent
                         inpPlaceHolder={searchPlaceholder}
@@ -187,10 +189,12 @@ export default function TableTS<T>({ data, columns, loading, enableFiltering,
                         iconPosition="left"
                     />
                 </div>
+                ) : null}
                 {toolbar ? <div className="flex min-w-0 items-center sm:ml-auto">{toolbar}</div> : null}
             </div>
+            )}
 
-            <div className="card overflow-x-auto">
+            <div className="card relative overflow-x-auto">
                 <table className="min-w-full">
                     <thead className="surface-header">
                         {table.getHeaderGroups().map(headerGroup => (

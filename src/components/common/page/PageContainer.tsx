@@ -14,7 +14,7 @@ export default function PageContainer({ children, width = 'default', className }
         <div className="min-h-[calc(100vh-var(--layout-navbar-height))] bg-canvas">
             <div
                 className={cn(
-                    'mx-auto space-y-6 px-4 py-6 sm:px-6 lg:px-8',
+                    'mx-auto animate-rise space-y-6 px-4 py-6 sm:px-6 lg:px-8',
                     width === 'narrow' ? 'max-w-4xl' : 'max-w-(--layout-content-max-width)',
                     className
                 )}

@@ -1,3 +1,4 @@
+import { sileo } from 'sileo'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import PopUp from '../../../../components/common/pop-up/PopUp'
 import ButtonComponent from '../../../../components/ui/buttons/ButtonComponent'
@@ -88,14 +89,15 @@ export default function GroupMembersPanel({
   }
 
   async function handleRemove(userId: string, username: string) {
-    if (!confirm(`¿Remover a "${username}" del grupo?`)) return
+    // Reversible action: no confirmation; a toast reports the result
     setRemovingId(userId)
     try {
       await groupsService.removeMember(group.id, userId)
       loadMembers()
       onChanged()
+      sileo.success({ title: `${username} ya no pertenece al grupo` })
     } catch {
-      // silently fail
+      sileo.error({ title: 'No se pudo quitar a la persona del grupo.' })
     } finally {
       setRemovingId(null)
     }

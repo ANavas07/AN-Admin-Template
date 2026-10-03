@@ -270,6 +270,8 @@ export const MODULE_CATEGORIES: ModuleCategory[] = [
         name: 'Cuenta',
         icon: 'user',
         catalog: false,
+        // Reached from the user menu in the navbar; the sidebar stays focused on work
+        sidebar: false,
         modules: [
             {
                 id: 'profile',
