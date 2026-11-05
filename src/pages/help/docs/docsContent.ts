@@ -34,7 +34,7 @@ src/
 │   ├── help/           Base de conocimiento, documentación, catálogo UI
 │   ├── account/        Perfil, preferencias, seguridad
 │   ├── system/         404, 403, 500, mantenimiento
-│   └── auth/           Inicio de sesión
+│   └── auth/           Página de entrada e inicio de sesión
 └── css/            Tokens de diseño y utilidades
 \`\`\`
 

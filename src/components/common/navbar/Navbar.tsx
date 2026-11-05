@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { ROLE_LABELS } from '../../../config/app.config'
 import type { CurrentUser, UserRole } from '../../../config/app.config'
 import {
@@ -20,6 +20,7 @@ import { signOut } from '../../../services/session'
 import { cn } from '../../../utils/cn'
 import { modifierKeyLabel } from '../../../utils/platform'
 import { HOME_PATH } from '../../../navigation/navigation'
+import { useGoBack } from '../../../navigation/useGoBack'
 import Avatar from '../../ui/avatar/Avatar'
 import BrandMark from '../brand/BrandMark'
 import { fieldControlClass, fieldSizeClasses } from '../../ui/inputs/fieldStyles'
@@ -62,7 +63,6 @@ export default function Navbar({
 }: NavbarProps) {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
-    const navigate = useNavigate()
     const location = useLocation()
     const { open: openPalette } = useCommandPalette()
 
@@ -83,11 +83,7 @@ export default function Navbar({
         }
     }, [isUserMenuOpen])
 
-    // History navigation keeps the previous module's route state intact
-    const handleGoBack = () => {
-        if (window.history.length > 1) navigate(-1)
-        else navigate(HOME_PATH)
-    }
+    const handleGoBack = useGoBack()
 
     const isHome = location.pathname === HOME_PATH
     const themeLabel = isDarkMode ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'

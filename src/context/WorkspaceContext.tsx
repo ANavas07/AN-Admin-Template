@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
-import { describeRoute, findRouteMatch } from '../navigation/navigation'
+import { describeRoute, findRouteMatch, hasModuleAccess } from '../navigation/navigation'
 import type { CurrentUser, UserRole } from '../config/app.config'
 import { workspaceService } from '../services/workspace/workspace.service'
 import type { WorkspaceState } from '../services/workspace/workspace.service'
@@ -49,7 +49,8 @@ export function WorkspaceProvider({ user, role, children }: WorkspaceProviderPro
         if (!isLoaded || lastRecordedPath.current === pathname) return
         lastRecordedPath.current = pathname
         const match = findRouteMatch(pathname)
-        if (!match) return
+        // Unknown routes (404) and pages the role cannot open (403) are not visits
+        if (!match || !hasModuleAccess(match.module, role)) return
         const userId = user.id
         workspaceService
             .recordVisit(userId, { path: pathname, moduleId: match.module.id, title: describeRoute(match), at: Date.now() })
@@ -57,7 +58,7 @@ export function WorkspaceProvider({ user, role, children }: WorkspaceProviderPro
                 // Ignore the answer if the session changed meanwhile
                 if (lastRecordedPath.current === pathname) setState(next)
             })
-    }, [isLoaded, pathname, user.id])
+    }, [isLoaded, pathname, role, user.id])
 
     function toggleFavorite(moduleId: string) {
         workspaceService.toggleFavorite(user.id, moduleId).then(setState)

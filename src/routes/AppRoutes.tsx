@@ -6,8 +6,10 @@ import { appConfig } from '../config/app.config'
 import type { CurrentUser, UserRole } from '../config/app.config'
 
 // Rutas de entrada: se cargan con el bundle inicial porque son lo primero
-// que ve el usuario (login -> dashboard) o las que responden a un error.
-import Login from '../pages/auth/login/Login'
+// que ve el usuario (pagina de entrada -> dashboard) o las que responden a un error.
+import LandingPage from '../pages/auth/landing/LandingPage'
+import type { LoginCredentials } from '../pages/auth/login/LoginForm'
+import { HOME_PATH, LANDING_PATH, SIGN_IN_SECTION_ID } from '../navigation/navigation'
 import AdminPanel from '../pages/workspace/dashboard/DashboardPage'
 import NotFoundPage from '../pages/system/NotFoundPage'
 import ForbiddenPage from '../pages/system/ForbiddenPage'
@@ -68,11 +70,6 @@ const GanttCatalog = lazy(() => import('../pages/help/playground/GanttCatalog'))
 const FormsCatalog = lazy(() => import('../pages/help/playground/FormsCatalog'))
 const PopUpCatalog = lazy(() => import('../pages/help/playground/PopUpCatalog'))
 
-type LoginCredentials = {
-  email: string
-  password: string
-}
-
 type AppRoutesProps = {
   currentRole: UserRole
   currentUser: CurrentUser
@@ -101,25 +98,26 @@ export function AppRoutes({
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
+        {/* Pagina publica de entrada; iniciar sesion es una de sus secciones (/#ingresar) */}
         <Route
-          path="/login"
+          path={LANDING_PATH}
           element={
             isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
+              <Navigate to={HOME_PATH} replace />
             ) : (
-              <Login
-                onLogin={onLogin}
-                isDarkMode={isDarkMode}
-                onToggleTheme={onToggleTheme}
-              />
+              <LandingPage onLogin={onLogin} isDarkMode={isDarkMode} onToggleTheme={onToggleTheme} />
             )
           }
+        />
+        {/* Enlaces antiguos a /login llevan a esa seccion */}
+        <Route
+          path="/login"
+          element={<Navigate to={isAuthenticated ? HOME_PATH : { pathname: LANDING_PATH, hash: SIGN_IN_SECTION_ID }} replace />}
         />
         {/* Vista previa de la pantalla de mantenimiento (se activa con VITE_MAINTENANCE_MODE) */}
         <Route path="/maintenance" element={<MaintenancePage />} />
 
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route
             path="/dashboard"
             element={
@@ -184,21 +182,21 @@ export function AppRoutes({
               <Route path="preferences" element={<PreferencesPage />} />
               <Route path="security" element={<SecurityPage />} />
             </Route>
+
+            {/* Gantt y el catalogo de UI son modulos del menu: piden sesion y respetan el rol */}
+            <Route path="/gantt" element={<GanttStandalone />} />
+            <Route path="/playground" element={<Playground />}>
+              <Route index element={<Navigate to="/playground/inputs" replace />} />
+              <Route path="inputs" element={<InputCatalog />} />
+              <Route path="buttons" element={<ButtonCatalog />} />
+              <Route path="tables" element={<TableCatalog />} />
+              <Route path="gantt" element={<GanttCatalog />} />
+              <Route path="forms" element={<FormsCatalog />} />
+              <Route path="modals" element={<PopUpCatalog />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />
-        </Route>
-
-        {/* Vistas publicas de demostracion */}
-        <Route path="/gantt" element={<GanttStandalone />} />
-        <Route path="/playground" element={<Playground />}>
-          <Route index element={<Navigate to="/playground/inputs" replace />} />
-          <Route path="inputs" element={<InputCatalog />} />
-          <Route path="buttons" element={<ButtonCatalog />} />
-          <Route path="tables" element={<TableCatalog />} />
-          <Route path="gantt" element={<GanttCatalog />} />
-          <Route path="forms" element={<FormsCatalog />} />
-          <Route path="modals" element={<PopUpCatalog />} />
         </Route>
       </Routes>
     </Suspense>

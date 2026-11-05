@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useGoBack } from '../../navigation/useGoBack'
 import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
 import Badge from '../../components/ui/badge/Badge'
 import { ROLE_LABELS } from '../../config/app.config'
@@ -22,6 +23,7 @@ function roleLabel(role: string) {
 /** 403: the route exists but the active role cannot open it. */
 export default function ForbiddenPage({ moduleTitle, currentRole, requiredRoles }: ForbiddenPageProps) {
     const navigate = useNavigate()
+    const goBack = useGoBack()
     const target = moduleTitle ?? 'esta sección'
 
     return (
@@ -43,7 +45,7 @@ export default function ForbiddenPage({ moduleTitle, currentRole, requiredRoles 
                     >
                         Contactar soporte
                     </ButtonComponent>
-                    <ButtonComponent variant="ghost" leftIcon={<ArrowLeftIcon className="size-4" />} onClick={() => navigate(-1)}>
+                    <ButtonComponent variant="ghost" leftIcon={<ArrowLeftIcon className="size-4" />} onClick={goBack}>
                         Atrás
                     </ButtonComponent>
                 </>
