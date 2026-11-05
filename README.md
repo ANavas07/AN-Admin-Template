@@ -38,8 +38,11 @@ pnpm dev
 ```
 
 The dev server prints a local URL (Vite defaults to `http://localhost:5173`).
-Any email + password gets you in — login is mocked and just writes a token to
-`localStorage`.
+It opens the public entry page; sign in from its **Ingresar** section
+(`/#ingresar`, also reachable at `/login`). Any email with a password of 6+
+characters works (or use *Usar cuenta de demostración*): login is mocked and
+just writes a token to `localStorage`. Opening any private link while signed
+out takes you to that section and returns you to the link after signing in.
 
 ## Scripts
 
@@ -67,9 +70,9 @@ backed by environment variables declared in [`.env.example`](.env.example).
 
 | Variable | Default | Used for |
 | --- | --- | --- |
-| `VITE_APP_NAME` | `Sistema de Gestión` | Application name (navbar, login) |
+| `VITE_APP_NAME` | `Sistema de Gestión` | Application name (navbar, entry page) |
 | `VITE_APP_SHORT_NAME` / `VITE_APP_TAGLINE` | `SG` / `Panel administrativo` | Logo initials and the line under the name |
-| `VITE_APP_ORGANIZATION` | `Mi Organización` | Organization shown in the sidebar and on the login |
+| `VITE_APP_ORGANIZATION` | `Mi Organización` | Organization shown in the sidebar and on the entry page |
 | `VITE_APP_LOCATION` | `Sede principal` | Location shown in the dashboard sidebar |
 | `VITE_API_BASE_URL` | `http://localhost:3000/api` | Base URL for `src/services/http.ts` |
 | `VITE_USE_MOCK_API` | `true` | Answers the RBAC REST calls (roles, permissions, groups, audit) in the browser; set `false` when your backend is ready |
@@ -110,7 +113,7 @@ src/
 │   ├── help/                Knowledge base, documentation, UI catalog
 │   ├── account/             Profile, preferences, security
 │   ├── system/              404, 403, 500 and maintenance pages
-│   └── auth/                Login
+│   └── auth/                Entry page (landing) with the sign-in section
 ├── utils/                   Small shared helpers (cn, format, attachments, text)
 └── css/
     ├── theme.css            Design tokens (light + dark), the single source of truth
@@ -232,7 +235,7 @@ support hover and keyboard exploration (arrow keys), and work in both themes.
 
 ### Code splitting
 
-Only `Login` and the dashboard ship in the initial bundle. Every other module —
+Only the entry page and the dashboard ship in the initial bundle. Every other module —
 Gantt, the process designer, dnd-kit boards, tables, the playground — is loaded
 on demand through `React.lazy` behind a single `<Suspense>` boundary, so opening
 the home page does not download code the user may never visit.

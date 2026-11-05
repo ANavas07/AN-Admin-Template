@@ -39,8 +39,11 @@ pnpm dev
 ```
 
 El servidor de desarrollo imprime la URL local (Vite usa `http://localhost:5173`
-por defecto). Entra con cualquier correo y contraseña: el login está simulado y
-solo escribe un token en `localStorage`.
+por defecto). Abre la página pública de entrada; inicia sesión desde su sección
+**Ingresar** (`/#ingresar`, también en `/login`). Funciona cualquier correo con
+una contraseña de 6 caracteres o más (o *Usar cuenta de demostración*): el login
+está simulado y solo escribe un token en `localStorage`. Si abres un enlace
+privado sin sesión, llegas a esa sección y al entrar vuelves a ese enlace.
 
 ## Scripts
 
@@ -113,7 +116,7 @@ src/
 │   ├── help/                Base de conocimiento, documentación, catálogo de UI
 │   ├── account/             Perfil, preferencias, seguridad
 │   ├── system/              Páginas 404, 403, 500 y mantenimiento
-│   └── auth/                Inicio de sesión
+│   └── auth/                Página de entrada con la sección para iniciar sesión
 ├── utils/                   Utilidades compartidas (cn, format, attachments, text)
 └── css/
     ├── theme.css            Tokens de diseño (claro + oscuro), fuente única de verdad
@@ -239,7 +242,7 @@ en ambos temas.
 
 ### División de código (code splitting)
 
-Solo `Login` y el dashboard viajan en el bundle inicial. Todos los demás módulos
+Solo la página de entrada y el dashboard viajan en el bundle inicial. Todos los demás módulos
 — Gantt, el diseñador de procesos, los tableros con dnd-kit, las tablas, el
 playground — se cargan bajo demanda con `React.lazy` detrás de un único
 `<Suspense>`. Abrir el home ya no descarga código que el usuario quizá nunca

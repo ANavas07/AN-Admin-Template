@@ -9,6 +9,10 @@ import type { ModuleCategory, ModuleDefinition, ModulePage } from './modules'
 /** Ruta del home, que no es un modulo del catalogo. */
 export const HOME_PATH = '/dashboard'
 
+/** Pagina publica de entrada y la seccion donde se inicia sesion (`/#ingresar`). */
+export const LANDING_PATH = '/'
+export const SIGN_IN_SECTION_ID = 'ingresar'
+
 export function hasModuleAccess(module: ModuleDefinition, role: string) {
     return !module.requiredRoles || module.requiredRoles.includes(role)
 }

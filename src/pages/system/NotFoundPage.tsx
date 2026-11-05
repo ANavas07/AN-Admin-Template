@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useGoBack } from '../../navigation/useGoBack'
 import { useCommandPalette } from '../../components/common/command-palette/command-palette-context'
 import ModuleIcon from '../../components/common/modules/ModuleIcon'
 import ButtonComponent from '../../components/ui/buttons/ButtonComponent'
@@ -18,6 +19,7 @@ const SUGGESTIONS = [
 export default function NotFoundPage() {
     const { pathname } = useLocation()
     const navigate = useNavigate()
+    const goBack = useGoBack()
     const { open: openPalette } = useCommandPalette()
 
     return (
@@ -44,7 +46,7 @@ export default function NotFoundPage() {
                             <Kbd>K</Kbd>
                         </span>
                     </ButtonComponent>
-                    <ButtonComponent variant="ghost" leftIcon={<ArrowLeftIcon className="size-4" />} onClick={() => navigate(-1)}>
+                    <ButtonComponent variant="ghost" leftIcon={<ArrowLeftIcon className="size-4" />} onClick={goBack}>
                         Atrás
                     </ButtonComponent>
                 </>
